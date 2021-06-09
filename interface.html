@@ -8,37 +8,216 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="activeEvent" class="event card">
-        <div id="rollAmounts" class="stat-box">
-            <div id="activePlayerRolls" class="roll-count">X</div>
-            <div id="supportPlayerRolls" class="roll-count">Y</div>
-        </div>
-        <div id="eventTitle" class="stat-box">Event Title</div>
-        <div id="eventStages" class="stat-box">
-            <div id="eventStage1" class="event-stage">
-                <div id="eventHP">XX</div>
-                <div id="eventDEF">YY</div>
-                <div id="eventDescription"></div>
+    <div id="gameboard">
+        <div id="activeEvent" class="event-card card">
+            <div id="eventImage">
+                <!--<img src="blank" alt="this is the event image">-->
+            </div>
+            <div id="rollAmounts" class="stat-box">
+                <div>Roll Counts:</div>
+                <div id="activePlayerRolls" class="roll-count">X</div>
+                <div id="supportPlayerRolls" class="roll-count">Y</div>
+            </div>
+            <div id="eventTitle" class="stat-box">Event Title</div>
+            <div id="eventStages" class="stat-box">
+                <div id="eventStage1" class="event-stage">
+                    <div id="eventHP1" class="stage-icon">
+                        HP: <span class="eventHPCounter">XX</span></div>
+                    <div id="eventDEF1" class="stage-icon">
+                        DMG: <span class="eventDMGstat">YY</span></div>
+                    <div id="eventDescription1" class="stage-description">
+                        <span class="eventDetails">This event is eventful.</span></div>
+                </div>
+                <div id="eventStage2" class="event-stage">
+                    <div id="eventHP2" class="stage-icon">
+                        HP: <span class="eventHPCounter">XX</span></div>
+                    <div id="eventDEF2" class="stage-icon">
+                        DMG: <span class="eventDMGstat">YY</span></div>
+                    <div id="eventDescription2" class="stage-description">
+                        <span class="eventDetails">This event is eventful.</span></div>
+                </div>
+                <div id="eventStage3" class="event-stage hidden">
+                    <div id="eventHP3" class="stage-icon">
+                        HP: <span class="eventHPCounter">XX</span></div>
+                    <div id="eventDEF3" class="stage-icon">
+                        DMG: <span class="eventDMGstat">YY</span></div>
+                    <div id="eventDescription3" class="stage-description">
+                        <span class="eventDetails">This event is eventful.</span></div>
+                </div>
+                <div id="eventStage4" class="event-stage hidden">
+                    <div id="eventHP4" class="stage-icon">
+                        HP: <span class="eventHPCounter">XX</span></div>
+                    <div id="eventDEF4" class="stage-icon">
+                        DMG: <span class="eventDMGstat">YY</span></div>
+                    <div id="eventDescription4" class="stage-description">
+                        <span class="eventDetails">This event is eventful.</span></div>
+                </div>
+
+
             </div>
         </div>
-    </div>
-    <div class="active-Player-Card card">
-        <div id="actveRolls" class="roll-dash">
-            <button id="rollButton" type="button">Roll</button>
-            <p>Rolls left:<span id="roll-counter">0</span></p>
-        </div>
-    <div id="activePlayerHand" class="player-hand">
-        <div class="die slot-1">
-            <p>X</p>
-        </div>
-        <div class="die slot-2">
-            <p>X</p>
-        </div>
-        <div class="die slot-3">
-            <p>X</p>
-        </div>
-        <div class="die slot-4">
-            <p>X</p>
+        <div id="activePlayerCard" class="active card">
+            <div id="activePlayerPortrait" class="portrait">
+                <!-- <img src="twitchProfilePic" alt="active player portrait"> -->
+            </div>
+            <div id="activePlayerName" class="player-name">
+                Username
+            </div>
+            <div id="activePlayerClass" class="player-class">
+                Class
+            </div>
+            <div id="activePlayerHP" class="player-HP">
+                00
+            </div>
+            <div id="activePlayerAbility" class="ability">
+                <button id="activePlayerAbilityUsesLeft" class="ability-uses">X</button>
+                Text for the ability.
+            </div>
+            <div id="activePlayerAtacks" class="stat-box">
+                <div id="attack1" class="player-attack">
+                    <div class="attack-requirments">
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                    </div>
+                    <div class="attack-name">Attack Name</div>
+                    <div class="attack-damage">YY</div>
+                    <div class="attack-augment">Pierce 5</div>
+                </div>
+                <div id="attack2" class="player-attack">
+                    <div class="attack-requirments">
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                    </div>
+                    <div class="attack-name">Attack Name</div>
+                    <div class="attack-damage">YY</div>
+                    <div class="attack-augment">Pierce 5</div>
+                </div>
+                <div id="attack3" class="player-attack hidden">
+                    <div class="attack-requirments">
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                    </div>
+                    <div class="attack-name">Attack Name</div>
+                    <div class="attack-damage">YY</div>
+                    <div class="attack-augment">Pierce 5</div>
+                </div>
+                <div id="attack4" class="player-attack hidden">
+                    <div class="attack-requirments">
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                    </div>
+                    <div class="attack-name">Attack Name</div>
+                    <div class="attack-damage">YY</div>
+                    <div class="attack-augment">Pierce 5</div>
+                </div>
+                <div id="attack5" class="player-attack hidden">
+                    <div class="attack-requirments">
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                    </div>
+                    <div class="attack-name">Attack Name</div>
+                    <div class="attack-damage">YY</div>
+                    <div class="attack-augment">Pierce 5</div>
+                </div>
+                <div id="attack6" class="player-attack hidden">
+                    <div class="attack-requirments">
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                    </div>
+                    <div class="attack-name">Attack Name</div>
+                    <div class="attack-damage">YY</div>
+                    <div class="attack-augment">Pierce 5</div>
+                </div>
+                <div id="attack7" class="player-attack hidden">
+                    <div class="attack-requirments">
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                    </div>
+                    <div class="attack-name">Attack Name</div>
+                    <div class="attack-damage">YY</div>
+                    <div class="attack-augment">Pierce 5</div>
+                </div>
+                <div id="attack8" class="player-attack hidden">
+                    <div class="attack-requirments">
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                        <span class="attack-req">X</span>
+                    </div>
+                    <div class="attack-name">Attack Name</div>
+                    <div class="attack-damage">YY</div>
+                    <div class="attack-augment">Pierce 5</div>
+                </div>
+
+            </div>
+            <div id="actveRolls" class="roll-dash">
+                <button id="rollButton" type="button">Roll</button>
+                <p>Rolls left:<span id="roll-counter">0</span></p>
+            <div id="activePlayerHand" class="player-hand">
+                <div id="activeSlot1" class="hand-slot">
+                    <div class="die">X</div>
+                    <button class="keep" type="button">Keep</button>
+                </div>
+                <div id="activeSlot2" class="hand-slot">
+                    <div class="die">X</div>
+                    <button class="keep" type="button">Keep</button>
+                </div>
+                <div id="activeSlot3" class="hand-slot">
+                    <div class="die">X</div>
+                    <button class="keep" type="button">Keep</button>
+                </div>
+                <div id="activeSlot4" class="hand-slot">
+                    <div class="die">X</div>
+                    <button class="keep" type="button">Keep</button>
+                </div>
+
+            </div>
         </div>
     </div>
     <script src="main.js"></script>

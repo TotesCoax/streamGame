@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="activeEvent" class="event card">
+        <div id="rollAmounts" class="stat-box">
+            <div id="activePlayerRolls" class="roll-count">X</div>
+            <div id="supportPlayerRolls" class="roll-count">Y</div>
+        </div>
+        <div id="eventTitle" class="stat-box">Event Title</div>
+        <div id="eventStages" class="stat-box">
+            <div id="eventStage1" class="event-stage">
+                <div id="eventHP">XX</div>
+                <div id="eventDEF">YY</div>
+                <div id="eventDescription"></div>
+            </div>
+        </div>
+    </div>
+    <div class="active-Player-Card card">
+        <div id="actveRolls" class="roll-dash">
+            <button id="rollButton" type="button">Roll</button>
+            <p>Rolls left:<span id="roll-counter">0</span></p>
+        </div>
+    <div id="activePlayerHand" class="player-hand">
+        <div class="die slot-1">
+            <p>X</p>
+        </div>
+        <div class="die slot-2">
+            <p>X</p>
+        </div>
+        <div class="die slot-3">
+            <p>X</p>
+        </div>
+        <div class="die slot-4">
+            <p>X</p>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

@@ -115,3 +115,7 @@ html {
 #inactivePlayersContainer {
     display: flex;
 }
+
+.inactive {
+    height: 100px;
+}

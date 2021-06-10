@@ -1,16 +1,16 @@
 //Grab the Active player hand
-let activePlayerHand = document.getElementById("activePlayerHand").children
-console.log(activePlayerHand)
+let dice = document.getElementsByClassName("die")
+console.log(dice)
 
 //Setting up the Roll Listeners
 document.getElementById("rollButton").addEventListener("click", rollHand)
 
 //Hand Roller
 function rollHand() {
-    for (let i = 0; i < activePlayerHand.length; i++) {
-        activePlayerHand[i].innerText = d6Roll()
+    for (let i = 0; i < dice.length; i++) {
+        dice[i].innerText = d6Roll()
     }
-    console.log(activePlayerHand.children);
+    console.log(dice);
 }
 
 //Dice Roller

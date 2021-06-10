@@ -6,6 +6,8 @@ html {
 #gameboard{
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .hidden {
@@ -17,11 +19,16 @@ html {
 .card {
     border: 5px solid black;
     border-radius: 10px;
+    width: 250px;
 }
 
 .stat-box {
     background-color: white;
     border: 1px dashed green;
+}
+
+.exhausted {
+    opacity: .5;
 }
 
 /*Active Event formatting*/
@@ -67,10 +74,9 @@ html {
 }
 
 
-/*Active player formatting*/
+/*Active players formatting*/
 
 #activePlayerCard {
-    width: 250px;
     height: 400px;
     background: lightcoral
 }
@@ -102,4 +108,10 @@ html {
 
 .attack-req {
     font-size: 6pt;
+}
+
+/* Inactive Players Formatting */
+
+#inactivePlayersContainer {
+    display: flex;
 }

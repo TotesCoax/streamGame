@@ -13,10 +13,10 @@ function rollHand() {
     console.log(dice);
 }
 
-//Dice Roller
+/*Dice Roller
 function dieRoll(num) {
     return Math.floor(Math.random() * num) + 1
-}
+}*/
 
 // Creating the classes 
 
@@ -27,6 +27,14 @@ class Die {
         this.value = 0
         this.keep = false
         this.redeemed = false
+    }
+
+    rollDie()  {
+        this.value = Math.floor(Math.random() * 6) + 1
+    }
+
+    markKeep() {
+        this.keep = true
     }
 }
 
@@ -42,6 +50,10 @@ class Item {
         this.abilityValue = abilityValue
         this.holder = ""
         this.consumed = false
+    }
+
+    use() {
+        this.consumed = true
     }
 }
 

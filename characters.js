@@ -1,11 +1,14 @@
 //Playstyle object holds the mechanics for each character class the players will use. Each mechanic is it's own object as well.
 
-//I still need to add in the more specific mechanics to each character but this will do for now just to get some core programming setup.
+//I still need to add in the more specific mechanics to each character attack but this will do for now just to get some core programming setup.
+
+//Make an Attack class object?
 
 let Playstyle = {
     Brash: {
+        "status":"inactive",
         "title": "the brash",
-        "hp":[10,15,20],
+        "hpMax":[10,15,20],
         "dmg": 0,
         "abilityMax": 0,
         "abilityUse": 0,
@@ -27,8 +30,9 @@ let Playstyle = {
     },
 
     Elegant: {
+        "status":"inactive",
         "title": "the elegant",
-        "hp":[8,12,16],
+        "hpMax":[8,12,16],
         "dmg": 0,
         "abilityMax": 0,
         "abilityUse": 0,
@@ -69,8 +73,9 @@ let Playstyle = {
     },
 
     Staunch: {
+        "status":"inactive",
         "title": "the staunch",
-        "HP":[12,18,24],
+        "HPMax":[12,18,24],
         "dmg": 0,
         "abilityMax": 0,
         "abilityUse": 0,
@@ -94,8 +99,9 @@ let Playstyle = {
     },
 
     Sly: {
+        "status":"inactive",
         "title":"the sly",
-        "hp":[10,15,20],
+        "hpMax":[10,15,20],
         "dmg": 0,
         "abilityMax": 0,
         "abilityUse": 0,
@@ -119,8 +125,9 @@ let Playstyle = {
     },
 
     Eccentric: {
+        "status":"inactive",
         "title":"the eccentric",
-        "hp":[8,12,16],
+        "hpMax":[8,12,16],
         "dmg": 0,
         "abilityMax": 0,
         "abilityUse": 0,
@@ -139,8 +146,9 @@ let Playstyle = {
     },
 
     Serene: {
+        "status":"inactive",
         "title":"the serene",
-        "hp":[8,12,16],
+        "hpMax":[8,12,16],
         "dmg": 0,
         "abilityMax": 0,
         "abilityUse": 0,

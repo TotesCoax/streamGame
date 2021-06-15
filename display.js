@@ -1,61 +1,17 @@
 //Grab the Active player hand
 let dice = document.getElementsByClassName("die")
-console.log(dice)
+//console.log(dice)
 
-//Setting up the Roll Listeners
-document.getElementById("rollButton").addEventListener("click", rollHand)
+let activePlayer = document.getElementById("activePlayerCard")
+// console.log(activePlayer);
 
-//Hand Roller
-function rollHand() {
-    for (let i = 0; i < dice.length; i++) {
-        dice[i].innerText = dieRoll(6)
-    }
-    console.log(dice);
-}
+let activeEvent = document.getElementById("activeEvent")
+// console.log(activeEvent);
+activeEvent.name = document.getElementById("eventTitle")
 
-/*Dice Roller
-function dieRoll(num) {
-    return Math.floor(Math.random() * num) + 1
-}*/
 
-// Creating the classes 
 
-// Die Object
 
-class Die {
-    constructor() {
-        this.value = 0
-        this.keep = false
-        this.redeemed = false
-    }
-
-    rollDie()  {
-        this.value = Math.floor(Math.random() * 6) + 1
-    }
-
-    markKeep() {
-        this.keep = true
-    }
-}
-
-// Item Object
-
-class Item {
-    constructor(name, type, abilityName, abilityText, abilityType, abilityValue) {
-        this.name = name
-        this.type = type
-        this.abilityName = abilityName
-        this.abilityText = abilityText
-        this.abilityType = abilityType
-        this.abilityValue = abilityValue
-        this.holder = ""
-        this.consumed = false
-    }
-
-    use() {
-        this.consumed = true
-    }
-}
 
 
 // Turn system

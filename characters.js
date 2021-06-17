@@ -2,10 +2,8 @@
 
 //I still need to add in the more specific mechanics to each character attack but this will do for now just to get some core programming setup.
 
-//Make an Attack class object?
-
 let Playstyle = {
-    Brash: {
+    brash: {
         "status":"inactive",
         "title": "the brash",
         "hpMax":[10,15,20],
@@ -29,7 +27,7 @@ let Playstyle = {
         }
     },
 
-    Elegant: {
+    elegant: {
         "status":"inactive",
         "title": "the elegant",
         "hpMax":[8,12,16],
@@ -72,7 +70,7 @@ let Playstyle = {
         }
     },
 
-    Staunch: {
+    staunch: {
         "status":"inactive",
         "title": "the staunch",
         "HPMax":[12,18,24],
@@ -98,7 +96,7 @@ let Playstyle = {
         }
     },
 
-    Sly: {
+    sly: {
         "status":"inactive",
         "title":"the sly",
         "hpMax":[10,15,20],
@@ -124,7 +122,7 @@ let Playstyle = {
         }
     },
 
-    Eccentric: {
+    eccentric: {
         "status":"inactive",
         "title":"the eccentric",
         "hpMax":[8,12,16],
@@ -145,7 +143,7 @@ let Playstyle = {
         }
     },
 
-    Serene: {
+    serene: {
         "status":"inactive",
         "title":"the serene",
         "hpMax":[8,12,16],
@@ -170,3 +168,4 @@ let Playstyle = {
         }
     }
 }
+

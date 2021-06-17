@@ -1,7 +1,7 @@
 //Eventually, use a class to make all of these so it will be easier to add new events
 //maybe link it to an outside spreadsheet.
 
-let event1Deck = [
+let scenario1Deck = [
     /*
     {"name":"cardName",
     "tier":1,

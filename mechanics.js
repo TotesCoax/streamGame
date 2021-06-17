@@ -8,6 +8,9 @@ class Player {
         //this.profilePic = profilePic
         this.playstyle = Playstyle[playstyle.toLowerCase()]
         this.inventory = []
+        this.currentRerolls = 0
+        this.abilityScenarioMax = 0
+        this.abilityCounter = 0
     }
 }
 
@@ -36,6 +39,7 @@ let board = {
     "scenario": [],
     "activePlayerDice": [],
     "suppPlayerDice": [],
+    "attackHand": [],
     "rerolls": 0,
     "noAbilities": false
 }
@@ -43,6 +47,7 @@ let board = {
 //Test Player generator
 populatePlayers()
 //Perhaps include a sort of ready check in the future before this function executes
+//This will later be filled with some fancy shit that lets twitch users log in and control
 function populatePlayers(){
         //Count the number of players
     let numPlayers = prompt("How many players?")
@@ -63,24 +68,46 @@ function populatePlayers(){
 //Prepare the item deck
 prepareItemDeck()
 function prepareItemDeck(){
+    console.log("Preparing the item deck")
     board.itemDeck = shuffle(lootDeck)
     console.log("Item deck has been shuffled")
     console.log(board.itemDeck)
 }
 
+//--------------------//
+//Scenario setup phase
+//--------------------//
+function setupScenario(){
+    prepareScenario(scenario1Deck)
+    prepareAbilities(board.level, board.players)
+    setRerolls(board.scenario[board.level])
+    
+}
+
 //Activate a scenario
-prepareScenario(scenario1Deck)
 function prepareScenario(deck){
+    console.log("Preparing the scenario");
     shuffle(deck)
     board.scenario.push(deck.shift())
-    console.log("The event has bene prepared")
+    console.log("The scenario has bene prepared")
     console.log(board.scenario)
 }
 
-//Populating the player hands 
+//Prepare/refresh all player abilities counter
+function prepareAbilities(level, players){
+    console.log("Setting the abilty counts for the scenario")
+    for (let i = 0; i < players.length; i++){
+        console.log("For player: " + players[i].username + " Ability max from card:" + players[i].playstyle.abilityMax[level][players.length - 2])
+        players[i].abilityScenarioMax = players[i].playstyle.abilityMax[level][players.length - 2]
+        console.log("Scenario ability count set to:" + players[i].abilityScenarioMax)
+    }
+    console.log("The ability counter has been prepared")
+}
 
-setRerolls(board.scenario[board.level])
+
+//Populating the player hands 
 function setRerolls(scenario){
+    console.log("Setting player hands for the scenario");
     let activeNum = scenario.activeDice,
         suppNum = scenario.suppDice
     
@@ -99,10 +126,9 @@ function setRerolls(scenario){
     console.log(board.suppPlayerDice)
 }
 
-//YOU LEFT OFF HERE
-
-
-
+//--------------------//
+//End of Scenario setup
+//--------------------//
 
 //Hand operations
 
@@ -153,8 +179,8 @@ function resetHand(hand) {
             //Confirm player wants to engage ability
             //Choose and confirm target of ability
             //Execute ability change
-            //Move to attack Phase
-                //Confirm player wants to move to attack phase
+        //Move to attack Phase
+            //Confirm player wants to move to attack phase
         //Attack phase
             //Execute an attack
                 //Assign dice to attack(s)
@@ -189,6 +215,10 @@ function resetHand(hand) {
 
                     //Give item to new player if desired
             //Level Up
+            //Level up function ~ works
+            function boardLevelUp() {
+                board.level++
+            }
                 //First level up (to level 2)
                     //Unlock tier 2 attack for all players
                 //Second Level up (to level 3)

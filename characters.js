@@ -8,8 +8,7 @@ let Playstyle = {
         "title": "the brash",
         "hpMax":[10,15,20],
         "dmg": 0,
-        "abilityMax": 0,
-        "abilityUse": 0,
+        "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
         "abilityText": "Change one dice value into a 1 or 6",
         "attack":[
             {"tier": 0, "diceReq": 1, "dmg":1},
@@ -32,8 +31,7 @@ let Playstyle = {
         "title": "the elegant",
         "hpMax":[8,12,16],
         "dmg": 0,
-        "abilityMax": 0,
-        "abilityUse": 0,
+        "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
         "abilityText": "Flip up to two standard dice to their opposite sides.",
         "attack":[
             {"tier": 0, "diceReq": 2, "dmg":1},
@@ -75,8 +73,7 @@ let Playstyle = {
         "title": "the staunch",
         "HPMax":[12,18,24],
         "dmg": 0,
-        "abilityMax": 0,
-        "abilityUse": 0,
+        "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
         "abilityText": "Change up to two standard dice to a value of 5",
         "attack":[
             {"tier": 0, "diceReq": 1, "dmg":1},
@@ -101,8 +98,7 @@ let Playstyle = {
         "title":"the sly",
         "hpMax":[10,15,20],
         "dmg": 0,
-        "abilityMax": 0,
-        "abilityUse": 0,
+        "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
         "abilityText": "Change up to two standard dice to a value of 2",
         "attack":[
             {"tier": 0, "diceReq": 1, "dmg":1},
@@ -127,8 +123,7 @@ let Playstyle = {
         "title":"the eccentric",
         "hpMax":[8,12,16],
         "dmg": 0,
-        "abilityMax": 0,
-        "abilityUse": 0,
+        "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
         "abilityText": "Pick a value among all dice. Increase or decrease all the value of all dice with that value by 1. Min value of 1 and max value of 6.",
         "attack":[
             {"tier": 0, "diceReq": 1, "dmg":1},
@@ -148,8 +143,7 @@ let Playstyle = {
         "title":"the serene",
         "hpMax":[8,12,16],
         "dmg": 0,
-        "abilityMax": 0,
-        "abilityUse": 0,
+        "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
         "abilityText": "Pick a player. That player restores 1 use of their ability (up to their max).",
         "attack":[
             {"tier": 0, "diceReq": 1, "dmg":1},

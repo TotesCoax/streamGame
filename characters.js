@@ -7,7 +7,6 @@ let Playstyle = {
         "status":"inactive",
         "title": "the brash",
         "hpMax":[10,15,20],
-        "dmg": 0,
         "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
         "abilityText": "Change one dice value into a 1 or 6",
         "attack":[
@@ -17,7 +16,8 @@ let Playstyle = {
             {"tier": 1, "diceReq": 6, "dmg":16},
             {"tier": 2, "diceReq": 8, "dmg":27}
         ],
-        "ability": function(target, newValue) {
+        "ability": function(target) {
+            let newValue = prompt("What would you like to change it to? Must be 1 or 6")
             if (newValue === 1 || newValue === 6 ) {
             target.value = newValue
             } else {
@@ -30,7 +30,6 @@ let Playstyle = {
         "status":"inactive",
         "title": "the elegant",
         "hpMax":[8,12,16],
-        "dmg": 0,
         "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
         "abilityText": "Flip up to two standard dice to their opposite sides.",
         "attack":[
@@ -72,7 +71,6 @@ let Playstyle = {
         "status":"inactive",
         "title": "the staunch",
         "HPMax":[12,18,24],
-        "dmg": 0,
         "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
         "abilityText": "Change up to two standard dice to a value of 5",
         "attack":[
@@ -97,7 +95,6 @@ let Playstyle = {
         "status":"inactive",
         "title":"the sly",
         "hpMax":[10,15,20],
-        "dmg": 0,
         "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
         "abilityText": "Change up to two standard dice to a value of 2",
         "attack":[
@@ -122,7 +119,6 @@ let Playstyle = {
         "status":"inactive",
         "title":"the eccentric",
         "hpMax":[8,12,16],
-        "dmg": 0,
         "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
         "abilityText": "Pick a value among all dice. Increase or decrease all the value of all dice with that value by 1. Min value of 1 and max value of 6.",
         "attack":[
@@ -142,7 +138,6 @@ let Playstyle = {
         "status":"inactive",
         "title":"the serene",
         "hpMax":[8,12,16],
-        "dmg": 0,
         "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
         "abilityText": "Pick a player. That player restores 1 use of their ability (up to their max).",
         "attack":[

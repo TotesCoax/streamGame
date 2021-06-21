@@ -11,6 +11,15 @@ class Player {
         this.currentRerolls = 0
         this.abilityScenarioMax = 0
         this.abilityCounter = 0
+        this.dmgCounter = 0
+    }
+}
+
+class Scenario {
+    constructor(scenarioCard) {
+        this.card = scenarioCard
+        this.dmgCounter = 0
+        this.defeated = false
     }
 }
 
@@ -36,13 +45,14 @@ let board = {
     "players": [],
     "level": 0,
     "itemDeck": [],
-    "scenario": [],
+    "scenarios": [],
     "activePlayerDice": [],
     "suppPlayerDice": [],
     "attackHand": [],
     "rerolls": 0,
-    "noAbilities": false
 }
+
+
 
 //Test Player generator
 populatePlayers()
@@ -77,8 +87,8 @@ function prepareItemDeck(){
 //--------------------//
 //Scenario setup phase
 //--------------------//
-function setupScenario(){
-    prepareScenario(scenario1Deck)
+function setupScenario(deck){
+    prepareScenario(deck)
     prepareAbilities(board.level, board.players)
     setRerolls(board.scenario[board.level])
     
@@ -89,7 +99,7 @@ function prepareScenario(deck){
     console.log("Preparing the scenario");
     shuffle(deck)
     board.scenario.push(deck.shift())
-    console.log("The scenario has bene prepared")
+    console.log("The scenario has been prepared")
     console.log(board.scenario)
 }
 

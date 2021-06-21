@@ -36,8 +36,27 @@ class Die {
 
 //Attack mechanics
 
+//Attack function
+// "attackSubmission" refers to the array of dice they are submitting as an attack
+
+//If the # of dice is met, and the attack fits the style, dmg is issued
+function attack(diceReq, attackSubmission, check, style, dmg) {
+    //If the number of dice required is met AND the character mechanic is met, assign dmg
+    if (check(diceReq, attackSubmission) && style(attackSubmission)){
+        console.log("Attack succeeds. " + dmg + " damage has been issued");
+        return dmg
+    }
+}
+
+//Check for required number of dice
+function numDiceCheck(diceReq, attackSubmission){
+    console.log((diceReq === attackSubmission.length))
+    return diceReq === attackSubmission.length
+}
+
 //Simple value checker for basic attacks
 function checkValue(val, die){
+    console.log(val + " = " + die.value + "?");
     return val === die.value
 }
 

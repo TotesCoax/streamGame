@@ -46,8 +46,10 @@ let board = {
     "level": 0,
     "itemDeck": [],
     "scenarios": [],
-    "activePlayerDice": [],
-    "suppPlayerDice": [],
+    "dicePool": {
+        "active": [],
+        "support": []
+    },
     "attackHand": [],
     "rerolls": 0,
 }
@@ -90,7 +92,7 @@ function prepareItemDeck(){
 function setupScenario(deck){
     prepareScenario(deck)
     prepareAbilities(board.level, board.players)
-    setRerolls(board.scenario[board.level])
+    setRerolls(board.scenarios[board.level])
     
 }
 
@@ -98,9 +100,9 @@ function setupScenario(deck){
 function prepareScenario(deck){
     console.log("Preparing the scenario");
     shuffle(deck)
-    board.scenario.push(deck.shift())
+    board.scenarios.push(deck.shift())
     console.log("The scenario has been prepared")
-    console.log(board.scenario)
+    console.log(board.scenarios)
 }
 
 //Prepare/refresh all player abilities counter
@@ -192,6 +194,7 @@ function resetHand(hand) {
         //Move to attack Phase
             //Confirm player wants to move to attack phase
         //Attack phase
+            //Clone attack hand
             //Execute an attack
                 //Assign dice to attack(s)
                     //check if assignment is valid
@@ -213,6 +216,8 @@ function resetHand(hand) {
             //Check if phase has more dmg than current HP
                 //If so, clear DMG and move to next phase
                 //If no next phase, scenario cleared
+            //Check if any PLAYER has more dmg than current HP max
+                //if yes, game over
         
         //Scenarion Cleared
             //Loot Phase

@@ -11,7 +11,8 @@ class Die {
     constructor(i) {
         this.value = 0
         this.keep = false
-        this.redeemed = false
+        this.redeemmed = false
+        this.submitted = false
     }
 
     rollDie()  {
@@ -20,24 +21,40 @@ class Die {
         }
     }
 
-    markKeep() {
+    keep() {
         this.keep = true
     }
 
     redeem() {
-        this.redeemed = true
+        this.redeemmed = true
+    }
+
+    submit() {
+        this.submitted = true
     }
 
     reset() {
         this.keep = false
         this.redeemed = false
+        this.submitted = false
     }
 }
 
 //Attack mechanics
 
 //Attack function
-// "attackSubmission" refers to the array of dice they are submitting as an attack
+//Generating an attack submission
+function createAttackSubmission(handArray) {
+    let attackSubmission = []
+    for (let i = 1; i < handArray.length; i++){
+        console.log(handArray)
+        if (handArray[i].submitted){
+            console.log()
+        }
+    }
+
+    
+}
 
 //If the # of dice is met, and the attack fits the style, dmg is issued
 function attack(diceReq, attackSubmission, check, style, dmg) {
@@ -45,6 +62,9 @@ function attack(diceReq, attackSubmission, check, style, dmg) {
     if (check(diceReq, attackSubmission) && style(attackSubmission)){
         console.log("Attack succeeds. " + dmg + " damage has been issued");
         return dmg
+    } else {
+        console.log("The attack did not succeed")
+        return false
     }
 }
 

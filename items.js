@@ -4,14 +4,12 @@ let lootDeck = [
     /*{"name":"cardName",
     "type":"type",
     "description":"itemDescription",
-    "holder":"playerName",
     "consumed":false,
     "ability":function(){}}*/
     
     {"name":"Coat",
     "type":"equipment",
     "description":"The holder of this item reduces damage by 1 per damage instance",
-    "holder":"playerName",
     "consumed":false,
     "ability":function(){
         alert(this.name + " effect has been applied")
@@ -21,7 +19,6 @@ let lootDeck = [
     {"name":"Ring",
     "type":"equipment",
     "description":"The holder of this item gets 1 extra reroll per turn",
-    "holder":"playerName",
     "consumed":false,
     "ability":function(){
         alert(this.name + " effect has been applied")
@@ -31,7 +28,6 @@ let lootDeck = [
     {"name":"Sword",
     "type":"equipment",
     "description":"The holder of this item increases all damage dealt by 1 per damage instance",
-    "holder":"playerName",
     "consumed":false,
     "ability":function(){
         alert(this.name + " effect has been applied")
@@ -41,7 +37,6 @@ let lootDeck = [
     {"name":"Ability Potion",
     "type":"consumable",
     "description":"Restore 1 use of ability to target player.",
-    "holder":"playerName",
     "consumed":false,
     "ability":function(){
         alert(this.name + " effect has been applied")
@@ -51,7 +46,6 @@ let lootDeck = [
     {"name":"Ability Potion",
     "type":"consumable",
     "description":"Restore 1 use of ability to target player.",
-    "holder":"playerName",
     "consumed":false,
     "ability":function(){
         alert(this.name + " effect has been applied")
@@ -61,7 +55,6 @@ let lootDeck = [
     {"name":"Healing Potion",
     "type":"consumable",
     "description":"Target player heals up to their max HP.",
-    "holder":"playerName",
     "consumed":false,
     "ability":function(){
         alert(this.name + " effect has been applied")
@@ -71,7 +64,6 @@ let lootDeck = [
     {"name":"Healing Potion",
     "type":"consumable",
     "description":"Target player heals up to their max HP.",
-    "holder":"playerName",
     "consumed":false,
     "ability":function(){
         alert(this.name + " effect has been applied")
@@ -81,7 +73,6 @@ let lootDeck = [
     {"name":"Sacred Relic",
     "type":"consumable",
     "description":"When any player is reduced to 0 or less HP, restore that player's HP to 1. This consumes the item.",
-    "holder":"playerName",
     "consumed":false,
     "ability":function(){
         alert(this.name + " effect has been applied")

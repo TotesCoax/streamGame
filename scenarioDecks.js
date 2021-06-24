@@ -1,6 +1,7 @@
 //Eventually, use a class to make all of these so it will be easier to add new events
 //maybe link it to an outside spreadsheet.
 
+
 let scenario1Deck = [
     /*
     {"name":"cardName",
@@ -323,6 +324,9 @@ let scenario3Deck = [
         }
     ]}
 ]
+
+let scenarios = [scenario1Deck, scenario2Deck, scenario3Deck]
+
 
 let bossDeck = [
     /*

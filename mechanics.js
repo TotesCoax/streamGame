@@ -12,6 +12,8 @@ class Player {
         this.abilityScenarioMax = 0
         this.abilityCounter = 0
         this.dmgCounter = 0
+        this.status = "inactive"
+        //There can be three status: active, support, and inactive
     }
 }
 
@@ -40,109 +42,38 @@ function shuffle(array) {
     return array;
   }
 
-//Gameboard object. To create some global variables and also spots to fetch HTML data from
-let board = {
-    "players": [],
-    "level": 0,
-    "itemDeck": [],
-    "scenarios": [],
-    "dicePool": {
-        "active": [],
-        "support": []
-    },
-    "attackHand": [],
-    "rerolls": 0,
+  //This function increases the board object level.
+  //Other functions care about the board level to set their own values.
+  function boardLevelUp() {
+    board.level++
 }
 
-
-
-//Test Player generator
-populatePlayers()
-//Perhaps include a sort of ready check in the future before this function executes
-//This will later be filled with some fancy shit that lets twitch users log in and control
-function populatePlayers(){
-        //Count the number of players
-    let numPlayers = prompt("How many players?")
-        //set the player array
-    board.players.length = Number(numPlayers)
-        //Populate the player array
-    for (let i = 0; i < board.players.length; i++){
-        //Create a Player object for each user logged in
-        let user = prompt("Username?"),
-            style = prompt("Style?")
-        board.players[i] = new Player(user, style)
-        //console.log(board.players[i]);
-    }
-    console.log("Player array has been populated")
-    console.log(board.players)
+//This function lets a player draw a card from a deck.
+//Currently used just for the item cards.
+function draw(player, deck){
+    console.log(deck, player);
+    player.inventory.push(deck.shift())
 }
-
-//Prepare the item deck
-prepareItemDeck()
-function prepareItemDeck(){
-    console.log("Preparing the item deck")
-    board.itemDeck = shuffle(lootDeck)
-    console.log("Item deck has been shuffled")
-    console.log(board.itemDeck)
-}
-
-//--------------------//
-//Scenario setup phase
-//--------------------//
-function setupScenario(deck){
-    prepareScenario(deck)
-    prepareAbilities(board.level, board.players)
-    setRerolls(board.scenarios[board.level])
-    
-}
-
-//Activate a scenario
-function prepareScenario(deck){
-    console.log("Preparing the scenario");
-    shuffle(deck)
-    board.scenarios.push(deck.shift())
-    console.log("The scenario has been prepared")
-    console.log(board.scenarios)
-}
-
-//Prepare/refresh all player abilities counter
-function prepareAbilities(level, players){
-    console.log("Setting the abilty counts for the scenario")
-    for (let i = 0; i < players.length; i++){
-        console.log("For player: " + players[i].username + " Ability max from card:" + players[i].playstyle.abilityMax[level][players.length - 2])
-        players[i].abilityScenarioMax = players[i].playstyle.abilityMax[level][players.length - 2]
-        console.log("Scenario ability count set to:" + players[i].abilityScenarioMax)
-    }
-    console.log("The ability counter has been prepared")
-}
-
-
-//Populating the player hands 
-function setRerolls(scenario){
-    console.log("Setting player hands for the scenario");
-    let activeNum = scenario.activeDice,
-        suppNum = scenario.suppDice
-    
-    console.log(activeNum, suppNum);
-
-    function populateHand(hand, num){
-        for (let i = 0; i < num; i++){
-        hand[i] = new Die()
-        }
-        //console.log(hand)
-    }
-    populateHand(board.activePlayerDice, activeNum)
-    populateHand(board.suppPlayerDice, suppNum)
-    console.log("The hands have been populated")
-    console.log(board.activePlayerDice)
-    console.log(board.suppPlayerDice)
-}
-
-//--------------------//
-//End of Scenario setup
-//--------------------//
 
 //Hand operations
+
+function rollActive(player) {
+    if((player.status === "active") && (player.currentRerolls > 0)){
+        rollHand(board.dicePool.active)
+        player.currentRerolls--
+    } else {
+        alert("You are not the active player!")
+    }
+}
+
+function rollSupport(player){
+    if((player.status === "support") && (player.currentRerolls > 0)){
+        rollHand(board.dicePool.support)
+        player.currentRerolls--
+    } else {
+        alert("You are not the support player!")
+    }
+}
 
 function rollHand(hand) {
     for (let i = 0; i < hand.length; i++) {
@@ -159,10 +90,127 @@ function resetHand(hand) {
 }
 
 
+//Gameboard object. To create some global variables and also spots to fetch HTML data from
+let board = {
+    "players": [],
+    "level": 0,
+    "itemDeck": [],
+    "scenarios": [],
+    "dicePool": {
+        "active": [],
+        "support": []
+    },
+    "attackHand": [],
+}
 
+//--------------------//
+//Pre-Game setup functions
+//--------------------//
+
+    //Test Player generator
+    //Perhaps include a sort of ready check in the future before this function executes
+    //This will later be filled with some fancy shit that lets twitch users log in and control
+    function populatePlayers(){
+            //Count the number of players
+        let numPlayers = prompt("How many players?")
+            //set the player array
+        board.players.length = Number(numPlayers)
+            //Populate the player array
+        for (let i = 0; i < board.players.length; i++){
+            //Create a Player object for each user logged in
+            let user = prompt("Username?"),
+                style = prompt("Style?")
+            board.players[i] = new Player(user, style)
+            //console.log(board.players[i]);
+        }
+        console.log("Player array has been populated")
+        console.log(board.players)
+    }
+
+    //Prepare the item deck
+
+    function prepareItemDeck(){
+        console.log("Preparing the item deck")
+        //Cloning and shuffling the item deck, moving it
+        board.itemDeck = shuffle(JSON.parse(JSON.stringify(lootDeck)))
+        console.log("Item deck has been shuffled")
+        console.log(board.itemDeck)
+    }
+
+
+//--------------------//
+//Scenario setup phase
+//--------------------//
+
+function setupScenario(deck){
+    prepareScenario(deck)
+    prepareAbilities(board.level, board.players)
+    setHands(board.scenarios[board.level])
+    console.log("The scenario for level " + (Number(board.level) + 1) + " has been prepared.")
+    
+}
+
+//Activate a scenario
+//This clones and shuffles the deck and draws on scenario, then adds that scenario to global board object
+function prepareScenario(deck){
+    console.log("Pulling the scenario card");
+    let clone = shuffle(JSON.parse(JSON.stringify(deck)))
+    board.scenarios.push(clone.shift())
+    console.log("The scenario card has been pulled")
+    console.log(board.scenarios)
+}
+
+//Prepare/refresh all player abilities counter based on the drawn scenario stats
+function prepareAbilities(level, players){
+    console.log("Setting the abilty counts for the scenario")
+    for (let i = 0; i < players.length; i++){
+        console.log("For player: " + players[i].username + " Ability max from card:" + players[i].playstyle.abilityMax[level][players.length - 2])
+        players[i].abilityScenarioMax = players[i].playstyle.abilityMax[level][players.length - 2]
+        console.log("Scenario ability count set to:" + players[i].abilityScenarioMax)
+    }
+    console.log("The ability counter has been prepared")
+}
+
+//Populating the player hands based on drawn scenario
+function setHands(scenario){
+    console.log("Setting player hands for the scenario");
+    console.log(scenario.activeDice, scenario.suppDice);
+
+    function populateHand(hand, num){
+        for (let i = 0; i < num; i++){
+        hand[i] = new Die()
+        }
+        //console.log(hand)
+    }
+    populateHand(board.dicePool.active, scenario.activeDice)
+    populateHand(board.dicePool.support, scenario.suppDice)
+    console.log("The hands have been populated")
+    console.log(board.dicePool.active)
+    console.log(board.dicePool.support)
+}
+
+function setRerolls() {
+    for (let i = 0; i < board.players.length; i++){
+        board.players[i].currentRerolls = 2
+    }
+    console.log("Rerolls have been set to the default value of 2");
+}
+
+//--------------------//
+//End of Scenario setup
+//--------------------//
+
+//PsuedoCode Section
+
+//Pre-game Setup
+    //Populate the players
+    populatePlayers()
+    //Setup the item deck
+    prepareItemDeck()
 
 // Turn system
-
+    //Prepare the Scenario for the level
+    setupScenario(scenario1Deck)
     //Check for any Event Stage effects
         //Apply the Stage effect
     //Active Player is declared
@@ -180,6 +228,8 @@ function resetHand(hand) {
         //Apply any reroll modifiers to respective party
     //Rolling phase
         //Roll all dice where keep is false and reroll counter is greater than zero for respective player
+        rollHand(board.dicePool.active)
+        rollHand(board.dicePool.support)
         //Declare any die rerolls (assign keep:true)
         //Rerolls
             //Check if player dice pool has rerolls (rerolls>0)
@@ -195,6 +245,7 @@ function resetHand(hand) {
             //Confirm player wants to move to attack phase
         //Attack phase
             //Clone attack hand
+            createAttackHand()
             //Execute an attack
                 //Assign dice to attack(s)
                     //check if assignment is valid
@@ -223,17 +274,9 @@ function resetHand(hand) {
             //Loot Phase
                 //draw item from deck
                   //add item to Player inventory ~ this seems to work
-                    function draw(player, deck){
-                        console.log(deck, player);
-                        player.inventory.push(deck.shift())
-                    }
-
                     //Give item to new player if desired
             //Level Up
             //Level up function ~ works
-            function boardLevelUp() {
-                board.level++
-            }
                 //First level up (to level 2)
                     //Unlock tier 2 attack for all players
                 //Second Level up (to level 3)
@@ -244,4 +287,3 @@ function resetHand(hand) {
                 //Characters cleared of exhausted status
                 //Ability points refreshed to max
                 //Any lingering augment effects are cleared
-

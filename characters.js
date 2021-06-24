@@ -4,7 +4,6 @@
 
 let Playstyle = {
     brash: {
-        "status":"inactive",
         "title": "the brash",
         "hpMax":[10,15,20],
         "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
@@ -27,7 +26,6 @@ let Playstyle = {
     },
 
     elegant: {
-        "status":"inactive",
         "title": "the elegant",
         "hpMax":[8,12,16],
         "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
@@ -42,7 +40,7 @@ let Playstyle = {
         ],
         "ability": function(target) {
             switch (target.value) {
-                case 1:
+                case 1:2
                     target.value = 6
                     break;
                 case 2:
@@ -68,7 +66,6 @@ let Playstyle = {
     },
 
     staunch: {
-        "status":"inactive",
         "title": "the staunch",
         "HPMax":[12,18,24],
         "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
@@ -92,7 +89,6 @@ let Playstyle = {
     },
 
     sly: {
-        "status":"inactive",
         "title":"the sly",
         "hpMax":[10,15,20],
         "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
@@ -116,7 +112,6 @@ let Playstyle = {
     },
 
     eccentric: {
-        "status":"inactive",
         "title":"the eccentric",
         "hpMax":[8,12,16],
         "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],
@@ -135,7 +130,6 @@ let Playstyle = {
     },
 
     serene: {
-        "status":"inactive",
         "title":"the serene",
         "hpMax":[8,12,16],
         "abilityMax": [[1,1,1],[2,1,1],[3,2,1]],

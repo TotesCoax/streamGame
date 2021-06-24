@@ -11,22 +11,17 @@ class Die {
     constructor(i) {
         this.value = 0
         this.keep = false
-        this.redeemmed = false
         this.submitted = false
     }
 
     rollDie()  {
-        if ((this.keep === false) && (this.redeemed === false)){
+        if (this.keep === false){
             this.value = Math.floor(Math.random() * 6) + 1
         }
     }
 
-    keep() {
+    markKeep() {
         this.keep = true
-    }
-
-    redeem() {
-        this.redeemmed = true
     }
 
     submit() {
@@ -43,34 +38,57 @@ class Die {
 //Attack mechanics
 
 //Attack function
-//Generating an attack submission
-function createAttackSubmission(handArray) {
-    let attackSubmission = []
-    for (let i = 1; i < handArray.length; i++){
-        console.log(handArray)
-        if (handArray[i].submitted){
-            console.log()
+
+    //Clones the dice objects and generated the attack pool
+    function createAttackHand() {
+        let counter = 0
+        for (let i = 0; i < board.dicePool.active.length; i++){
+            board.attackHand[counter] = JSON.parse(JSON.stringify(board.dicePool.active[i]))
+            counter++
+        }
+        for (let i = 0; i < board.dicePool.support.length; i++){
+            board.attackHand[counter] = JSON.parse(JSON.stringify(board.dicePool.support[i]))
+            counter++
+        }
+        board.attackHand.sort(function(a,b) {
+            return a.value - b.value
+        })
+        console.log(board.attackHand)
+    }
+
+    //Generate an attack submisison
+    function createAttackSubmission(hand){
+        for (let i = 0; i < hand.length; i++){
+            if (hand[i].submitted = true){
+                submission.push(hand[i])
+                i--
+            }
         }
     }
 
-    
-}
-
 //If the # of dice is met, and the attack fits the style, dmg is issued
 function attack(diceReq, attackSubmission, check, style, dmg) {
+    let discard = []
     //If the number of dice required is met AND the character mechanic is met, assign dmg
     if (check(diceReq, attackSubmission) && style(attackSubmission)){
-        console.log("Attack succeeds. " + dmg + " damage has been issued");
+        console.log("Attack succeeds. " + dmg + " damage has been issued")
+        //remove the dice from the attack pool
+        discard.push(attackSubmission)
+        console.log(board.attackHand)
         return dmg
     } else {
         console.log("The attack did not succeed")
+        //returns the attack submission to the pool
+        board.attackHand.push(attackSubmission)
+        console.log(board.attackHand)
         return false
     }
 }
 
 //Check for required number of dice
 function numDiceCheck(diceReq, attackSubmission){
-    console.log((diceReq === attackSubmission.length))
+
+    console.log(diceReq, "=", attackSubmission.length, "?")
     return diceReq === attackSubmission.length
 }
 
@@ -94,11 +112,12 @@ function brash(attackSubmission){
     return true
 }
     //Just for testing
-    function setBrash(hand, x) {
+    function setBrash(hand) {
+        x = Math.floor(Math.random() * 6) + 1;
         hand.forEach(die => {
             die.value = Number(x)
         })
-        console.log("Brash has been set.");
+        console.log("Brash has been set to: ", x)
     }
 
 

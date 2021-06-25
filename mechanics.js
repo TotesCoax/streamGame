@@ -8,12 +8,15 @@ class Player {
         //this.profilePic = profilePic
         this.playstyle = Playstyle[playstyle.toLowerCase()]
         this.inventory = []
+        //These are counters for each Scenario. Scen can modify them.
         this.currentRerolls = 0
         this.abilityScenarioMax = 0
         this.abilityCounter = 0
         this.dmgCounter = 0
+        //There can be three status: active, support, and inactive - this is for rolling and CSS positioning
         this.status = "inactive"
-        //There can be three status: active, support, and inactive
+        //Exhausted is for selecting supports
+        this.exhausted = false
     }
 }
 
@@ -22,6 +25,7 @@ class Scenario {
         this.card = scenarioCard
         this.dmgCounter = 0
         this.defeated = false
+        this.stageCounter = 0
     }
 }
 
@@ -145,7 +149,6 @@ let board = {
 function setupScenario(deck){
     prepareScenario(deck)
     prepareAbilities(board.level, board.players)
-    setHands(board.scenarios[board.level])
     console.log("The scenario for level " + (Number(board.level) + 1) + " has been prepared.")
     
 }
@@ -155,7 +158,7 @@ function setupScenario(deck){
 function prepareScenario(deck){
     console.log("Pulling the scenario card");
     let clone = shuffle(JSON.parse(JSON.stringify(deck)))
-    board.scenarios.push(clone.shift())
+    board.scenarios.push(new Scenario(clone.shift()))
     console.log("The scenario card has been pulled")
     console.log(board.scenarios)
 }
@@ -200,65 +203,163 @@ function setRerolls() {
 //End of Scenario setup
 //--------------------//
 
+//--------------------//
+//Player Turn Setup Functions
+//--------------------//
+
+//Select Active Player
+function selectActivePlayer(players){
+    //Check previously duo players status and update them
+    for (let i = 0; i < players.length; i++){
+        switch (players[i].status) {
+            case "active":
+                players[i].status = "inactive"
+                break;
+
+            case "support":
+                players[i].status = "active"
+                break;
+    
+            default:
+                //This instance would take place only for the first time each scenario (all are inactive)
+                let activePlayer = prompt("Select the active player (enter username for testing purposes)")
+                activePlayer.status = "active"
+                break;
+        }
+    }
+    allExhaustedRefresh(players)
+}
+
+//All Exhausted and refresh check
+    //Before asking to pick a support, these will verify there are supports to pick
+    //Refresh Function
+    function allExhaustedRefresh(players){
+        if (allExhaustedQuery(players) === true){
+            for (let i = 0; i < players.length; i++){
+                players[i].exhausted = false
+            }
+        }
+        supportPlayerSelect(players)
+    }
+    //Checking function
+    function allExhaustedQuery(players){
+        for (let i = 0; i < players.length; i++){
+            if (players[i].exhausted === false){
+                return false
+            } else {
+                return true
+            }
+        }
+    }
+
+//Select Support Player
+function supportPlayerSelect(players){
+    let validChoices = []
+    for (let i = 0; i < players.length; i++){
+        if (players[i].exhausted === "false"){
+            validChoices.push(players[i].username)
+        }
+    }
+    console.log(validChoices)
+    let supportChoice = players.find(player => player.name === prompt("Who do you choose are your support? (enter username for testing"))
+    if (supportChoice.exhausted === "true"){
+        alert("That player is exhausted")
+        supportPlayerSelect(players)
+    } else {
+        supportChoice.exhausted = "true"
+        supportChoice.status = "support"
+    }
+}
+
+
+
+
+//--------------------//
 //PsuedoCode Section
+//--------------------//
+
 
 //Pre-game Setup
-    //Populate the players
-    populatePlayers()
-    //Setup the item deck
-    prepareItemDeck()
+    function PreGameSetup() {
+        //Populate the players
+        populatePlayers()
+        //Setup the item deck
+        prepareItemDeck()
+    }
 
 // Turn system
-    //Prepare the Scenario for the level
-    setupScenario(scenario1Deck)
-    //Check for any Event Stage effects
+    //Setup steps each turn before each roll
+    function PreRollScenarioSetup() {
+        //Prepare the Scenario for the level
+        setupScenario(scenario1Deck)
+        PreRollStageSetup()
+    }
+    //Setup for each new stage reveal (once per stage)
+    function PreRollStageSetup() {
+        //Check for any Event Stage effects
+        console.log("This is where we would check for stage effects")
         //Apply the Stage effect
-    //Active Player is declared
-    //Check if all other players are exhausted
-        //If all others are exhausted, unexhaust all
-    //Consumable Item phase
-        //Check for any consumables
-        //Prompt if the holder would like to use item
-    //Select a support
-        //verify the support is not exhausted
-    //Check for any item (equipment) modifiers
+        console.log("This is where we would apply the stage effects")
+        //Check for any item (equipment) modifiers
         //Apply any modifiers 
-    //Check the event rolls tally
+        //Check the event rolls tally
+        console.log("Reroll amount check")
         //Check for any reroll modifiers (event or items)
         //Apply any reroll modifiers to respective party
+        console.log("Apply Reroll modifiers")
+        PreRollPlayerTurnSetup()
+    }
+    //Setup for each Player's turn
+    function PreRollPlayerTurnSetup() {
+        //Active Player is declared
+        //Check if all other players are exhausted
+        //If all others are exhausted, unexhaust all
+        //Consumable Item phase
+        //Check for any consumables
+        //Prompt if the holder would like to use item
+        //Select a support
+        //verify the support is not exhausted
+    }
     //Rolling phase
-        //Roll all dice where keep is false and reroll counter is greater than zero for respective player
-        rollHand(board.dicePool.active)
-        rollHand(board.dicePool.support)
-        //Declare any die rerolls (assign keep:true)
-        //Rerolls
+        function RollingPhase(){
+            //Create player "hands" based on the scenario's restrictions
+            setHands(board.scenarios[board.level])
+            //Roll all dice where keep is false and reroll counter is greater than zero for respective player
+            rollHand(board.dicePool.active)
+            rollHand(board.dicePool.support)
+            //Declare any die rerolls (assign keep:true)
+            //Rerolls
             //Check if player dice pool has rerolls (rerolls>0)
-                //If counter = 0, set all player dice to keep:true
-                //If both counters are 0, disable roll button
+            //If counter = 0, set all player dice to keep:true
+            //If both counters are 0, disable roll button
             //Roll any keep:false dice
-        //Using abilities
+            //Using abilities
             //Only Active and Support player can use Abilities
             //Confirm player wants to engage ability
             //Choose and confirm target of ability
             //Execute ability change
-        //Move to attack Phase
+            //Move to attack Phase
             //Confirm player wants to move to attack phase
+        }
         //Attack phase
+        function AttackPhase() {
+
             //Clone attack hand
             createAttackHand()
             //Execute an attack
-                //Assign dice to attack(s)
-                    //check if assignment is valid
-                    //if not return dice to pool
-                //Submit attack(s)
-                    //Assigned dice are marked as redeemed
-                    //Check for any Event defense augments
-                    //Check for any Player attack augments
-                    //Calculate DMG result
-                    //Modified DMG is submitted to Event stage counter
-                //Count number of remaining dice
-                    //if greater than 0 await end turn confirmation
-                    //if zero, engage skip counter attack phase
+            //Assign dice to attack(s)
+            //check if assignment is valid
+            //if not return dice to pool
+            //Submit attack(s)
+            //Assigned dice are marked as redeemed
+            //Check for any Event defense augments
+            //Check for any Player attack augments
+            //Calculate DMG result
+            //Modified DMG is submitted to Event stage counter
+            //Count number of remaining dice
+            //if greater than 0 await end turn confirmation
+            //if zero, engage skip counter attack phase
+        }
         //Counter Attack Phase
             //Event executes an attack
                 //Check for any attack modifiers

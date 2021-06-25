@@ -58,24 +58,34 @@ class Die {
 
     //Generate an attack submisison
     function createAttackSubmission(hand){
+        let submission = []
         for (let i = 0; i < hand.length; i++){
+            console.log(hand[i])
             if (hand[i].submitted = true){
+                console.log("Die Moved")
                 submission.push(hand[i])
+                hand.splice(i,1)
                 i--
             }
         }
+        console.log(submission)
+        return submission
+    }
+
+    //Apply DMG to scenario function
+    function applyDMGtoScenario(dmg, level) {
+        board.scenarios[level].dmgCoutner+= dmg
     }
 
 //If the # of dice is met, and the attack fits the style, dmg is issued
-function attack(diceReq, attackSubmission, check, style, dmg) {
-    let discard = []
+function attack(diceReq, attackHand, check, style, dmg) {
+    let attackSubmission = createAttackSubmission(attackHand)
     //If the number of dice required is met AND the character mechanic is met, assign dmg
     if (check(diceReq, attackSubmission) && style(attackSubmission)){
         console.log("Attack succeeds. " + dmg + " damage has been issued")
-        //remove the dice from the attack pool
-        discard.push(attackSubmission)
+        applyDMGtoScenario(dmg, board.level)
+        //The used dice should automatically be deleted/discarded one the function ends
         console.log(board.attackHand)
-        return dmg
     } else {
         console.log("The attack did not succeed")
         //returns the attack submission to the pool

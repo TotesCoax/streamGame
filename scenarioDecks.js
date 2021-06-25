@@ -138,14 +138,14 @@ let scenario2Deck = [
     "suppDice":3,
     "stage":[
         {
-            "name":"name",
+            "name":"PLAYER has been poisoned! Get the antidote!",
             "hp":30,
             "dmg":1,
             "def":0,
             "aoe":false,
             "effect":function(){
                 //No Consumables
-                //At the start of each player's turn PLAYER suffers 4 dmg
+                //At the start of each player's turn POISONED PLAYER (randomly chosen) suffers X (4 is default for game) dmg
                 alert(this.name + " effect has been applied")
                 console.log(this.name + " effect has been applied")
             }

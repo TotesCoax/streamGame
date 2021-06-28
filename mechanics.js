@@ -146,18 +146,18 @@ let board = {
 //Scenario setup phase
 //--------------------//
 
-function setupScenario(deck){
-    prepareScenario(deck)
-    prepareAbilities(board.level, board.players)
-    console.log("The scenario for level " + (Number(board.level) + 1) + " has been prepared.")
+function setupScenario(deck, level){
+    prepareScenario(deck, level)
+    prepareAbilities(level, board.players)
+    console.log("The scenario for level " + (Number(level) + 1) + " has been prepared.")
     
 }
 
 //Activate a scenario
 //This clones and shuffles the deck and draws on scenario, then adds that scenario to global board object
-function prepareScenario(deck){
+function prepareScenario(deck, level){
     console.log("Pulling the scenario card");
-    let clone = shuffle(JSON.parse(JSON.stringify(deck)))
+    let clone = shuffle(JSON.parse(JSON.stringify(deck[level])))
     board.scenarios.push(new Scenario(clone.shift()))
     console.log("The scenario card has been pulled")
     console.log(board.scenarios)
@@ -285,13 +285,15 @@ function supportPlayerSelect(players){
         populatePlayers()
         //Setup the item deck
         prepareItemDeck()
+        console.log("PreGameSetup function has finished")
     }
 
 // Turn system
     //Setup steps each turn before each roll
     function PreRollScenarioSetup() {
         //Prepare the Scenario for the level
-        setupScenario(scenario1Deck)
+        setupScenario(scenarios, board.level)
+        console.log("PreRollScenarioSetup has finished")
         PreRollStageSetup()
     }
     //Setup for each new stage reveal (once per stage)
@@ -307,6 +309,7 @@ function supportPlayerSelect(players){
         //Check for any reroll modifiers (event or items)
         //Apply any reroll modifiers to respective party
         console.log("Apply Reroll modifiers")
+        console.log("PreRollStageSetup had finished")
         PreRollPlayerTurnSetup()
     }
     //Setup for each Player's turn
@@ -319,6 +322,7 @@ function supportPlayerSelect(players){
         //Prompt if the holder would like to use item
         //Select a support
         //verify the support is not exhausted
+        console.log("PreRollPlayerTurnSetup had completed")
     }
     //Rolling phase
         function RollingPhase(){

@@ -78,10 +78,13 @@ class Die {
     }
 
 //If the # of dice is met, and the attack fits the style, dmg is issued
-function attack(diceReq, attackHand, check, style, dmg) {
-    let attackSubmission = createAttackSubmission(attackHand)
+function attack(player, attackNum, attackHand) {
+    let attackSubmission = createAttackSubmission(attackHand),
+        diceReq = player.playstyle.attack[attackNum].diceReq,
+        dmg = player.playstyle.attack[attackNum].dmg,
+        style = player.playstyle.mechanic
     //If the number of dice required is met AND the character mechanic is met, assign dmg
-    if (check(diceReq, attackSubmission) && style(attackSubmission)){
+    if (numDiceCheck(diceReq, attackSubmission) && style(attackSubmission)){
         console.log("Attack succeeds. " + dmg + " damage has been issued")
         applyDMGtoScenario(dmg, board.level)
         //The used dice should automatically be deleted/discarded one the function ends
@@ -109,18 +112,19 @@ function checkValue(val, die){
 }
 
 //Brash checks that all dice values are the same
-function brash(attackSubmission){
-    console.log(attackSubmission)
-    for (let i = 1; i < attackSubmission.length; i++){
-        console.log(attackSubmission[i-1].value, attackSubmission[i].value);
-        if (attackSubmission[i-1].value !== attackSubmission[i].value){
-            console.log("The attack is not brash")
-            return false
-        }
-    }
-    console.log("The attack is brash")
-    return true
-}
+// Moved to relevant character card object
+// function brash(attackSubmission){
+//     console.log(attackSubmission)
+//     for (let i = 1; i < attackSubmission.length; i++){
+//         console.log(attackSubmission[i-1].value, attackSubmission[i].value);
+//         if (attackSubmission[i-1].value !== attackSubmission[i].value){
+//             console.log("The attack is not brash")
+//             return false
+//         }
+//     }
+//     console.log("The attack is brash")
+//     return true
+// }
     //Just for testing
     function setBrash(hand) {
         x = Math.floor(Math.random() * 6) + 1;
@@ -132,21 +136,22 @@ function brash(attackSubmission){
 
 
 //Elegant checks that submitted dice are sequential
-function elegant(attackSubmission){
-    console.log(attackSubmission)
-    attackSubmission.sort(function compareNumbers(a, b) {
-        return a - b;
-      })
-    for (let i = 1; i < attackSubmission.length; i++){
-        console.log(attackSubmission[i-1].value, attackSubmission[i].value);
-        if (attackSubmission[i].value !== attackSubmission[i-1].value + 1){
-            console.log("The attack is not elegant")
-            return false
-        }
-    }
-    console.log("The attack is elegant")
-    return true
-}
+// // Moved to relevant character card object
+// function elegant(attackSubmission){
+//     console.log(attackSubmission)
+//     attackSubmission.sort(function compareNumbers(a, b) {
+//         return a - b;
+//       })
+//     for (let i = 1; i < attackSubmission.length; i++){
+//         console.log(attackSubmission[i-1].value, attackSubmission[i].value);
+//         if (attackSubmission[i].value !== attackSubmission[i-1].value + 1){
+//             console.log("The attack is not elegant")
+//             return false
+//         }
+//     }
+//     console.log("The attack is elegant")
+//     return true
+// }
     //Just for testing
     function setElegant(hand) {
         let x = 1
@@ -158,22 +163,23 @@ function elegant(attackSubmission){
     }
 
 //Staunch checks that sum of submitted dice values are above a number
-function staunch(attackSubmission, threshold){
-    let sum = 0
-    for (let i = 0; i < attackSubmission.length; i++){
-        console.log(attackSubmission[i].value);
-        sum += attackSubmission[i].value
-        console.log("sum:" + sum)
-        }
-    console.log("Threshold:" + threshold)
-    if (sum >= threshold){
-        console.log("The attack is staunch")
-        return true
-    } else {
-        console.log("the attack is not staunch")
-        return false
-    }
-}
+// Moved to relevant character card object
+// function staunch(attackSubmission, threshold){
+//     let sum = 0
+//     for (let i = 0; i < attackSubmission.length; i++){
+//         console.log(attackSubmission[i].value);
+//         sum += attackSubmission[i].value
+//         console.log("sum:" + sum)
+//         }
+//     console.log("Threshold:" + threshold)
+//     if (sum >= threshold){
+//         console.log("The attack is staunch")
+//         return true
+//     } else {
+//         console.log("the attack is not staunch")
+//         return false
+//     }
+// }
 
     //Just for testing
     function setStaunch(hand) {
@@ -184,23 +190,24 @@ function staunch(attackSubmission, threshold){
     }
 
 //Sly checks that sum of submitted dice values are below a number
-function sly(attackSubmission, threshold){
-    console.log(attackSubmission, threshold);
-    let sum = 0
-    for (let i = 0; i < attackSubmission.length; i++){
-        console.log(attackSubmission[i].value);
-        sum += attackSubmission[i].value
-        console.log("Sum:" + sum)
-        }
-        console.log("Threshold:" + threshold)
-    if (sum <= threshold){
-        console.log("The attack is sly")
-        return true
-    } else {
-        console.log("The attack is not sly")
-        return false
-    }
-}
+// Moved to relevant character card object
+// function sly(attackSubmission, threshold){
+//     console.log(attackSubmission, threshold);
+//     let sum = 0
+//     for (let i = 0; i < attackSubmission.length; i++){
+//         console.log(attackSubmission[i].value);
+//         sum += attackSubmission[i].value
+//         console.log("Sum:" + sum)
+//         }
+//         console.log("Threshold:" + threshold)
+//     if (sum <= threshold){
+//         console.log("The attack is sly")
+//         return true
+//     } else {
+//         console.log("The attack is not sly")
+//         return false
+//     }
+// }
 
     //Just for testing
     function setSly(hand) {

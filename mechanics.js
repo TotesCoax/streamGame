@@ -209,8 +209,10 @@ function setRerolls() {
 
 //Select Active Player
 function selectActivePlayer(players){
+    let inactivePlayers = 0
     //Check previously duo players status and update them
     for (let i = 0; i < players.length; i++){
+        console.log(players[i].username, players[i].status)
         switch (players[i].status) {
             case "active":
                 players[i].status = "inactive"
@@ -221,12 +223,17 @@ function selectActivePlayer(players){
                 break;
     
             default:
-                //This instance would take place only for the first time each scenario (all are inactive)
-                let activePlayer = prompt("Select the active player (enter username for testing purposes)")
-                activePlayer.status = "active"
+                inactivePlayers++
+                console.log(players[i].username + ": no status update. ", inactivePlayers)
                 break;
+            }
         }
-    }
+        //This instance would take place only for the first time each scenario (all are inactive)
+        if (inactivePlayers === players.length){
+            let activePlayer = players.find(player => player.username === prompt("Who is the active player? (enter username for testing)"))
+            activePlayer.status = "active"
+        }
+        console.log("selectActivePlayer has completed")
     allExhaustedRefresh(players)
 }
 
@@ -239,37 +246,45 @@ function selectActivePlayer(players){
                 players[i].exhausted = false
             }
         }
-        supportPlayerSelect(players)
+        console.log("allExhaustRefresh has completed")
+        selectSupportPlayer(players)
     }
-    //Checking function
-    function allExhaustedQuery(players){
-        for (let i = 0; i < players.length; i++){
-            if (players[i].exhausted === false){
-                return false
-            } else {
-                return true
+        //Checking function
+        function allExhaustedQuery(players){
+            for (let i = 0; i < players.length; i++){
+                if (players[i].exhausted === false){
+                    return false
+                } else {
+                    return true
+                }
             }
         }
-    }
 
 //Select Support Player
-function supportPlayerSelect(players){
+function selectSupportPlayer(players){
     let validChoices = []
     for (let i = 0; i < players.length; i++){
-        if (players[i].exhausted === "false"){
+        if ((players[i].exhausted === false) && (players[i].status !== "active")){
             validChoices.push(players[i].username)
         }
     }
-    console.log(validChoices)
-    let supportChoice = players.find(player => player.name === prompt("Who do you choose are your support? (enter username for testing"))
-    if (supportChoice.exhausted === "true"){
+    console.log("valid choices",validChoices)
+    //This should search for a valid username when I remove the prompt and add in a select box.
+    let supportChoice = players.find(player => player.username === prompt("Who do you choose as your support? (enter username for testing)"))
+    console.log("support choice: ",supportChoice.username)
+    if (supportChoice.exhausted === true){
         alert("That player is exhausted")
-        supportPlayerSelect(players)
+        selectSupportPlayer(players)
     } else {
-        supportChoice.exhausted = "true"
+        supportChoice.exhausted = true
         supportChoice.status = "support"
     }
 }
+
+//--------------------//
+//Player Turn Setup Functions
+//--------------------//
+
 
 
 
@@ -315,12 +330,14 @@ function supportPlayerSelect(players){
     //Setup for each Player's turn
     function PreRollPlayerTurnSetup() {
         //Active Player is declared
+        selectActivePlayer(board.players)
         //Check if all other players are exhausted
         //If all others are exhausted, unexhaust all
         //Consumable Item phase
         //Check for any consumables
         //Prompt if the holder would like to use item
         //Select a support
+        selectSupportPlayer(board.players)
         //verify the support is not exhausted
         console.log("PreRollPlayerTurnSetup had completed")
     }

@@ -4,7 +4,7 @@
 
 class Player {
     constructor(username, playstyle) {
-        this.username = username
+        this.username = username.toLowerCase()
         //this.profilePic = profilePic
         this.playstyle = Playstyle[playstyle.toLowerCase()]
         this.inventory = []
@@ -131,6 +131,16 @@ let board = {
         console.log(board.players)
     }
 
+    function TESTFILLpopulatePlayers(){
+        board.players.length = 4
+        board.players[0] = new Player("me","brash")
+        board.players[1] = new Player("you","elegant")
+        board.players[2] = new Player("she","staunch")
+        board.players[3] = new Player("them","sly")
+        console.log("TEST Function run, Player array has been populated")
+        console.log(board.players)
+    }
+
     //Prepare the item deck
 
     function prepareItemDeck(){
@@ -224,16 +234,20 @@ function selectActivePlayer(players){
     
             default:
                 inactivePlayers++
-                console.log(players[i].username + ": no status update. ", inactivePlayers)
+                console.log(players[i].username + ": no status update. ", inactivePlayers, players.length)
                 break;
             }
         }
         //This instance would take place only for the first time each scenario (all are inactive)
+        console.log("First turn protocol engaged")
         if (inactivePlayers === players.length){
-            let activePlayer = players.find(player => player.username === prompt("Who is the active player? (enter username for testing)"))
+            let input = prompt("Who is the active player? (enter username for testing)").toLowerCase()
+            console.log("input: ", input)
+            let activePlayer = players.find(player => player.username === input)
+            console.log(activePlayer)
             activePlayer.status = "active"
         }
-        console.log("selectActivePlayer has completed")
+    console.log("selectActivePlayer has completed")
     allExhaustedRefresh(players)
 }
 
@@ -241,6 +255,7 @@ function selectActivePlayer(players){
     //Before asking to pick a support, these will verify there are supports to pick
     //Refresh Function
     function allExhaustedRefresh(players){
+        console.log("Checking if all are exhausted: ", allExhaustedQuery(players))
         if (allExhaustedQuery(players) === true){
             for (let i = 0; i < players.length; i++){
                 players[i].exhausted = false
@@ -251,13 +266,14 @@ function selectActivePlayer(players){
     }
         //Checking function
         function allExhaustedQuery(players){
+            console.log("Checking exhausted status")
             for (let i = 0; i < players.length; i++){
+                console.log(players[i].username, "exhausted: ", players[i].exhausted)
                 if (players[i].exhausted === false){
                     return false
-                } else {
-                    return true
                 }
             }
+            return true
         }
 
 //Select Support Player
@@ -270,7 +286,9 @@ function selectSupportPlayer(players){
     }
     console.log("valid choices",validChoices)
     //This should search for a valid username when I remove the prompt and add in a select box.
-    let supportChoice = players.find(player => player.username === prompt("Who do you choose as your support? (enter username for testing)"))
+    let input = prompt("Who do you choose as your support? (enter username for testing)").toLowerCase()
+    console.log("input: ", input)
+    let supportChoice = players.find(player => player.username === input)
     console.log("support choice: ",supportChoice.username)
     if (supportChoice.exhausted === true){
         alert("That player is exhausted")
@@ -281,12 +299,29 @@ function selectSupportPlayer(players){
     }
 }
 
+
 //--------------------//
-//Player Turn Setup Functions
+//End of Player Turn Setup Functions
 //--------------------//
 
+//--------------------//
+//Rolling Phase Functions
+//--------------------//
+
+//Checking for any remaining rerolls
+
+function hasRerollsremaining(player){
+    if (player.currentRerolls > 0){
+        return true
+    } else {
+        return false
+    }
+}
 
 
+//--------------------//
+//End Rolling Phase Functions
+//--------------------//
 
 
 //--------------------//
@@ -297,7 +332,8 @@ function selectSupportPlayer(players){
 //Pre-game Setup
     function PreGameSetup() {
         //Populate the players
-        populatePlayers()
+        //populatePlayers()
+        TESTFILLpopulatePlayers()
         //Setup the item deck
         prepareItemDeck()
         console.log("PreGameSetup function has finished")
@@ -337,7 +373,6 @@ function selectSupportPlayer(players){
         //Check for any consumables
         //Prompt if the holder would like to use item
         //Select a support
-        selectSupportPlayer(board.players)
         //verify the support is not exhausted
         console.log("PreRollPlayerTurnSetup had completed")
     }

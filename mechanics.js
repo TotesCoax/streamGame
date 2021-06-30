@@ -273,7 +273,7 @@ function checkConsumables(players){
             }
         }
     }
-    console.log(playersWithItems)
+    console.log("Players with consumables: ", playersWithItems)
     //export the list
     return playersWithItems
 }
@@ -297,7 +297,7 @@ function selectSupportPlayer(players){
     let input = prompt("Who do you choose as your support? (enter username for testing)").toLowerCase()
     console.log("input: ", input)
     let supportChoice = players.find(player => player.username === input)
-    console.log("support choice: ",supportChoice.username)
+    console.log("support choice: ",supportChoice)
     if (supportChoice.exhausted === true){
         alert("That player is exhausted")
         selectSupportPlayer(players)
@@ -405,44 +405,43 @@ function rerollsExhaustedCheck(active, support){
         //If all others are exhausted, unexhaust all
         //Consumable Item phase
         //Check for any consumables
-        alert(checkConsumables(board.players).toString)
         //Prompt if the holder would like to use item
         //Select a support
         selectSupportPlayer(board.players)
         //verify the support is not exhausted
-        console.log("PreRollPlayerTurnSetup had completed")
+        console.log("PreRollPlayerTurnSetup has completed")
     }
 
     function CombatPhase(){
-        let activePlayer = board.players.find(player => player.username === "active")
-        let supportPlayer = board.players.find(player => player.username === "support")
-        console.log("active: ", activePlayer, " support: ", supportPlayer)
+        let activePlayer = board.players.find(player => player.status === "active")
+        let supportPlayer = board.players.find(player => player.status === "support")
+        console.log("active: ", activePlayer.username, " support: ", supportPlayer.username)
     //Rolling phase
-        RollingPhase()
-        function RollingPhase(){
-            //Create player "hands" based on the scenario's restrictions
-            setHands(board.scenarios[board.level])
-            //Initial Rolls for scenario
-            console.log("Initial Rolls for the scenario")
-            rollActive(activePlayer)
-            rollSupport(supportPlayer)
-            //Declare any die rerolls (assign keep:true)
-                //This will be done with client side code sending keep command back to server
-            //Roll all dice where keep is false and reroll counter is greater than zero for respective player
-                //This is built into the roll function
-            //Rerolls
-            //Check if player has rerolls (rerolls>0)
-            //If counter = 0, set all player dice to keep:true
-            //If both counters are 0, disable roll button
-            //Roll any keep:false dice
-            //Using abilities
-            //Only Active and Support player can use Abilities
-            //Confirm player wants to engage ability
-            //Choose and confirm target of ability
-            //Execute ability change
-            //Move to attack Phase
-            //Confirm player wants to move to attack phase
-        }
+    function RollingPhase(){
+        //Create player "hands" based on the scenario's restrictions
+        setHands(board.scenarios[board.level])
+        //Initial Rolls for scenario
+        console.log("Initial Rolls for the scenario")
+        rollHand(board.dicePool.active)
+        rollHand(board.dicePool.support)
+        //Declare any die rerolls (assign keep:true)
+        //This will be done with client side code sending keep command back to server
+        //Roll all dice where keep is false and reroll counter is greater than zero for respective player
+        //This is built into the roll function
+        //Rerolls
+        //Check if player has rerolls (rerolls>0)
+        //If counter = 0, set all player dice to keep:true
+        //If both counters are 0, disable roll button
+        //Roll any keep:false dice
+        //Using abilities
+        //Only Active and Support player can use Abilities
+        //Confirm player wants to engage ability
+        //Choose and confirm target of ability
+        //Execute ability change
+        //Move to attack Phase
+        //Confirm player wants to move to attack phase
+    }
+    RollingPhase()
         //Attack phase
         function AttackPhase() {
             //Clone attack hand

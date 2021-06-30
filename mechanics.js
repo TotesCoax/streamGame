@@ -61,24 +61,6 @@ function draw(player, deck){
 
 //Hand operations
 
-function rollActive(player) {
-    if((player.status === "active") && (player.currentRerolls > 0)){
-        rollHand(board.dicePool.active)
-        player.currentRerolls--
-    } else {
-        alert("You are not the active player!")
-    }
-}
-
-function rollSupport(player){
-    if((player.status === "support") && (player.currentRerolls > 0)){
-        rollHand(board.dicePool.support)
-        player.currentRerolls--
-    } else {
-        alert("You are not the support player!")
-    }
-}
-
 function rollHand(hand) {
     for (let i = 0; i < hand.length; i++) {
         hand[i].rollDie()
@@ -238,14 +220,15 @@ function selectActivePlayer(players){
                 break;
             }
         }
+        console.log("Switch case completed. Checking for first turn", inactivePlayers,"=?", players.length)
         //This instance would take place only for the first time each scenario (all are inactive)
-        console.log("First turn protocol engaged")
         if (inactivePlayers === players.length){
+            console.log("First turn protocol engaged")
             let input = prompt("Who is the active player? (enter username for testing)").toLowerCase()
             console.log("input: ", input)
-            let activePlayer = players.find(player => player.username === input)
-            console.log(activePlayer)
-            activePlayer.status = "active"
+            let activeChoice = players.find(player => player.username === input)
+            console.log(activeChoice)
+            activeChoice.status = "active"
         }
     console.log("selectActivePlayer has completed")
     allExhaustedRefresh(players)
@@ -262,7 +245,6 @@ function selectActivePlayer(players){
             }
         }
         console.log("allExhaustRefresh has completed")
-        selectSupportPlayer(players)
     }
         //Checking function
         function allExhaustedQuery(players){
@@ -275,6 +257,32 @@ function selectActivePlayer(players){
             }
             return true
         }
+
+//Check for consumable items
+function checkConsumables(players){
+    let playersWithItems = []
+    //Check each player for an inventory
+    for (let i = 0; i < players.length; i++){
+        //if that player has an items in their inventory
+        if (players[i].inventory.length > 0){
+            //check each item in their inventory if they are a type:consumable
+            for (let j = 0; j < players[i].inventory.length; j++){
+                if (player[i].inventory[j].type === "consumable")
+                //add the username and item name to a list to export
+                playersWithItems.push(players[i].username, players[i].inventory[j].name)
+            }
+        }
+    }
+    console.log(playersWithItems)
+    //export the list
+    return playersWithItems
+}
+
+//Use consumable
+function useConsumable(item){
+    item.ability()
+    item.consumed = true
+}
 
 //Select Support Player
 function selectSupportPlayer(players){
@@ -296,6 +304,7 @@ function selectSupportPlayer(players){
     } else {
         supportChoice.exhausted = true
         supportChoice.status = "support"
+        console.log("Support has been chosen:", supportChoice.username)
     }
 }
 
@@ -308,8 +317,9 @@ function selectSupportPlayer(players){
 //Rolling Phase Functions
 //--------------------//
 
-//Checking for any remaining rerolls
 
+
+//Checking for rerolls on players
 function hasRerollsremaining(player){
     if (player.currentRerolls > 0){
         return true
@@ -318,6 +328,30 @@ function hasRerollsremaining(player){
     }
 }
 
+function rollActive(player) {
+    if((player.status === "active") && hasRerollsremaining(player)){
+        rollHand(board.dicePool.active)
+        player.currentRerolls--
+    } else {
+        alert("You cannot roll this hand.", player.status, player.currentRerolls)
+    }
+}
+
+function rollSupport(player){
+    if((player.status === "support") && hasRerollsremaining(player)){
+        rollHand(board.dicePool.support)
+        player.currentRerolls--
+    } else {
+        alert("You cannot roll this hand.", player.status, player.currentRerolls)
+    }
+}
+
+//Checking for rerolls exhausted
+function rerollsExhaustedCheck(active, support){
+    if ((active.currentRerolls = 0) && (support.currentRerolls = 0)){
+        alert("Rerolls for both players have been exhausted")
+    }
+}
 
 //--------------------//
 //End Rolling Phase Functions
@@ -371,21 +405,33 @@ function hasRerollsremaining(player){
         //If all others are exhausted, unexhaust all
         //Consumable Item phase
         //Check for any consumables
+        alert(checkConsumables(board.players).toString)
         //Prompt if the holder would like to use item
         //Select a support
+        selectSupportPlayer(board.players)
         //verify the support is not exhausted
         console.log("PreRollPlayerTurnSetup had completed")
     }
+
+    function CombatPhase(){
+        let activePlayer = board.players.find(player => player.username === "active")
+        let supportPlayer = board.players.find(player => player.username === "support")
+        console.log("active: ", activePlayer, " support: ", supportPlayer)
     //Rolling phase
+        RollingPhase()
         function RollingPhase(){
             //Create player "hands" based on the scenario's restrictions
             setHands(board.scenarios[board.level])
-            //Roll all dice where keep is false and reroll counter is greater than zero for respective player
-            rollHand(board.dicePool.active)
-            rollHand(board.dicePool.support)
+            //Initial Rolls for scenario
+            console.log("Initial Rolls for the scenario")
+            rollActive(activePlayer)
+            rollSupport(supportPlayer)
             //Declare any die rerolls (assign keep:true)
+                //This will be done with client side code sending keep command back to server
+            //Roll all dice where keep is false and reroll counter is greater than zero for respective player
+                //This is built into the roll function
             //Rerolls
-            //Check if player dice pool has rerolls (rerolls>0)
+            //Check if player has rerolls (rerolls>0)
             //If counter = 0, set all player dice to keep:true
             //If both counters are 0, disable roll button
             //Roll any keep:false dice
@@ -399,10 +445,9 @@ function hasRerollsremaining(player){
         }
         //Attack phase
         function AttackPhase() {
-
             //Clone attack hand
             createAttackHand()
-            //Execute an attack
+            //Execute an attack, only the active player can submit attacks
             //Assign dice to attack(s)
             //check if assignment is valid
             //if not return dice to pool
@@ -424,9 +469,9 @@ function hasRerollsremaining(player){
             //Check if phase has more dmg than current HP
                 //If so, clear DMG and move to next phase
                 //If no next phase, scenario cleared
-            //Check if any PLAYER has more dmg than current HP max
+            //Check if any PLAYER has more dmg than their current HP max
                 //if yes, game over
-        
+    }
         //Scenarion Cleared
             //Loot Phase
                 //draw item from deck

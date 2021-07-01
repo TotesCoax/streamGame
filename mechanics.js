@@ -46,19 +46,6 @@ function shuffle(array) {
     return array;
   }
 
-  //This function increases the board object level.
-  //Other functions care about the board level to set their own values.
-  function boardLevelUp() {
-    board.level++
-}
-
-//This function lets a player draw a card from a deck.
-//Currently used just for the item cards.
-function draw(player, deck){
-    console.log(deck, player);
-    player.inventory.push(deck.shift())
-}
-
 //Hand operations
 
 function rollHand(hand) {
@@ -78,15 +65,19 @@ function resetHand(hand) {
 
 //Gameboard object. To create some global variables and also spots to fetch HTML data from
 let board = {
-    "players": [],
-    "level": 0,
-    "itemDeck": [],
-    "scenarios": [],
-    "dicePool": {
-        "active": [],
-        "support": []
+    players: [],
+    level: 0,
+    itemDeck: [],
+    scenarios: [],
+    dicePool: {
+        active: [],
+        support: []
     },
-    "attackHand": [],
+    attackHand: [],
+    boon: {
+        deck: [],
+        drawn: []
+    }
 }
 
 //--------------------//
@@ -113,6 +104,7 @@ let board = {
         console.log(board.players)
     }
 
+    //This is just to speed up testing
     function TESTFILLpopulatePlayers(){
         board.players.length = 4
         board.players[0] = new Player("me","brash")
@@ -133,6 +125,33 @@ let board = {
         console.log(board.itemDeck)
     }
 
+    //Prepare the boon deck
+
+    function prepareBoonDeck(){
+        console.log("Preparing the boon deck")
+        //Cloning and shuffling the item deck, moving it
+        board.boon.deck = shuffle(JSON.parse(JSON.stringify(Boons)))
+        console.log("Item deck has been shuffled")
+        console.log(board.boon.deck)
+    }
+
+    //Prepare/refresh all player abilities counter based on the number of players and their level, level is board.level in most cases.
+    //This should be run before any scenario effects that might modify their ability usage
+    //This runs once in preGame setup but then all other instances are in the post-scenario healing phase.
+    //I like this as a pre-game once and post-scen second, in case I introduce random events between scenarios they can have abilities ready to use (making them unavailible in the next scenario as a cost to pass the event)
+    function prepareAbilities(level, players){
+        console.log("Setting the abilty counts for the scenario")
+        for (let i = 0; i < players.length; i++){
+            let numberOfPlayers = players.length - 2 //There must always be two players, and this works with the abilityMax array to grant the right number
+            console.log("For player: " + players[i].username + " Ability max from card:" + players[i].playstyle.abilityMax[level][numberOfPlayers])
+            players[i].abilityScenarioMax = players[i].playstyle.abilityMax[level][numberOfPlayers]
+            console.log("Scenario ability count set to:" + players[i].abilityScenarioMax)
+        }
+        console.log("The ability counter has been prepared")
+    }
+
+
+
 
 //--------------------//
 //Scenario setup phase
@@ -140,7 +159,6 @@ let board = {
 
 function setupScenario(deck, level){
     prepareScenario(deck, level)
-    prepareAbilities(level, board.players)
     console.log("The scenario for level " + (Number(level) + 1) + " has been prepared.")
     
 }
@@ -155,16 +173,6 @@ function prepareScenario(deck, level){
     console.log(board.scenarios)
 }
 
-//Prepare/refresh all player abilities counter based on the drawn scenario stats
-function prepareAbilities(level, players){
-    console.log("Setting the abilty counts for the scenario")
-    for (let i = 0; i < players.length; i++){
-        console.log("For player: " + players[i].username + " Ability max from card:" + players[i].playstyle.abilityMax[level][players.length - 2])
-        players[i].abilityScenarioMax = players[i].playstyle.abilityMax[level][players.length - 2]
-        console.log("Scenario ability count set to:" + players[i].abilityScenarioMax)
-    }
-    console.log("The ability counter has been prepared")
-}
 
 //Populating the player hands based on drawn scenario
 function setHands(scenario){
@@ -318,7 +326,6 @@ function selectSupportPlayer(players){
 //--------------------//
 
 
-
 //Checking for rerolls on players
 function hasRerollsremaining(player){
     if (player.currentRerolls > 0){
@@ -347,15 +354,112 @@ function rollSupport(player){
 }
 
 //Checking for rerolls exhausted
-function rerollsExhaustedCheck(active, support){
-    if ((active.currentRerolls = 0) && (support.currentRerolls = 0)){
-        alert("Rerolls for both players have been exhausted")
-    }
-}
 
 //--------------------//
 //End Rolling Phase Functions
 //--------------------//
+
+//--------------------//
+//Attack Phase Functions
+//--------------------//
+
+//--------------------//
+//End Attack Phase Functions
+//--------------------//
+
+//--------------------//
+//CounterAttack Phase Functions
+//--------------------//
+
+//Applies dmg to all players, used for AOE Attacks
+//I didn't specifically hard code board.players to allow for future expansion
+function applyDMGAOE(players, dmg){
+    for (let i = 0; i < players.length; i++){
+        players[i].dmgCounter+= dmg
+    }
+}
+
+
+//Primary event counterattack.
+//I think currentScenario is always submitted as board.scenario[board.level], player is *usually* activePlayer
+//I left player open in case varations for the game are designed
+    //If a dungeon is designed where the party gets split, and AOE is thus split, this will require reworking.
+function eventCounterAttack(currentScenario, player){
+    let currentStage = currentScenario.card.stage[stageCounter]
+    if (currentStage.aoe === true){
+        applyDMGAOE(board.players, currentStage.dmg)
+    } else {
+        player.dmgCounter+= dmg
+    }
+}
+
+
+
+//--------------------//
+//End CounterAttack Phase Functions
+//--------------------//
+
+//--------------------//
+//Start of Turn End Phase Functions
+//--------------------//
+
+//Checks the current stage's dmg counter against it's max HP
+function stageHPchecker(currentScenario){
+    let currentStage = currentScenario.card.stage[stageCounter]
+    if (currentScenario.dmgCounter >= currentStage.hp){
+        currentScenario.stageCounter++
+        alert("Stage defeated!")
+    }
+}
+
+function scenarioAllStagesDefeated(currentScenario){
+    if (currentScenario.stageCounter > (currentScenario.card.stage.length - 1)){
+        alert("Scenario Cleared!")
+        ScenarioCLeared()
+    }
+}
+
+function isAnyoneDead(players){
+    for (let i = 0; i < players.length; i++){
+        if (players[i].dmgCounter === players[i].card.hpMax[board.level]){
+            console.log(players[i].username, " was calculated to be dead, but there might be more.")
+            return true
+        }
+    }
+    return false
+}
+
+//--------------------//
+//End of Turn End Phase Functions
+//--------------------//
+
+//--------------------//
+//Scenario Cleared Phase Functions
+//--------------------//
+
+//This function increases the board object level.
+  function boardLevelUp() {
+    board.level++
+}
+
+//This function lets a player draw a card from a deck. Currently just used for the item deck
+function draw(player, deck){
+    console.log(deck, player);
+    player.inventory.push(deck.shift())
+}
+
+//This function is used to "grant" (draw) a boon for the party.
+function boonDraw(target, deck){
+    console.log(deck, target);
+    target.push(deck.shift())
+}
+
+
+
+//--------------------//
+//End Scenario Cleared Phase Functions
+//--------------------//
+
 
 
 //--------------------//
@@ -368,8 +472,12 @@ function rerollsExhaustedCheck(active, support){
         //Populate the players
         //populatePlayers()
         TESTFILLpopulatePlayers()
+        //Initial Preparation of player abilities
+        prepareAbilities(board.level, board.players)
         //Setup the item deck
         prepareItemDeck()
+        //Setup the boon deck
+        prepareBoonDeck()
         console.log("PreGameSetup function has finished")
     }
 
@@ -413,6 +521,7 @@ function rerollsExhaustedCheck(active, support){
     }
 
     function CombatPhase(){
+        //I created the combat phase function so multiple phases have access to the active/support player variables
         let activePlayer = board.players.find(player => player.status === "active")
         let supportPlayer = board.players.find(player => player.status === "support")
         console.log("active: ", activePlayer.username, " support: ", supportPlayer.username)
@@ -462,29 +571,56 @@ function rerollsExhaustedCheck(active, support){
         }
         //Counter Attack Phase
             //Event executes an attack
+            eventCounterAttack(board.scenarios[board.level], activePlayer)
                 //Check for any attack modifiers
                 //Assign DMG to target(s)
-        //End Phase
+        //Turn End Phase
+            function EndPhase(){
             //Check if phase has more dmg than current HP
                 //If so, clear DMG and move to next phase
+                stageHPchecker(board.scenarios[board.level])
                 //If no next phase, scenario cleared
+                scenarioAllStagesDefeated(board.scenarios[board.level])
             //Check if any PLAYER has more dmg than their current HP max
-                //if yes, game over
-    }
+                if (isAnyoneDead(board.players)){
+                    //if yes, game over
+                    alert("GAME OVER MAN")
+                }
+            }
+    
         //Scenarion Cleared
-            //Loot Phase
+            function ScenarioCleared(){
+            //Loot Phase -- activePlayer gets to loot as "last hit" bonus
                 //draw item from deck
+                draw(activePlayer, board.itemDeck)
                   //add item to Player inventory ~ this seems to work
+                  console.log("Item has been drawn and given to:", activePlayer)
                     //Give item to new player if desired
             //Level Up
             //Level up function ~ works
                 //First level up (to level 2)
+                if (board.level = 0){
+                    boardLevelUp()
+                    console.log("board is now level: ", board.level);
                     //Unlock tier 2 attack for all players
+
+                }
                 //Second Level up (to level 3)
+                if (board.level = 1){
+                    boardLevelUp()
+                    console.log("board is now level: ", board.level);
                     //Unlock tier 3 attack for all players
                     //Grant a boon to the party
+                    boonDraw(board.boon.deck, Boons)
+                    console.log("Boon has been granted to the party: ", board.boon.drawn)
+
+                }
+                    
             //Healing
                 //DMG counters removed
                 //Characters cleared of exhausted status
                 //Ability points refreshed to max
+                prepareAbilities(board.level, board.players)
                 //Any lingering augment effects are cleared
+            }
+    } //End of Combat phase --- This clears the activePlayer and supportPlayer variables

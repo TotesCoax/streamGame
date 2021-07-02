@@ -131,7 +131,7 @@ let board = {
         console.log("Preparing the boon deck")
         //Cloning and shuffling the item deck, moving it
         board.boon.deck = shuffle(JSON.parse(JSON.stringify(Boons)))
-        console.log("Item deck has been shuffled")
+        console.log("Boon deck has been shuffled")
         console.log(board.boon.deck)
     }
 
@@ -177,7 +177,7 @@ function prepareScenario(deck, level){
 //Populating the player hands based on drawn scenario
 function setHands(scenario){
     console.log("Setting player hands for the scenario");
-    console.log(scenario.activeDice, scenario.suppDice);
+    console.log(scenario.card.activeDice, scenario.card.suppDice);
 
     function populateHand(hand, num){
         for (let i = 0; i < num; i++){
@@ -185,8 +185,8 @@ function setHands(scenario){
         }
         //console.log(hand)
     }
-    populateHand(board.dicePool.active, scenario.activeDice)
-    populateHand(board.dicePool.support, scenario.suppDice)
+    populateHand(board.dicePool.active, scenario.card.activeDice)
+    populateHand(board.dicePool.support, scenario.card.suppDice)
     console.log("The hands have been populated")
     console.log(board.dicePool.active)
     console.log(board.dicePool.support)
@@ -353,7 +353,25 @@ function rollSupport(player){
     }
 }
 
-//Checking for rerolls exhausted
+//Move to attack phase? function
+function moveToAttackPhaseCheck(player1, player2){
+    console.log("Checking rerolls", player1.currentRerolls, player2.currentRerolls)
+    if (!hasRerollsremaining(player1) && !hasRerollsremaining(player2)){
+        console.log("Move to attack phase initiated.")
+        alert("No more rerolls remain. It is time to move to attack phase.")
+        return true
+    }
+    return false
+}
+
+
+//Move to attack phase
+function moveToAttackPhase(){
+    let choice = confirm("Are you sure you want to move to attack phase?")
+    if (choice){
+        AttackPhase()
+    }
+}
 
 //--------------------//
 //End Rolling Phase Functions
@@ -454,6 +472,26 @@ function boonDraw(target, deck){
     target.push(deck.shift())
 }
 
+//Healing
+
+//This targets only one player, to allow it being reused for single healing
+function removeDMGCountersOnePlayer(player, amt){
+    if (amt === "all"){
+        player.dmgCounter = 0
+    } else {
+        player.dmgCounter-= amt
+    }
+}
+
+function HealAllPlayers(players){
+    for (let i = 0; i < players.length; i++){
+        removeDMGCountersOnePlayer(player[i], all)
+    }
+}
+
+function unexhaustAllPlayers(players){
+    players.forEach(player => player.exhausted = "false")
+}
 
 
 //--------------------//
@@ -521,14 +559,17 @@ function boonDraw(target, deck){
     }
 
     function CombatPhase(){
+        setRerolls()
         //I created the combat phase function so multiple phases have access to the active/support player variables
-        let activePlayer = board.players.find(player => player.status === "active")
-        let supportPlayer = board.players.find(player => player.status === "support")
-        console.log("active: ", activePlayer.username, " support: ", supportPlayer.username)
+        let activePlayer = board.players.find(player => player.status === "active"),
+            supportPlayer = board.players.find(player => player.status === "support"),
+            currentScenario = board.scenarios[board.level],
+            turnTimer = 0
+        console.log("active: ", activePlayer, " support: ", supportPlayer, "Current scenario is: ", currentScenario)
     //Rolling phase
     function RollingPhase(){
         //Create player "hands" based on the scenario's restrictions
-        setHands(board.scenarios[board.level])
+        setHands(currentScenario)
         //Initial Rolls for scenario
         console.log("Initial Rolls for the scenario")
         rollHand(board.dicePool.active)
@@ -570,17 +611,20 @@ function boonDraw(target, deck){
             //if zero, engage skip counter attack phase
         }
         //Counter Attack Phase
+        function CounterAttackPhase() {
             //Event executes an attack
-            eventCounterAttack(board.scenarios[board.level], activePlayer)
+            eventCounterAttack(currentScenario, activePlayer)
                 //Check for any attack modifiers
                 //Assign DMG to target(s)
+            console.log("Stage has counterattacked")
+        }
         //Turn End Phase
             function EndPhase(){
             //Check if phase has more dmg than current HP
                 //If so, clear DMG and move to next phase
-                stageHPchecker(board.scenarios[board.level])
+                stageHPchecker(currentScenario)
                 //If no next phase, scenario cleared
-                scenarioAllStagesDefeated(board.scenarios[board.level])
+                scenarioAllStagesDefeated(currentScenario)
             //Check if any PLAYER has more dmg than their current HP max
                 if (isAnyoneDead(board.players)){
                     //if yes, game over
@@ -618,7 +662,9 @@ function boonDraw(target, deck){
                     
             //Healing
                 //DMG counters removed
+                endPhaseHealAll(board.players)
                 //Characters cleared of exhausted status
+                unexhaustAllPlayers(board.players)
                 //Ability points refreshed to max
                 prepareAbilities(board.level, board.players)
                 //Any lingering augment effects are cleared

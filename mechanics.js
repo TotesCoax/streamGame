@@ -176,8 +176,8 @@ function prepareScenario(deck, level){
 
 //Populating the player hands based on drawn scenario
 function setHands(scenario){
-    console.log("Setting player hands for the scenario");
-    console.log(scenario.card.activeDice, scenario.card.suppDice);
+    console.log("Setting player hands for the scenario")
+    console.log(scenario.card.activeDice, scenario.card.suppDice)
 
     function populateHand(hand, num){
         for (let i = 0; i < num; i++){
@@ -192,6 +192,7 @@ function setHands(scenario){
     console.log(board.dicePool.support)
 }
 
+//Currently this is a blanket reset without targetting any specific pool of players.
 function setRerolls() {
     for (let i = 0; i < board.players.length; i++){
         board.players[i].currentRerolls = 2
@@ -338,36 +339,48 @@ function hasRerollsremaining(player){
 function rollActive(player) {
     if((player.status === "active") && hasRerollsremaining(player)){
         rollHand(board.dicePool.active)
+        console.log("Active pool has been rerolled: ", board.dicePool.active)
         player.currentRerolls--
+        console.log("Reroll deducted, now checking both rerolls:")
+        moveToAttackPhaseCheck()
     } else {
-        alert("You cannot roll this hand.", player.status, player.currentRerolls)
+        console.log(player.status, player.currentRerolls)
+        alert("You cannot roll this hand.")
     }
 }
 
 function rollSupport(player){
     if((player.status === "support") && hasRerollsremaining(player)){
         rollHand(board.dicePool.support)
+        console.log("Support pool has been rerolled: ", board.dicePool.support)
         player.currentRerolls--
+        console.log("Reroll deducted, now checking both rerolls:")
+        moveToAttackPhaseCheck()
     } else {
-        alert("You cannot roll this hand.", player.status, player.currentRerolls)
+        console.log(player.status, player.currentRerolls)
+        alert("You cannot roll this hand.")
     }
 }
 
 //Move to attack phase? function
-function moveToAttackPhaseCheck(player1, player2){
-    console.log("Checking rerolls", player1.currentRerolls, player2.currentRerolls)
-    if (!hasRerollsremaining(player1) && !hasRerollsremaining(player2)){
+function moveToAttackPhaseCheck(){
+    let activePlayer = board.players.find(player => player.status === "active"),
+        supportPlayer = board.players.find(player => player.status === "support")
+
+    console.log("Checking rerolls", "Active:", activePlayer.currentRerolls, " Support:", supportPlayer.currentRerolls)
+    if (!hasRerollsremaining(activePlayer) && !hasRerollsremaining(supportPlayer)){
         console.log("Move to attack phase initiated.")
         alert("No more rerolls remain. It is time to move to attack phase.")
         return true
     }
+    console.log("There are rerolls remaining.")
     return false
 }
 
 
 //Move to attack phase
 function moveToAttackPhase(){
-    let choice = confirm("Are you sure you want to move to attack phase?")
+    let choice = confirm("Are you ready to move to attack phase?")
     if (choice){
         AttackPhase()
     }
@@ -399,7 +412,7 @@ function applyDMGAOE(players, dmg){
 
 
 //Primary event counterattack.
-//I think currentScenario is always submitted as board.scenario[board.level], player is *usually* activePlayer
+//I think currentScenario is always submitted as board.scenarios[board.level], player is *usually* activePlayer
 //I left player open in case varations for the game are designed
     //If a dungeon is designed where the party gets split, and AOE is thus split, this will require reworking.
 function eventCounterAttack(currentScenario, player){
@@ -558,18 +571,13 @@ function unexhaustAllPlayers(players){
         console.log("PreRollPlayerTurnSetup has completed")
     }
 
-    function CombatPhase(){
-        setRerolls()
-        //I created the combat phase function so multiple phases have access to the active/support player variables
-        let activePlayer = board.players.find(player => player.status === "active"),
-            supportPlayer = board.players.find(player => player.status === "support"),
-            currentScenario = board.scenarios[board.level],
-            turnTimer = 0
-        console.log("active: ", activePlayer, " support: ", supportPlayer, "Current scenario is: ", currentScenario)
+
+
     //Rolling phase
     function RollingPhase(){
+        setRerolls()
         //Create player "hands" based on the scenario's restrictions
-        setHands(currentScenario)
+        setHands(board.scenarios[board.level])
         //Initial Rolls for scenario
         console.log("Initial Rolls for the scenario")
         rollHand(board.dicePool.active)
@@ -591,7 +599,6 @@ function unexhaustAllPlayers(players){
         //Move to attack Phase
         //Confirm player wants to move to attack phase
     }
-    RollingPhase()
         //Attack phase
         function AttackPhase() {
             //Clone attack hand
@@ -612,8 +619,9 @@ function unexhaustAllPlayers(players){
         }
         //Counter Attack Phase
         function CounterAttackPhase() {
+            let activePlayer = board.players.find(player => player.status === "active")
             //Event executes an attack
-            eventCounterAttack(currentScenario, activePlayer)
+            eventCounterAttack(board.scenarios[board.level], activePlayer)
                 //Check for any attack modifiers
                 //Assign DMG to target(s)
             console.log("Stage has counterattacked")
@@ -622,9 +630,9 @@ function unexhaustAllPlayers(players){
             function EndPhase(){
             //Check if phase has more dmg than current HP
                 //If so, clear DMG and move to next phase
-                stageHPchecker(currentScenario)
+                stageHPchecker(board.scenarios[board.level])
                 //If no next phase, scenario cleared
-                scenarioAllStagesDefeated(currentScenario)
+                scenarioAllStagesDefeated(board.scenarios[board.level])
             //Check if any PLAYER has more dmg than their current HP max
                 if (isAnyoneDead(board.players)){
                     //if yes, game over
@@ -634,7 +642,8 @@ function unexhaustAllPlayers(players){
     
         //Scenarion Cleared
             function ScenarioCleared(){
-            //Loot Phase -- activePlayer gets to loot as "last hit" bonus
+            //Loot Phase -- active Player gets to loot as "last hit" bonus
+            let activePlayer = board.players.find(player => player.status === "active")
                 //draw item from deck
                 draw(activePlayer, board.itemDeck)
                   //add item to Player inventory ~ this seems to work
@@ -669,4 +678,3 @@ function unexhaustAllPlayers(players){
                 prepareAbilities(board.level, board.players)
                 //Any lingering augment effects are cleared
             }
-    } //End of Combat phase --- This clears the activePlayer and supportPlayer variables

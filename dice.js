@@ -20,12 +20,29 @@ class Die {
         }
     }
 
-    markKeep() {
-        this.keep = true
+    toggleKeep() {
+        switch (this.keep) {
+            case true:
+                this.keep = false
+                break;
+        
+            case false:
+                this.keep = true
+                break;
+        }
     }
 
-    submit() {
-        this.submitted = true
+    toggleSubmit() {
+        switch (this.submitted) {
+            case true:
+                this.submitted = false
+                break;
+        
+            case false:
+                this.submitted = true
+                break;
+        }
+
     }
 
     reset() {
@@ -43,11 +60,15 @@ class Die {
     function createAttackHand() {
         let counter = 0
         for (let i = 0; i < board.dicePool.active.length; i++){
-            board.attackHand[counter] = JSON.parse(JSON.stringify(board.dicePool.active[i]))
+            board.attackHand[counter] = new Die()
+            board.attackHand[counter].value = board.dicePool.active[i].value
+            board.attackHand[counter].keep = true
             counter++
         }
         for (let i = 0; i < board.dicePool.support.length; i++){
-            board.attackHand[counter] = JSON.parse(JSON.stringify(board.dicePool.support[i]))
+            board.attackHand[counter] = new Die()
+            board.attackHand[counter].value = board.dicePool.support[i].value
+            board.attackHand[counter].keep = true
             counter++
         }
         board.attackHand.sort(function(a,b) {
@@ -61,7 +82,7 @@ class Die {
         let submission = []
         for (let i = 0; i < hand.length; i++){
             console.log(hand[i])
-            if (hand[i].submitted = true){
+            if (hand[i].submitted === true){
                 console.log("Die Moved")
                 submission.push(hand[i])
                 hand.splice(i,1)
@@ -74,7 +95,7 @@ class Die {
 
     //Apply DMG to scenario function
     function applyDMGtoScenario(dmg, level) {
-        board.scenarios[level].dmgCoutner+= dmg
+        board.scenarios[level].dmgCounter+= dmg
     }
 
 //If the # of dice is met, and the attack fits the style, dmg is issued
@@ -92,7 +113,12 @@ function attack(player, attackNum, attackHand) {
     } else {
         console.log("The attack did not succeed")
         //returns the attack submission to the pool
-        board.attackHand.push(attackSubmission)
+        for (let i = 0; i < attackSubmission.length; i++){
+            board.attackHand.push(attackSubmission[i])            
+        }
+        board.attackHand.sort(function(a,b) {
+            return a.value - b.value
+        })
         console.log(board.attackHand)
         return false
     }

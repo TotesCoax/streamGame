@@ -394,6 +394,14 @@ function moveToAttackPhase(){
 //Attack Phase Functions
 //--------------------//
 
+function endAttackPhase(attackHand) {
+    if (attackHand.length > 0){
+        CounterAttackPhase()
+    } else {
+        EndPhase()
+    }
+}
+
 //--------------------//
 //End Attack Phase Functions
 //--------------------//
@@ -416,11 +424,11 @@ function applyDMGAOE(players, dmg){
 //I left player open in case varations for the game are designed
     //If a dungeon is designed where the party gets split, and AOE is thus split, this will require reworking.
 function eventCounterAttack(currentScenario, player){
-    let currentStage = currentScenario.card.stage[stageCounter]
+    let currentStage = currentScenario.card.stage[currentScenario.stageCounter]
     if (currentStage.aoe === true){
         applyDMGAOE(board.players, currentStage.dmg)
     } else {
-        player.dmgCounter+= dmg
+        player.dmgCounter+= currentStage.dmg
     }
 }
 
@@ -436,24 +444,28 @@ function eventCounterAttack(currentScenario, player){
 
 //Checks the current stage's dmg counter against it's max HP
 function stageHPchecker(currentScenario){
-    let currentStage = currentScenario.card.stage[stageCounter]
+    let currentStage = currentScenario.card.stage[currentScenario.stageCounter]
     if (currentScenario.dmgCounter >= currentStage.hp){
         currentScenario.stageCounter++
         alert("Stage defeated!")
+        scenarioAllStagesDefeated(currentScenario)
     }
 }
 
 function scenarioAllStagesDefeated(currentScenario){
     if (currentScenario.stageCounter > (currentScenario.card.stage.length - 1)){
+        isAnyoneDead(board.players)
         alert("Scenario Cleared!")
         ScenarioCLeared()
+    } else {
     }
 }
 
 function isAnyoneDead(players){
     for (let i = 0; i < players.length; i++){
-        if (players[i].dmgCounter === players[i].card.hpMax[board.level]){
+        if (players[i].dmgCounter >= players[i].playstyle.hpMax[board.level]){
             console.log(players[i].username, " was calculated to be dead, but there might be more.")
+            alert("GAME OVER")
             return true
         }
     }
@@ -489,7 +501,7 @@ function boonDraw(target, deck){
 
 //This targets only one player, to allow it being reused for single healing
 function removeDMGCountersOnePlayer(player, amt){
-    if (amt === "all"){
+    if (amt === "full"){
         player.dmgCounter = 0
     } else {
         player.dmgCounter-= amt
@@ -498,7 +510,7 @@ function removeDMGCountersOnePlayer(player, amt){
 
 function HealAllPlayers(players){
     for (let i = 0; i < players.length; i++){
-        removeDMGCountersOnePlayer(player[i], all)
+        removeDMGCountersOnePlayer(players[i], all)
     }
 }
 
@@ -583,7 +595,7 @@ function unexhaustAllPlayers(players){
         rollHand(board.dicePool.active)
         rollHand(board.dicePool.support)
         //Declare any die rerolls (assign keep:true)
-        //This will be done with client side code sending keep command back to server
+            //This will be done with client side code sending keep command back to server
         //Roll all dice where keep is false and reroll counter is greater than zero for respective player
         //This is built into the roll function
         //Rerolls
@@ -591,11 +603,11 @@ function unexhaustAllPlayers(players){
         //If counter = 0, set all player dice to keep:true
         //If both counters are 0, disable roll button
         //Roll any keep:false dice
-        //Using abilities
-        //Only Active and Support player can use Abilities
-        //Confirm player wants to engage ability
-        //Choose and confirm target of ability
-        //Execute ability change
+        //Using abilities --> NEED TO DO
+            //Only Active and Support player can use Abilities
+            //Confirm player wants to engage ability
+            //Choose and confirm target of ability
+            //Execute ability change
         //Move to attack Phase
         //Confirm player wants to move to attack phase
     }
@@ -604,13 +616,13 @@ function unexhaustAllPlayers(players){
             //Clone attack hand
             createAttackHand()
             //Execute an attack, only the active player can submit attacks
-            //Assign dice to attack(s)
-            //check if assignment is valid
-            //if not return dice to pool
+                //Assign dice to attack(s)
+                //check if assignment is valid
+                //if they are, the used dice are discarded
+                //if not return dice to pool
             //Submit attack(s)
-            //Assigned dice are marked as redeemed
-            //Check for any Event defense augments
-            //Check for any Player attack augments
+            //Check for any Event defense augments --> need to do
+            //Check for any Player attack augments --> need to do
             //Calculate DMG result
             //Modified DMG is submitted to Event stage counter
             //Count number of remaining dice
@@ -619,15 +631,18 @@ function unexhaustAllPlayers(players){
         }
         //Counter Attack Phase
         function CounterAttackPhase() {
+            console.log("Start of counterattack")
             let activePlayer = board.players.find(player => player.status === "active")
             //Event executes an attack
             eventCounterAttack(board.scenarios[board.level], activePlayer)
                 //Check for any attack modifiers
                 //Assign DMG to target(s)
             console.log("Stage has counterattacked")
+            EndPhase()
         }
         //Turn End Phase
             function EndPhase(){
+                console.log("Start of End phase")
             //Check if phase has more dmg than current HP
                 //If so, clear DMG and move to next phase
                 stageHPchecker(board.scenarios[board.level])
@@ -637,7 +652,11 @@ function unexhaustAllPlayers(players){
                 if (isAnyoneDead(board.players)){
                     //if yes, game over
                     alert("GAME OVER MAN")
+                } else {
+
                 }
+                console.log("End phase has completed")
+
             }
     
         //Scenarion Cleared
@@ -671,7 +690,7 @@ function unexhaustAllPlayers(players){
                     
             //Healing
                 //DMG counters removed
-                endPhaseHealAll(board.players)
+                HealAllPlayers(board.players)
                 //Characters cleared of exhausted status
                 unexhaustAllPlayers(board.players)
                 //Ability points refreshed to max

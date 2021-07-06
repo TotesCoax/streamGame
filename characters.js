@@ -23,7 +23,8 @@ let Playstyle = {
                 alert("Incorrect value was given")
             }
         },
-        mechanic: function brash(attackSubmission){
+        mechanic: function brash(attackSubmission, chosenAttack){
+            console.log("Checking attack: ", chosenAttack)
             console.log(attackSubmission)
             for (let i = 1; i < attackSubmission.length; i++){
                 console.log(attackSubmission[i-1].value, attackSubmission[i].value);
@@ -34,6 +35,9 @@ let Playstyle = {
             }
             console.log("The attack is brash")
             return true
+        },
+        basicAttack: function bleepblorp(params) {
+            console.log(this)
         }
     },
 
@@ -75,11 +79,12 @@ let Playstyle = {
                     break;
             }
         },
-        mechanic: function elegant(attackSubmission){
+        mechanic: function elegant(attackSubmission, chosenAttack){
+            console.log("Checking attack: ", chosenAttack)
+            attackSubmission.sort(function(a,b) {
+                return a.value - b.value
+            })
             console.log(attackSubmission)
-            attackSubmission.sort(function compareNumbers(a, b) {
-                return a - b;
-              })
             for (let i = 1; i < attackSubmission.length; i++){
                 console.log(attackSubmission[i-1].value, attackSubmission[i].value);
                 if (attackSubmission[i].value !== attackSubmission[i-1].value + 1){
@@ -98,11 +103,11 @@ let Playstyle = {
         abilityMax: [[1,1,1],[2,1,1],[3,2,1]],
         abilityText: "Change up to two standard dice to a value of 5",
         attack:[
-            {tier: 0, diceReq: 1, dmg:1},
-            {tier: 0, diceReq: 2, dmg:3},
-            {tier: 0, diceReq: 4, dmg:8},
-            {tier: 2, diceReq: 6, dmg:15},
-            {tier: 3, diceReq: 8, dmg:25}
+            {tier: 0, diceReq: 1, dmg:1, threshold:"x"},
+            {tier: 0, diceReq: 2, dmg:3, threshold:10},
+            {tier: 0, diceReq: 4, dmg:8, threshold:20},
+            {tier: 2, diceReq: 6, dmg:15, threshold:32},
+            {tier: 3, diceReq: 8, dmg:25, threshold:45}
         ],
         ability: function(targetArray) {
             if (targetArray.length > 2){
@@ -113,15 +118,16 @@ let Playstyle = {
                 targetArray[i].value = 5
             }
         },
-        mechanic: function staunch(attackSubmission, threshold){
+        mechanic: function staunch(attackSubmission, chosenAttack){
+            console.log("Checking attack: ", chosenAttack)
             let sum = 0
             for (let i = 0; i < attackSubmission.length; i++){
                 console.log(attackSubmission[i].value);
                 sum += attackSubmission[i].value
                 console.log("sum:" + sum)
                 }
-            console.log("Threshold:" + threshold)
-            if (sum >= threshold){
+            console.log("Threshold:" + chosenAttack.threshold)
+            if (sum >= chosenAttack.threshold){
                 console.log("The attack is staunch")
                 return true
             } else {
@@ -137,11 +143,11 @@ let Playstyle = {
         abilityMax: [[1,1,1],[2,1,1],[3,2,1]],
         abilityText: "Change up to two standard dice to a value of 2",
         attack:[
-            {tier: 0, diceReq: 1, dmg:1},
-            {tier: 0, diceReq: 2, dmg:3},
-            {tier: 0, diceReq: 4, dmg:6},
-            {tier: 2, diceReq: 6, dmg:12},
-            {tier: 3, diceReq: 8, dmg:20}
+            {tier: 0, diceReq: 1, dmg:1, threshold:"x"},
+            {tier: 0, diceReq: 2, dmg:3, threshold:4},
+            {tier: 0, diceReq: 4, dmg:6, threshold:8},
+            {tier: 2, diceReq: 6, dmg:12, threshold:10},
+            {tier: 3, diceReq: 8, dmg:20, threshold:12}
         ],
         ability: function(targetArray) {
             if (targetArray.length > 2){
@@ -152,16 +158,17 @@ let Playstyle = {
                 targetArray[i].value = 2
             }
         },
-        mechanic: function sly(attackSubmission, threshold){
-            console.log(attackSubmission, threshold);
+        mechanic: function sly(attackSubmission, chosenAttack){
+            console.log("Checking attack: ", chosenAttack)
+            console.log(attackSubmission)
             let sum = 0
             for (let i = 0; i < attackSubmission.length; i++){
                 console.log(attackSubmission[i].value);
                 sum += attackSubmission[i].value
                 console.log("Sum:" + sum)
                 }
-                console.log("Threshold:" + threshold)
-            if (sum <= threshold){
+                console.log("Threshold:" + chosenAttack.threshold)
+            if (sum <= chosenAttack.threshold){
                 console.log("The attack is sly")
                 return true
             } else {
@@ -213,6 +220,12 @@ let Playstyle = {
             } else {
                 alert("NOPERS")
             }
+        }
+        mechanic: function name(attackSubmission, chosenAttack){
+            console.log("The attack fits the mechanic")
+        }
+        basicAttack: function(targetPlayer) {
+            console.log("Basic Attack has been performed")
         }
     }
     */

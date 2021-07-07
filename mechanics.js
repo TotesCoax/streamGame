@@ -143,9 +143,9 @@ let board = {
         console.log("Setting the abilty counts for the scenario")
         for (let i = 0; i < players.length; i++){
             let numberOfPlayers = players.length - 2 //There must always be two players, and this works with the abilityMax array to grant the right number
-            console.log("For player: " + players[i].username + " Ability max from card:" + players[i].playstyle.abilityMax[level][numberOfPlayers])
+            //console.log("For player: " + players[i].username + " Ability max from card:" + players[i].playstyle.abilityMax[level][numberOfPlayers])
             players[i].abilityScenarioMax = players[i].playstyle.abilityMax[level][numberOfPlayers]
-            console.log("Scenario ability count set to:" + players[i].abilityScenarioMax)
+            //console.log("Default bility count set to:" + players[i].abilityScenarioMax)
         }
         console.log("The ability counter has been prepared")
     }
@@ -257,7 +257,7 @@ function selectActivePlayer(players){
     }
         //Checking function
         function allExhaustedQuery(players){
-            console.log("Checking exhausted status")
+            console.log("exhaust check loop")
             for (let i = 0; i < players.length; i++){
                 console.log(players[i].username, "exhausted: ", players[i].exhausted)
                 if (players[i].exhausted === false){
@@ -447,6 +447,7 @@ function stageHPchecker(currentScenario){
     let currentStage = currentScenario.card.stage[currentScenario.stageCounter]
     if (currentScenario.dmgCounter >= currentStage.hp){
         currentScenario.stageCounter++
+        currentScenario.dmgCounter = 0
         alert("Stage defeated!")
         scenarioAllStagesDefeated(currentScenario)
     }
@@ -456,8 +457,7 @@ function scenarioAllStagesDefeated(currentScenario){
     if (currentScenario.stageCounter > (currentScenario.card.stage.length - 1)){
         isAnyoneDead(board.players)
         alert("Scenario Cleared!")
-        ScenarioCLeared()
-    } else {
+        ScenarioCleared()
     }
 }
 
@@ -510,7 +510,7 @@ function removeDMGCountersOnePlayer(player, amt){
 
 function HealAllPlayers(players){
     for (let i = 0; i < players.length; i++){
-        removeDMGCountersOnePlayer(players[i], all)
+        removeDMGCountersOnePlayer(players[i], "full")
     }
 }
 
@@ -531,7 +531,7 @@ function unexhaustAllPlayers(players){
 
 
 //Pre-game Setup
-    function PreGameSetup() {
+    function NewGameSetup() {
         //Populate the players
         //populatePlayers()
         TESTFILLpopulatePlayers()
@@ -541,19 +541,19 @@ function unexhaustAllPlayers(players){
         prepareItemDeck()
         //Setup the boon deck
         prepareBoonDeck()
-        console.log("PreGameSetup function has finished")
+        console.log("Start of game Setup function has finished")
     }
 
 // Turn system
     //Setup steps each turn before each roll
-    function PreRollScenarioSetup() {
+    function NewScenarioSetup() {
         //Prepare the Scenario for the level
         setupScenario(scenarios, board.level)
         console.log("PreRollScenarioSetup has finished")
-        PreRollStageSetup()
+        NewStageSetup()
     }
     //Setup for each new stage reveal (once per stage)
-    function PreRollStageSetup() {
+    function NewStageSetup() {
         //Check for any Event Stage effects
         console.log("This is where we would check for stage effects")
         //Apply the Stage effect
@@ -565,11 +565,11 @@ function unexhaustAllPlayers(players){
         //Check for any reroll modifiers (event or items)
         //Apply any reroll modifiers to respective party
         console.log("Apply Reroll modifiers")
-        console.log("PreRollStageSetup had finished")
-        PreRollPlayerTurnSetup()
+        console.log("NewStageSetup had finished")
+        NewPlayerTurnSetup()
     }
     //Setup for each Player's turn
-    function PreRollPlayerTurnSetup() {
+    function NewPlayerTurnSetup() {
         //Active Player is declared
         selectActivePlayer(board.players)
         //Check if all other players are exhausted
@@ -580,7 +580,7 @@ function unexhaustAllPlayers(players){
         //Select a support
         selectSupportPlayer(board.players)
         //verify the support is not exhausted
-        console.log("PreRollPlayerTurnSetup has completed")
+        console.log("NewPlayerTurnSetup has completed")
     }
 
 
@@ -670,23 +670,31 @@ function unexhaustAllPlayers(players){
                     //Give item to new player if desired
             //Level Up
             //Level up function ~ works
-                //First level up (to level 2)
-                if (board.level = 0){
-                    boardLevelUp()
-                    console.log("board is now level: ", board.level);
-                    //Unlock tier 2 attack for all players
-
+                switch (board.level) {
+                    //First level up (to level 2)
+                    case 0:
+                        boardLevelUp()
+                        console.log("board is now level: ", board.level);
+                        //Unlock tier 2 attack for all players    
+                        break;
+                
+                    case 1:
+                        boardLevelUp()
+                        console.log("board is now level: ", board.level);
+                        //Unlock tier 3 attack for all players
+                        //Grant a boon to the party
+                        boonDraw(board.boon.deck, Boons)
+                        console.log("Boon has been granted to the party: ", board.boon.drawn)    
+                        break;
+                
+                    case 2:
+                        console.log("board is now level: ", board.level);
+                        break;
+                
+                    default:
+                        break;
                 }
                 //Second Level up (to level 3)
-                if (board.level = 1){
-                    boardLevelUp()
-                    console.log("board is now level: ", board.level);
-                    //Unlock tier 3 attack for all players
-                    //Grant a boon to the party
-                    boonDraw(board.boon.deck, Boons)
-                    console.log("Boon has been granted to the party: ", board.boon.drawn)
-
-                }
                     
             //Healing
                 //DMG counters removed

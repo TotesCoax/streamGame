@@ -36,8 +36,11 @@ let Playstyle = {
             console.log("The attack is brash")
             return true
         },
-        basicAttack: function bleepblorp(params) {
-            console.log(this)
+        basicAttack: function(attackSubmission, chosenAttack){
+            console.log(attackSubmission, chosenAttack)
+            if (attackSubmission.length === 1 && attackSubmission[0].value === 6){
+                applyDMGtoScenario(chosenAttack.dmg, board.level)
+            }
         }
     },
 
@@ -51,8 +54,8 @@ let Playstyle = {
             {tier: 0, diceReq: 3, dmg:3},
             {tier: 0, diceReq: 4, dmg:5},
             {tier: 0, diceReq: 5, dmg:8},
-            {tier: 2, diceReq: 6, dmg:12},
-            {tier: 3, diceReq: 8, dmg:24}
+            {tier: 1, diceReq: 6, dmg:12},
+            {tier: 2, diceReq: 8, dmg:24}
         ],
         ability: function(target) {
             switch (target.value) {
@@ -86,7 +89,7 @@ let Playstyle = {
             })
             console.log(attackSubmission)
             for (let i = 1; i < attackSubmission.length; i++){
-                console.log(attackSubmission[i-1].value, attackSubmission[i].value);
+                console.log(attackSubmission[i-1].value, "->", attackSubmission[i].value);
                 if (attackSubmission[i].value !== attackSubmission[i-1].value + 1){
                     console.log("The attack is not elegant")
                     return false
@@ -94,7 +97,14 @@ let Playstyle = {
             }
             console.log("The attack is elegant")
             return true
+        },
+        basicAttack: function(attackSubmission, chosenAttack){
+            console.log(attackSubmission, chosenAttack)
+            if (this.mechanic(attackSubmission, chosenAttack) && attackSubmission.length === 2){
+                applyDMGtoScenario(chosenAttack.dmg, board.level)
+            }
         }
+
     },
 
     staunch: {
@@ -106,8 +116,8 @@ let Playstyle = {
             {tier: 0, diceReq: 1, dmg:1, threshold:"x"},
             {tier: 0, diceReq: 2, dmg:3, threshold:10},
             {tier: 0, diceReq: 4, dmg:8, threshold:20},
-            {tier: 2, diceReq: 6, dmg:15, threshold:32},
-            {tier: 3, diceReq: 8, dmg:25, threshold:45}
+            {tier: 1, diceReq: 6, dmg:15, threshold:32},
+            {tier: 2, diceReq: 8, dmg:25, threshold:45}
         ],
         ability: function(targetArray) {
             if (targetArray.length > 2){
@@ -134,7 +144,14 @@ let Playstyle = {
                 console.log("the attack is not staunch")
                 return false
             }
-        }        
+        },
+        basicAttack: function(attackSubmission, chosenAttack){
+            console.log(attackSubmission, chosenAttack)
+            if (attackSubmission.length === 1 && attackSubmission[0].value === 1){
+                applyDMGtoScenario(chosenAttack.dmg, board.level)
+            }
+        }
+
     },
 
     sly: {
@@ -146,8 +163,8 @@ let Playstyle = {
             {tier: 0, diceReq: 1, dmg:1, threshold:"x"},
             {tier: 0, diceReq: 2, dmg:3, threshold:4},
             {tier: 0, diceReq: 4, dmg:6, threshold:8},
-            {tier: 2, diceReq: 6, dmg:12, threshold:10},
-            {tier: 3, diceReq: 8, dmg:20, threshold:12}
+            {tier: 1, diceReq: 6, dmg:12, threshold:10},
+            {tier: 2, diceReq: 8, dmg:20, threshold:12}
         ],
         ability: function(targetArray) {
             if (targetArray.length > 2){
@@ -175,7 +192,14 @@ let Playstyle = {
                 console.log("The attack is not sly")
                 return false
             }
-        }        
+        },
+        basicAttack: function(attackSubmission, chosenAttack){
+            console.log(attackSubmission, chosenAttack)
+            if (attackSubmission.length === 1 && ((attackSubmission[0].value === 6)||(attackSubmission[0].value === 5))){
+                applyDMGtoScenario(chosenAttack.dmg, board.level)
+            }
+        }
+
     },
 
     /*
@@ -190,8 +214,8 @@ let Playstyle = {
             {tier: 0, diceReq: 3, dmg:3},
             {tier: 0, diceReq: 3, dmg:4},
             {tier: 0, diceReq: 3, dmg:5},
-            {tier: 2, diceReq: 6, dmg:12},
-            {tier: 3, diceReq: 8, dmg:12}
+            {tier: 1, diceReq: 6, dmg:12},
+            {tier: 2, diceReq: 8, dmg:12}
         ],
         ability: function(targetValue, targetArray, direction) {
             //I'll do this later.
@@ -211,8 +235,8 @@ let Playstyle = {
             {tier: 0, diceReq: 3, dmg:6},
             {tier: 0, diceReq: 3, dmg:3},
             {tier: 0, diceReq: 3, dmg:3},
-            {tier: 2, diceReq: 6, dmg:12},
-            {tier: 3, diceReq: 8, dmg:20}
+            {tier: 1, diceReq: 6, dmg:12},
+            {tier: 2, diceReq: 8, dmg:20}
         ],
         ability: function(targetPlayer) {
             if ((targetPlayer.abilityUse + 1) < targetPlayer.abilityMax) {

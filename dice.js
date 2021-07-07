@@ -100,15 +100,16 @@ class Die {
 
 //If the # of dice is met, and the attack fits the style, dmg is issued
 function attack(player, attackNum, attackHand) {
-    if (attackNum === 0 && attackHand.length === 1){
-        console.log("Basic attack detected")
-        //Program in basic attack function to each card and call that function here?
-    }
     let attackSubmission = createAttackSubmission(attackHand),
-        chosenAttack = player.playstyle.attack[attackNum],
-        diceReq = chosenAttack.diceReq,
-        dmg = chosenAttack.dmg,
-        style = player.playstyle.mechanic
+    chosenAttack = player.playstyle.attack[attackNum],
+    diceReq = chosenAttack.diceReq,
+    dmg = chosenAttack.dmg,
+    style = player.playstyle.mechanic
+    //Checking for basic attack submission - because they have their own special rules for each character
+    if (attackNum === 0){
+        console.log("Basic attack detected")
+        player.playstyle.basicAttack(attackSubmission, chosenAttack)
+    }
     //If the number of dice required is met AND the character mechanic is met, assign dmg
     if (numDiceCheck(diceReq, attackSubmission) && style(attackSubmission, chosenAttack)){
         console.log("Attack succeeds. " + dmg + " damage has been issued")

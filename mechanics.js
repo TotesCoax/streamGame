@@ -1,5 +1,55 @@
 
 //Object Factories
+
+// Die Object
+
+class Die {
+    constructor(i) {
+        this.value = 0
+        this.keep = false
+        this.submitted = false
+    }
+//This function rolls values 1-6
+    rollDie()  {
+        if (this.keep === false){
+            this.value = Math.floor(Math.random() * 6) + 1
+        }
+    }
+//This is used in the rolling phase
+    toggleKeep() {
+        switch (this.keep) {
+            case true:
+                this.keep = false
+                break;
+        
+            case false:
+                this.keep = true
+                break;
+        }
+    }
+//This is used in the attack phase
+    toggleSubmit() {
+        switch (this.submitted) {
+            case true:
+                this.submitted = false
+                break;
+        
+            case false:
+                this.submitted = true
+                break;
+        }
+
+    }
+//I don't think I need this anymore.
+    reset() {
+        this.keep = false
+        this.redeemed = false
+        this.submitted = false
+    }
+}
+
+
+
 //Player object
 
 class Player {
@@ -7,6 +57,7 @@ class Player {
         this.username = username.toLowerCase()
         //this.profilePic = profilePic
         this.playstyle = Playstyle[playstyle.toLowerCase()]
+        //Inventory is where loot items are held
         this.inventory = []
         //These are counters for each Scenario. Scen can modify them.
         this.currentRerolls = 0
@@ -20,11 +71,16 @@ class Player {
     }
 }
 
+//Scenario object
 class Scenario {
     constructor(scenarioCard) {
+        //This is used to pull stats from the card file
         this.card = scenarioCard
+        //This is used to track dmg between stages
         this.dmgCounter = 0
+        //I don't think I need this...
         this.defeated = false
+        //This tracks which stage the players are on for each scenario.
         this.stageCounter = 0
     }
 }
@@ -79,6 +135,23 @@ let board = {
         drawn: []
     }
 }
+
+//Dev object - I created this to make some coding shorthands for testing
+let dev = {}
+function setDev(){
+    dev = {
+        aPlay: board.players.find(player => player.status === "active"),
+        sPlay: board.players.find(player => player.status === "support"),
+        cScen: board.scenarios[board.level],
+        cStage: board.scenarios[board.level].card.stage[board.scenarios[board.level].stageCounter],
+        aDice: board.dicePool.active,
+        sDice: board.dicePool.support,
+        aHand: board.attackHand
+    }
+    console.log("Dev object has been set")
+}
+
+
 
 //--------------------//
 //Pre-Game setup functions
@@ -336,6 +409,14 @@ function hasRerollsremaining(player){
     }
 }
 
+function rollBoth() {
+    let active = board.players.find(player => player.status === "active"),
+        support = board.players.find(player => player.status === "support")
+
+    rollActive(active)
+    rollSupport(support)
+}
+
 function rollActive(player) {
     if((player.status === "active") && hasRerollsremaining(player)){
         rollHand(board.dicePool.active)
@@ -394,6 +475,90 @@ function moveToAttackPhase(){
 //Attack Phase Functions
 //--------------------//
 
+//Attack function
+
+    //Clones the dice objects and generated the attack pool
+    function createAttackHand() {
+        let counter = 0
+        for (let i = 0; i < board.dicePool.active.length; i++){
+            board.attackHand[counter] = new Die()
+            board.attackHand[counter].value = board.dicePool.active[i].value
+            board.attackHand[counter].keep = true
+            counter++
+        }
+        for (let i = 0; i < board.dicePool.support.length; i++){
+            board.attackHand[counter] = new Die()
+            board.attackHand[counter].value = board.dicePool.support[i].value
+            board.attackHand[counter].keep = true
+            counter++
+        }
+        board.attackHand.sort(function(a,b) {
+            return a.value - b.value
+        })
+        console.log(board.attackHand)
+    }
+
+    //Generate an attack submisison
+    function createAttackSubmission(hand){
+        let submission = []
+        for (let i = 0; i < hand.length; i++){
+            console.log(hand[i])
+            if (hand[i].submitted === true){
+                console.log("Die Moved")
+                submission.push(hand[i])
+                hand.splice(i,1)
+                i--
+            }
+        }
+        console.log(submission)
+        return submission
+    }
+
+    //Apply DMG to scenario function
+    function applyDMGtoScenario(dmg, level) {
+        board.scenarios[level].dmgCounter+= dmg
+    }
+
+//If the # of dice is met, and the attack fits the style, dmg is issued
+function attack(player, attackNum, attackHand) {
+    let attackSubmission = createAttackSubmission(attackHand),
+    chosenAttack = player.playstyle.attack[attackNum],
+    diceReq = chosenAttack.diceReq,
+    dmg = chosenAttack.dmg,
+    style = player.playstyle.mechanic
+    //Checking for basic attack submission - because they have their own special rules for each character
+    if (attackNum === 0){
+        console.log("Basic attack detected")
+        player.playstyle.basicAttack(attackSubmission, chosenAttack)
+    }
+    //If the number of dice required is met AND the character mechanic is met, assign dmg
+    if (numDiceCheck(diceReq, attackSubmission) && style(attackSubmission, chosenAttack)){
+        console.log("Attack succeeds. " + dmg + " damage has been issued")
+        applyDMGtoScenario(dmg, board.level)
+        //The used dice should automatically be deleted/discarded one the function ends
+        console.log(board.attackHand)
+    } else {
+        console.log("The attack did not succeed")
+        //returns the attack submission to the pool
+        for (let i = 0; i < attackSubmission.length; i++){
+            board.attackHand.push(attackSubmission[i])            
+        }
+        board.attackHand.sort(function(a,b) {
+            return a.value - b.value
+        })
+        console.log(board.attackHand)
+        return false
+    }
+}
+
+//Check for required number of dice
+function numDiceCheck(diceReq, attackSubmission){
+
+    console.log(diceReq, "=", attackSubmission.length, "?")
+    return diceReq === attackSubmission.length
+}
+
+
 function endAttackPhase(attackHand) {
     if (attackHand.length > 0){
         CounterAttackPhase()
@@ -450,12 +615,14 @@ function stageHPchecker(currentScenario){
         currentScenario.dmgCounter = 0
         alert("Stage defeated!")
         scenarioAllStagesDefeated(currentScenario)
+    } else {
+        
     }
+
 }
 
 function scenarioAllStagesDefeated(currentScenario){
-    if (currentScenario.stageCounter > (currentScenario.card.stage.length - 1)){
-        isAnyoneDead(board.players)
+    if (currentScenario.stageCounter > (currentScenario.card.stage.length - 1) && !isAnyoneDead(board.players)){
         alert("Scenario Cleared!")
         ScenarioCleared()
     }
@@ -480,9 +647,34 @@ function isAnyoneDead(players){
 //Scenario Cleared Phase Functions
 //--------------------//
 
-//This function increases the board object level.
-  function boardLevelUp() {
-    board.level++
+
+//This function
+function LevelUp() {
+        switch (board.level) {
+            //First level up (to level 2)
+            case 0:
+                board.level++
+                console.log("board is now level: ", board.level);
+                //Unlock tier 2 attack for all players    
+                break;
+
+            case 1:
+                board.level++
+                console.log("board is now level: ", board.level);
+                //Unlock tier 3 attack for all players
+                //Grant a boon to the party
+                boonDraw(board.boon.deck, Boons)
+                console.log("Boon has been granted to the party: ", board.boon.drawn)    
+                break;
+
+            case 2:
+                board.level++
+                console.log("board is now level: ", board.level);
+                break;
+
+            default:
+                break;
+    }
 }
 
 //This function lets a player draw a card from a deck. Currently just used for the item deck
@@ -542,6 +734,7 @@ function unexhaustAllPlayers(players){
         //Setup the boon deck
         prepareBoonDeck()
         console.log("Start of game Setup function has finished")
+        NewScenarioSetup()
     }
 
 // Turn system
@@ -549,7 +742,7 @@ function unexhaustAllPlayers(players){
     function NewScenarioSetup() {
         //Prepare the Scenario for the level
         setupScenario(scenarios, board.level)
-        console.log("PreRollScenarioSetup has finished")
+        console.log("NewScenarioSetup has finished")
         NewStageSetup()
     }
     //Setup for each new stage reveal (once per stage)
@@ -581,7 +774,7 @@ function unexhaustAllPlayers(players){
         selectSupportPlayer(board.players)
         //verify the support is not exhausted
         console.log("NewPlayerTurnSetup has completed")
-    }
+        }
 
 
 
@@ -594,6 +787,7 @@ function unexhaustAllPlayers(players){
         console.log("Initial Rolls for the scenario")
         rollHand(board.dicePool.active)
         rollHand(board.dicePool.support)
+        setDev()
         //Declare any die rerolls (assign keep:true)
             //This will be done with client side code sending keep command back to server
         //Roll all dice where keep is false and reroll counter is greater than zero for respective player
@@ -625,9 +819,10 @@ function unexhaustAllPlayers(players){
             //Check for any Player attack augments --> need to do
             //Calculate DMG result
             //Modified DMG is submitted to Event stage counter
-            //Count number of remaining dice
-            //if greater than 0 await end turn confirmation
-            //if zero, engage skip counter attack phase
+            //endAttackPhase(board.attackHand) function
+                //Count number of remaining dice
+                //if greater than 0 await end turn confirmation
+                //if zero, engage skip counter attack phase
         }
         //Counter Attack Phase
         function CounterAttackPhase() {
@@ -644,17 +839,11 @@ function unexhaustAllPlayers(players){
             function EndPhase(){
                 console.log("Start of End phase")
             //Check if phase has more dmg than current HP
+            stageHPchecker(board.scenarios[board.level])
                 //If so, clear DMG and move to next phase
-                stageHPchecker(board.scenarios[board.level])
                 //If no next phase, scenario cleared
-                scenarioAllStagesDefeated(board.scenarios[board.level])
             //Check if any PLAYER has more dmg than their current HP max
-                if (isAnyoneDead(board.players)){
                     //if yes, game over
-                    alert("GAME OVER MAN")
-                } else {
-
-                }
                 console.log("End phase has completed")
 
             }
@@ -670,31 +859,13 @@ function unexhaustAllPlayers(players){
                     //Give item to new player if desired
             //Level Up
             //Level up function ~ works
-                switch (board.level) {
-                    //First level up (to level 2)
-                    case 0:
-                        boardLevelUp()
-                        console.log("board is now level: ", board.level);
-                        //Unlock tier 2 attack for all players    
-                        break;
-                
-                    case 1:
-                        boardLevelUp()
-                        console.log("board is now level: ", board.level);
-                        //Unlock tier 3 attack for all players
-                        //Grant a boon to the party
-                        boonDraw(board.boon.deck, Boons)
-                        console.log("Boon has been granted to the party: ", board.boon.drawn)    
-                        break;
-                
-                    case 2:
-                        console.log("board is now level: ", board.level);
-                        break;
-                
-                    default:
-                        break;
-                }
+            LevelUp()
+                //First level up (to level 2)
+                    //Unlock tier 2 attack for all players
                 //Second Level up (to level 3)
+                    //Unlock tier 3 attack for all players
+                    //Grant a boon to the party
+
                     
             //Healing
                 //DMG counters removed

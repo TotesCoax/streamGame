@@ -39,7 +39,7 @@ html {
     background-color: antiquewhite;
 }
 
- .roll-amounts {
+.roll-amounts {
     width: 100px;
     height: 50px;
  }
@@ -51,7 +51,7 @@ html {
     float: left;
 }
 
-.roll-count.active-player-rolls {
+.active-player-rolls {
     background: black;
     color: white;
 }
@@ -76,9 +76,14 @@ html {
 
 /*Active players formatting*/
 
-#activePlayerCard {
+.active {
     height: 400px;
     background: lightcoral
+}
+
+.support {
+    height: 200px;
+    background-color: lightseagreen;
 }
 
 .roll-dash {
@@ -106,13 +111,14 @@ html {
     text-align: center;
 }
 
-.attack-req {
+.attack-requirements {
     font-size: 6pt;
+    background: lightseagreen;
 }
 
 /* Inactive Players Formatting */
 
-#inactivePlayersContainer {
+#playerContainer {
     display: flex;
 }
 

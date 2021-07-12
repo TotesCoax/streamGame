@@ -42,7 +42,7 @@ function fillUpPlayers(){
         let playerInsert = playerContainer.lastElementChild
             playerStats = gameboard.players[i]
 
-        playerInsert.id = `player${i}`
+        playerInsert.id = playerStats.username.toLowerCase()
         playerInsert.children[1].innerText = playerStats.username.toUpperCase()
         playerInsert.children[2].innerText = playerStats.playstyle.title
         playerInsert.children[3].children[1].firstElementChild.innerText = playerStats.playstyle.hpMax[gameboard.level]
@@ -64,4 +64,31 @@ function fillUpPlayers(){
             newAttack.children[2].innerText = attackImport[a].dmg
         }
     }
+}
+
+//This function sets the initial die objects - BUT NEED ONE JUST TO UPDATE VALUEs
+//If run again this function just adds more dice to the pool
+//Also need a function for the attack pool and such.
+function fillUpDice() {
+    let dieTemplate = document.getElementById("dieTemplate"),
+        activeContainer = document.getElementById("activePlayerHand"),
+        suppContainer = document.getElementById("supportPlayerHand")
+    console.log(dieTemplate, activeContainer, suppContainer)
+
+    for (let d = 0; d < gameboard.dicePool.active.length; d++){
+        activeContainer.appendChild(dieTemplate.content.cloneNode(true))
+        let newDie = activeContainer.lastElementChild,
+            dieVal = gameboard.dicePool.active[d].value
+        console.log(dieVal)
+        newDie.getElementsByClassName("die")[0].innerText = dieVal
+    }
+
+    for (let d = 0; d < gameboard.dicePool.support.length; d++){
+        suppContainer.appendChild(dieTemplate.content.cloneNode(true))
+        let newDie = suppContainer.lastElementChild,
+            dieVal = gameboard.dicePool.support[d].value
+        console.log(dieVal)
+        newDie.getElementsByClassName("die")[0].innerText = dieVal
+    }
+
 }

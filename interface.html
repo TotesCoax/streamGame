@@ -43,7 +43,7 @@
 
     <!-- Player Card Templates -->
     <template id="playerCardTemplate">
-        <div class="player active card">
+        <div class="player card">
             <div class="portrait">
                 <!-- <img src="twitchProfilePic" alt="active player portrait"> -->
             </div>
@@ -53,7 +53,7 @@
             <div class="player-class">
                 Class
             </div>
-            <div class="stat-box">
+            <div class="hp-bar stat-box">
                 <div class="player-dmg counter">
                     DMG: <span>00</span>
                 </div>
@@ -65,7 +65,7 @@
                 <button class="ability-uses">X</button>
                 <span>Text for the ability.</span>
             </div>
-            <div class="attack-box stat-box">
+            <div class="attack-box stat-box hidden">
             </div>
         </div>
     </template>
@@ -73,7 +73,7 @@
     <template id="playerAttackTemplate">
         <div class="player-attack">
             <div class="attack-requirments">
-                <span class="attack-req">X</span>
+                <span class="attack-req-dice">X</span>
             </div>
             <div class="attack-name">Attack Name</div>
             <div class="attack-damage">YY</div>
@@ -82,12 +82,18 @@
     </template>
 
     <!-- End player card templates -->
+
+    <!-- Die Template -->
+    <template id="dieTemplate">
+        <div class="hand-slot">
+            <div class="die">X</div>
+            <button class="keep" type="button">Keep</button>
+        </div>
+    </template>
+    <!-- End Die Template -->
     
     <div id="gameboard">
         <div id="scenarioContainer">
-
-        </div>
-        <div id="playerContainer">
 
         </div>
         <div id="rollingPlayers" class="stat-box">
@@ -116,112 +122,7 @@
                 </div>
                 <div id="activePlayerAttacks" class="attack-box stat-box">
                     <div id="attack1" class="player-attack">
-                        <div class="attack-requirments">
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                        </div>
-                        <div class="attack-name">Attack Name</div>
-                        <div class="attack-damage">YY</div>
-                        <div class="attack-augment">Pierce 5</div>
-                    </div>
-                    <div id="attack2" class="player-attack">
-                        <div class="attack-requirments">
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                        </div>
-                        <div class="attack-name">Attack Name</div>
-                        <div class="attack-damage">YY</div>
-                        <div class="attack-augment">Pierce 5</div>
-                    </div>
-                    <div id="attack3" class="player-attack hidden">
-                        <div class="attack-requirments">
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                        </div>
-                        <div class="attack-name">Attack Name</div>
-                        <div class="attack-damage">YY</div>
-                        <div class="attack-augment">Pierce 5</div>
-                    </div>
-                    <div id="attack4" class="player-attack hidden">
-                        <div class="attack-requirments">
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                        </div>
-                        <div class="attack-name">Attack Name</div>
-                        <div class="attack-damage">YY</div>
-                        <div class="attack-augment">Pierce 5</div>
-                    </div>
-                    <div id="attack5" class="player-attack hidden">
-                        <div class="attack-requirments">
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                        </div>
-                        <div class="attack-name">Attack Name</div>
-                        <div class="attack-damage">YY</div>
-                        <div class="attack-augment">Pierce 5</div>
-                    </div>
-                    <div id="attack6" class="player-attack hidden">
-                        <div class="attack-requirments">
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                        </div>
-                        <div class="attack-name">Attack Name</div>
-                        <div class="attack-damage">YY</div>
-                        <div class="attack-augment">Pierce 5</div>
-                    </div>
-                    <div id="attack7" class="player-attack hidden">
-                        <div class="attack-requirments">
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                        </div>
-                        <div class="attack-name">Attack Name</div>
-                        <div class="attack-damage">YY</div>
-                        <div class="attack-augment">Pierce 5</div>
-                    </div>
-                    <div id="attack8" class="player-attack hidden">
-                        <div class="attack-requirments">
+                        <div class="attack-requirements">
                             <span class="attack-req">X</span>
                             <span class="attack-req">X</span>
                             <span class="attack-req">X</span>
@@ -240,22 +141,7 @@
                     <button id="rollButton" type="button">Roll</button>
                     <p>Rolls left:<span id="roll-counter">0</span></p>
                     <div id="activePlayerHand" class="player-hand">
-                        <div id="activeSlot1" class="hand-slot">
-                            <div class="die">X</div>
-                            <button class="keep" type="button">Keep</button>
-                        </div>
-                        <div id="activeSlot2" class="hand-slot">
-                            <div class="die">X</div>
-                            <button class="keep" type="button">Keep</button>
-                        </div>
-                        <div id="activeSlot3" class="hand-slot">
-                            <div class="die">X</div>
-                            <button class="keep" type="button">Keep</button>
-                        </div>
-                        <div id="activeSlot4" class="hand-slot">
-                            <div class="die">X</div>
-                            <button class="keep" type="button">Keep</button>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -264,22 +150,7 @@
             <div id="supportPlayerCard" class="player card">
                 <div id="actveRolls" class="roll-dash">
                     <div id="supportPlayerHand" class="player-hand">
-                        <div id="supportSlot1" class="hand-slot">
-                            <button class="keep" type="button">Keep</button>
-                            <div class="die">X</div>
-                        </div>
-                        <div id="supportSlot2" class="hand-slot">
-                            <button class="keep" type="button">Keep</button>
-                            <div class="die">X</div>
-                        </div>
-                        <div id="supportSlot3" class="hand-slot">
-                            <button class="keep" type="button">Keep</button>
-                            <div class="die">X</div>
-                        </div>
-                        <div id="supportSlot4" class="hand-slot">
-                            <button class="keep" type="button">Keep</button>
-                            <div class="die">X</div>
-                        </div>
+
                     </div>
                 </div>
                 <div id="supportPlayerAbility" class="ability">
@@ -306,47 +177,11 @@
             </div>
         </div>
 
-        <!-- Inactive Player Cards -->
-        <div id="inactivePlayersContainer" class="stat-box">
-            <div id="inactivePlayer1" class="player card inactive">
-                <div id="inactivePlayer1Portrait" class="portrait">
-                    <!-- <img src="twitchProfilePic" alt="support player portrait"> -->
-                </div>
-                    <div id="inactivePlayer1Status" class="stat-box">
-                        <div id="inactivePlayer1DMG" class="counter">
-                            DMG: <span>00</span>
-                        </div>
-                        <div id="inactivePlayer1HP" class="counter">
-                            HP: <span>88</span>
-                        </div>
-                    </div>
-                    <div id="inactivePlayer1Name" class="player-name">
-                        Username
-                    </div>
-                    <div id="inactivePlayer1Class" class="player-class">
-                        Class
-                    </div>
-            </div>
-            <div id="inactivePlayer2" class="player card inactive exhausted">
-                <div id="inactivePlayer2Portrait" class="portrait">
-                    <!-- <img src="twitchProfilePic" alt="support player portrait"> -->
-                </div>
-                <div id="inactivePlayer2Status" class="stat-box">
-                    <div id="inactivePlayer2DMG" class="counter">
-                        DMG: <span>00</span>
-                    </div>
-                    <div id="inactivePlayer2HP" class="counter">
-                        HP: <span>88</span>
-                    </div>
-                </div>
-                <div id="inactivePlayer2Name" class="player-name">
-                    Username
-                </div>
-                <div id="inactivePlayer2Class" class="player-class">
-                    Class
-                </div>
-            </div>
+        <!-- Player Container -->
+        <div id="playerContainer">
+
         </div>
+
         <!-- Gameboard end div -->
     </div>
 

@@ -23,6 +23,7 @@ let Playstyle = {
                 alert("Incorrect value was given")
             }
         },
+        mechanicExplain: "A brash fighter requires all dice values for non-basic attacks to be identical.",
         mechanic: function brash(attackSubmission, chosenAttack){
             console.log("Checking attack: ", chosenAttack)
             console.log(attackSubmission)
@@ -82,6 +83,7 @@ let Playstyle = {
                     break;
             }
         },
+        mechanicExplain: "An elegant fighter requires dice values for non-basic attacks to be sequentially ascending.",
         mechanic: function elegant(attackSubmission, chosenAttack){
             console.log("Checking attack: ", chosenAttack)
             attackSubmission.sort(function(a,b) {
@@ -128,6 +130,7 @@ let Playstyle = {
                 targetArray[i].value = 5
             }
         },
+        mechanicExplain: "A staunch fighter requires the sum of dice values for non-basic attacks to be OVER an amount specified for that attack.",
         mechanic: function staunch(attackSubmission, chosenAttack){
             console.log("Checking attack: ", chosenAttack)
             let sum = 0
@@ -175,6 +178,7 @@ let Playstyle = {
                 targetArray[i].value = 2
             }
         },
+        mechanicExplain: "A sly fighter requires the sum of dice values for non-basic attacks to be UNDER an amount specified for that attack.",
         mechanic: function sly(attackSubmission, chosenAttack){
             console.log("Checking attack: ", chosenAttack)
             console.log(attackSubmission)

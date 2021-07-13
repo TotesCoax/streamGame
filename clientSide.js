@@ -92,3 +92,7 @@ function fillUpDice() {
     }
 
 }
+
+function updateDiceValuesHTML(){
+    //Looking into transferring this all to a REACT build instead of functons...
+}

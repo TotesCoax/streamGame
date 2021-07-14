@@ -9,11 +9,11 @@ let Playstyle = {
         abilityMax: [[1,1,1],[2,1,1],[3,2,1]],
         abilityText: "Change one dice value into a 1 or 6",
         attack:[
-            {tier: 0, diceReq: 1, dmg:1},
-            {tier: 0, diceReq: 2, dmg:4},
-            {tier: 0, diceReq: 4, dmg:10},
-            {tier: 1, diceReq: 6, dmg:16},
-            {tier: 2, diceReq: 8, dmg:27}
+            {tier: 0, diceReq: 1, dmg:1, name: "Basic Attack", desc: "Give the enemy a bonk"},
+            {tier: 0, diceReq: 2, dmg:4, name: "Punch", desc: "A simple punch"},
+            {tier: 0, diceReq: 4, dmg:10, name: "Kick", desc: "A simple kick"},
+            {tier: 1, diceReq: 6, dmg:16, name: "Combo", desc: "You swing wildly and somehow connect on a few occasions"},
+            {tier: 2, diceReq: 8, dmg:27, name: "Finisher", desc: "It's not pretty but it gets the job done"}
         ],
         ability: function(target) {
             let newValue = prompt("What would you like to change it to? Must be 1 or 6")
@@ -49,18 +49,19 @@ let Playstyle = {
         title: "the elegant",
         hpMax:[8,12,16],
         abilityMax: [[1,1,1],[2,1,1],[3,2,1]],
-        abilityText: "Flip up to two standard dice to their opposite sides.",
+        abilityText: "Flip up to two standard dice to their opposite sides.(Pairing 1:6 2:5 3:4)",
         attack:[
-            {tier: 0, diceReq: 2, dmg:1},
-            {tier: 0, diceReq: 3, dmg:3},
-            {tier: 0, diceReq: 4, dmg:5},
-            {tier: 0, diceReq: 5, dmg:8},
-            {tier: 1, diceReq: 6, dmg:12},
-            {tier: 2, diceReq: 8, dmg:24}
+            //The default names are ballet terms.
+            {tier: 0, diceReq: 2, dmg:1, name: "Demi", desc: "Basic? My attacks? Perish the thought."},
+            {tier: 0, diceReq: 3, dmg:3, name: "Pique", desc: "A three step combo"},
+            {tier: 0, diceReq: 4, dmg:5, name: "En Croix", desc: "A four step combo with a minor flourish"},
+            {tier: 0, diceReq: 5, dmg:8, name: "Rond de jambe", desc: "A five step combo with a major flourish"},
+            {tier: 1, diceReq: 6, dmg:12, name: "Port de bras", desc: "A six step combo with hits on the strike and return"},
+            {tier: 2, diceReq: 8, dmg:24, name: "Magnum", desc: "Dear god, it's beautiful."}
         ],
         ability: function(target) {
             switch (target.value) {
-                case 1:2
+                case 1:
                     target.value = 6
                     break;
                 case 2:
@@ -115,11 +116,12 @@ let Playstyle = {
         abilityMax: [[1,1,1],[2,1,1],[3,2,1]],
         abilityText: "Change up to two standard dice to a value of 5",
         attack:[
-            {tier: 0, diceReq: 1, dmg:1, threshold:"x"},
-            {tier: 0, diceReq: 2, dmg:3, threshold:10},
-            {tier: 0, diceReq: 4, dmg:8, threshold:20},
-            {tier: 1, diceReq: 6, dmg:15, threshold:32},
-            {tier: 2, diceReq: 8, dmg:25, threshold:45}
+            //Attack names are boxing punch terms.
+            {tier: 0, diceReq: 1, dmg:1, threshold:"x", name: "Basic Attack", desc: "Give the enemy a bonk"},
+            {tier: 0, diceReq: 2, dmg:3, threshold:10, name: "Jab", desc: "An attack to keep the enemy at distance"},
+            {tier: 0, diceReq: 4, dmg:8, threshold:20, name: "Cross", desc: "An attack to counter enemy aggression"},
+            {tier: 1, diceReq: 6, dmg:15, threshold:32, name: "Hook", desc: "The enemy drops their guard and you take advantage"},
+            {tier: 2, diceReq: 8, dmg:25, threshold:45, name: "Uppercut", desc: "An all-in attack on the enemy"}
         ],
         ability: function(targetArray) {
             if (targetArray.length > 2){
@@ -163,11 +165,11 @@ let Playstyle = {
         abilityMax: [[1,1,1],[2,1,1],[3,2,1]],
         abilityText: "Change up to two standard dice to a value of 2",
         attack:[
-            {tier: 0, diceReq: 1, dmg:1, threshold:"x"},
-            {tier: 0, diceReq: 2, dmg:3, threshold:4},
-            {tier: 0, diceReq: 4, dmg:6, threshold:8},
-            {tier: 1, diceReq: 6, dmg:12, threshold:10},
-            {tier: 2, diceReq: 8, dmg:20, threshold:12}
+            {tier: 0, diceReq: 1, dmg:1, threshold:"x", name: "Basic Attack", desc: "Give the enemy a bonk"},
+            {tier: 0, diceReq: 2, dmg:3, threshold:4, name: "Sleight of hand", desc: "Distract the enemy so you can strike with your off-hand"},
+            {tier: 0, diceReq: 4, dmg:6, threshold:8, name: "Calculated strike", desc: "You find a weakness in their guard and exploit it"},
+            {tier: 1, diceReq: 6, dmg:12, threshold:10, name: "Backstab", desc: "Dash to the enemy's flank and strike"},
+            {tier: 2, diceReq: 8, dmg:20, threshold:12, name: "Pocket sand", desc: "GYAAAAHHH!!"}
         ],
         ability: function(targetArray) {
             if (targetArray.length > 2){
@@ -214,12 +216,12 @@ let Playstyle = {
         abilityMax: [[1,1,1],[2,1,1],[3,2,1]],
         abilityText: "Pick a value among all dice. Increase or decrease all the value of all dice with that value by 1. Min value of 1 and max value of 6.",
         attack:[
-            {tier: 0, diceReq: 1, dmg:1},
-            {tier: 0, diceReq: 3, dmg:3},
-            {tier: 0, diceReq: 3, dmg:4},
-            {tier: 0, diceReq: 3, dmg:5},
-            {tier: 1, diceReq: 6, dmg:12},
-            {tier: 2, diceReq: 8, dmg:12}
+            {tier: 0, diceReq: 1, dmg:1, name: ""},
+            {tier: 0, diceReq: 3, dmg:3, name: ""},
+            {tier: 0, diceReq: 3, dmg:4, name: ""},
+            {tier: 0, diceReq: 3, dmg:5, name: ""},
+            {tier: 1, diceReq: 6, dmg:12, name: ""},
+            {tier: 2, diceReq: 8, dmg:12, name: ""}
         ],
         ability: function(targetValue, targetArray, direction) {
             //I'll do this later.
@@ -235,12 +237,12 @@ let Playstyle = {
         abilityMax: [[1,1,1],[2,1,1],[3,2,1]],
         abilityText: "Pick a player. That player restores 1 use of their ability (up to their max).",
         attack:[
-            {tier: 0, diceReq: 1, dmg:1},
-            {tier: 0, diceReq: 3, dmg:6},
-            {tier: 0, diceReq: 3, dmg:3},
-            {tier: 0, diceReq: 3, dmg:3},
-            {tier: 1, diceReq: 6, dmg:12},
-            {tier: 2, diceReq: 8, dmg:20}
+            {tier: 0, diceReq: 1, dmg:1, name: ""},
+            {tier: 0, diceReq: 3, dmg:6, name: ""},
+            {tier: 0, diceReq: 3, dmg:3, name: ""},
+            {tier: 0, diceReq: 3, dmg:3, name: ""},
+            {tier: 1, diceReq: 6, dmg:12, name: ""},
+            {tier: 2, diceReq: 8, dmg:20, name: ""}
         ],
         ability: function(targetPlayer) {
             if ((targetPlayer.abilityUse + 1) < targetPlayer.abilityMax) {

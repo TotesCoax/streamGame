@@ -1,0 +1,34 @@
+NOW things to do 
+
+
+    Learn React so that I can ->
+        build user interface
+            -> have client code pick apart transmitted board object
+                -Player and Scenario parser mostly works
+                ->need to workout a way to adjust classes based on player.status
+            -> also the functionality programming (use socket.io?)
+
+
+
+Near future THINGS TO DO
+
+    Correct the reroll system
+        Sync each reroll -> rules state they must be rerolled at the same time
+            This just requires consolidating the current functions into a single activation
+                Still want to keep them separate for item potentially
+        Reroll adjusting stage effects also need to be carved out.
+            Perhaps introduce a clear effects function for stages so that we may modify effects on each stage?
+
+    Lock/Unlock tier 2 and 3 attacks for players based on level
+        need to program in a checker of sorts
+
+    program in abilities
+
+    program in items
+
+    implement attack augments:
+        pierce
+        heal
+        split (50/50)
+
+

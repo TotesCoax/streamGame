@@ -60,6 +60,7 @@ class Player {
         //Inventory is where loot items are held
         this.inventory = []
         //These are counters for each Scenario. Scen can modify them.
+        this.currentRerollsMax = 2
         this.currentRerolls = 0
         this.abilityScenarioMax = 0
         this.abilityCounter = 0
@@ -136,7 +137,7 @@ let board = {
     }
 }
 
-//Dev object - I created this to make some coding shorthands for testing
+//Dev object - I created this to make some coding shorthands for testing - set after Rolling phase.
 let dev = {}
 function setDev(){
     dev = {
@@ -265,10 +266,10 @@ function setHands(scenario){
     console.log(board.dicePool.support)
 }
 
-//Currently this is a blanket reset without targetting any specific pool of players.
+//Currently this is a blanket reset without targetting any specific pool of players based on the max they are allowed by the stage.
 function setRerolls() {
     for (let i = 0; i < board.players.length; i++){
-        board.players[i].currentRerolls = 2
+        board.players[i].currentRerolls = board.players[i].currentRerollsMax
     }
     console.log("Rerolls have been set to the default value of 2");
 }

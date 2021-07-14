@@ -60,7 +60,7 @@ function fillUpPlayers(){
 
             newAttack.id = `attack${a}`
             newAttack.children[0].innerText = attackImport[a].diceReq
-            //newAttack.children[1].innerText = attackImport.name
+            newAttack.children[1].innerText = attackImport.name
             newAttack.children[2].innerText = attackImport[a].dmg
         }
     }

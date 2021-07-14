@@ -4,6 +4,7 @@ let lootDeck = [
     /*{
         name:"cardName",
     type:"type",
+    timing: "" //shortname name of the phase where it would trigger.
     description:"itemDescription",
     consumed:false,
     ability:function(){}}
@@ -11,6 +12,7 @@ let lootDeck = [
     
     {name:"Coat",
     type:"equipment",
+    timing: "counterAttack",
     description:"The holder of this item reduces damage by 1 per damage instance",
     consumed:false,
     ability:function(){
@@ -20,6 +22,7 @@ let lootDeck = [
 
     {name:"Ring",
     type:"equipment",
+    timing: "reroll",
     description:"The holder of this item gets 1 extra reroll per turn",
     consumed:false,
     ability:function(){
@@ -29,6 +32,7 @@ let lootDeck = [
 
     {name:"Sword",
     type:"equipment",
+    timing: "attack",
     description:"The holder of this item increases all damage dealt by 1 per damage instance",
     consumed:false,
     ability:function(){

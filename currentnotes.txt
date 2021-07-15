@@ -1,12 +1,11 @@
 NOW things to do 
 
 
-    Learn React so that I can ->
-        build user interface
-            -> have client code pick apart transmitted board object
-                -Player and Scenario parser mostly works
-                ->need to workout a way to adjust classes based on player.status
-            -> also the functionality programming (use socket.io?)
+    build user interface
+        -> have client code pick apart transmitted board object
+            -Player and Scenario parser mostly works
+            ->need to workout a way to adjust classes based on player.status
+        -> also the functionality programming (use socket.io?)
 
 
 
@@ -26,9 +25,16 @@ Near future THINGS TO DO
 
     program in items
 
+    program in stage effects
+
     implement attack augments:
         pierce
         heal
         split (50/50)
+
+    Eccentric/Serene additions
+
+    Add progress bar HTML tag to player cards and get functioning health bar display (value kept for testing environment)
+        on hover have health bar display actual values
 
 

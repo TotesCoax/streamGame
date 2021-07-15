@@ -1,5 +1,11 @@
 let gameboard = board
 
+
+//GENERATE HTML ELEMENT FUNCTIONS
+
+
+//Populates the UI with the current scenario.
+//I don't think It will currently hide the second scenario.
 function fillUpScenario(){
     let scenTemplate = document.getElementById("scenarioCardTemplate"),
         scenContainer = document.getElementById("scenarioContainer")
@@ -30,6 +36,7 @@ function fillUpScenario(){
     }
 }
 
+//This function takes the player array from gameboard object and populates HTML elements based on how pany players there are and what style they are playing.
 function fillUpPlayers(){
     let temp = document.getElementById("playerCardTemplate"),
         playerContainer = document.getElementById("playerContainer")
@@ -43,6 +50,7 @@ function fillUpPlayers(){
             playerStats = gameboard.players[i]
 
         playerInsert.id = playerStats.username.toLowerCase()
+        playerInsert.classList.add(playerStats.status)
         playerInsert.children[1].innerText = playerStats.username.toUpperCase()
         playerInsert.children[2].innerText = playerStats.playstyle.title
         playerInsert.children[3].children[1].firstElementChild.innerText = playerStats.playstyle.hpMax[gameboard.level]
@@ -66,10 +74,10 @@ function fillUpPlayers(){
     }
 }
 
-//This function sets the initial die objects - BUT NEED ONE JUST TO UPDATE VALUEs
+//This function sets the initial die objects
+//This should be run once at the start of a new player turn.
 //If run again this function just adds more dice to the pool
-//Also need a function for the attack pool and such.
-function fillUpDice() {
+function fillUpDiceRollingPhase() {
     let dieTemplate = document.getElementById("dieTemplate"),
         activeContainer = document.getElementById("activePlayerHand"),
         suppContainer = document.getElementById("supportPlayerHand")
@@ -93,6 +101,24 @@ function fillUpDice() {
 
 }
 
-function updateDiceValuesHTML(){
-    //Looking into transferring this all to a REACT build instead of functons...
+
+
+//REFRESH VALUES FUNCTIONS
+
+//This function updates the values of the displaying dice based on the data from the board object
+//should be run at the end of each roll command
+function updateDiceValuesHTML(incomingDicePool){
+    let activeDiceArray = document.querySelectorAll("#activePlayerHand .die"),
+        supportDiceArray = document.querySelectorAll("#supportPlayerHand .die"),
+        newActivePool = incomingDicePool.active,
+        newSupportPool = incomingDicePool.support
+
+    for(let a = 0; a < newActivePool.length; a++){
+        activeDiceArray[a].innerText = newActivePool[a].value
+    }
+
+    for(let s = 0; s < newSupportPool.length; s++){
+        supportDiceArray[s].innerText = newSupportPool[s].value
+    }
+
 }

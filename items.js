@@ -1,5 +1,12 @@
 //Future goal: Convert this to use classes so adding new items becomes easier.
 
+/*List of timing events
+startTurn -> start of player turn
+attack -> when player deals damage
+counterAttack -> when the player receives damage
+playerDeath -> when a player damage counter equals or exceeds their HPmax
+*/
+
 let lootDeck = [
     /*{
         name:"cardName",
@@ -22,7 +29,7 @@ let lootDeck = [
 
     {name:"Ring",
     type:"equipment",
-    timing: "reroll",
+    timing: "startTurn",
     description:"The holder of this item gets 1 extra reroll per turn",
     consumed:false,
     ability:function(){
@@ -42,6 +49,7 @@ let lootDeck = [
 
     {name:"Ability Potion",
     type:"consumable",
+    timing: "startTurn",
     description:"Restore 1 use of ability to target player.",
     consumed:false,
     ability:function(){
@@ -51,6 +59,7 @@ let lootDeck = [
 
     {name:"Ability Potion",
     type:"consumable",
+    timing: "startTurn",
     description:"Restore 1 use of ability to target player.",
     consumed:false,
     ability:function(){
@@ -60,6 +69,7 @@ let lootDeck = [
 
     {name:"Healing Potion",
     type:"consumable",
+    timing: "startTurn",
     description:"Target player heals up to their max HP.",
     consumed:false,
     ability:function(){
@@ -69,6 +79,7 @@ let lootDeck = [
 
     {name:"Healing Potion",
     type:"consumable",
+    timing: "startTurn",
     description:"Target player heals up to their max HP.",
     consumed:false,
     ability:function(){
@@ -78,6 +89,7 @@ let lootDeck = [
 
     {name:"Sacred Relic",
     type:"consumable",
+    timing: "playerDeath",
     description:"When any player is reduced to 0 or less HP, restore that player's HP to 1. This consumes the item.",
     consumed:false,
     ability:function(){

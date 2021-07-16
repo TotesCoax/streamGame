@@ -137,22 +137,43 @@ let board = {
     }
 }
 
+//Gameboard object to export - this hides deck information from the front end
+let boardExport = {
+    players: board.players,
+    level: board.level,
+    senarios: board.scenarios,
+    dicePool: {
+        active: board.dicePool.active,
+        support: board.dicePool.support
+    },
+    attackHand: board.attackHand,
+    boon: board.boon.drawn
+}
+
 //Dev object - I created this to make some coding shorthands for testing - set after Rolling phase.
 let dev = {}
 function setDev(){
     dev = {
-        aPlay: board.players.find(player => player.status === "active"),
-        sPlay: board.players.find(player => player.status === "support"),
-        cScen: board.scenarios[board.level],
-        cStage: board.scenarios[board.level].card.stage[board.scenarios[board.level].stageCounter],
-        aDice: board.dicePool.active,
-        sDice: board.dicePool.support,
-        aHand: board.attackHand
+        activePlay: board.players.find(player => player.status === "active"),
+        supportPlay: board.players.find(player => player.status === "support"),
+        currScen: board.scenarios[board.level],
+        currStage: board.scenarios[board.level].card.stage[board.scenarios[board.level].stageCounter],
+        activeDice: board.dicePool.active,
+        supportDice: board.dicePool.support,
+        attackHand: board.attackHand
     }
     console.log("Dev object has been set")
 }
 
+//Dev Functions
+function giveItem(player, itemName) {
+    let itemObject = board.itemDeck.find(item => item.name === itemName),
+        itemIndex = board.itemDeck.indexOf(itemObject)
 
+    player.inventory.push(itemObject)
+    board.itemDeck.splice(itemIndex,1)
+    console.log(itemObject, " has been moved to ", player.username)
+}
 
 //--------------------//
 //Pre-Game setup functions
@@ -194,7 +215,7 @@ function setDev(){
     function prepareItemDeck(){
         console.log("Preparing the item deck")
         //Cloning and shuffling the item deck, moving it
-        board.itemDeck = shuffle(JSON.parse(JSON.stringify(lootDeck)))
+        board.itemDeck = shuffle(lootDeck)
         console.log("Item deck has been shuffled")
         console.log(board.itemDeck)
     }
@@ -204,7 +225,7 @@ function setDev(){
     function prepareBoonDeck(){
         console.log("Preparing the boon deck")
         //Cloning and shuffling the item deck, moving it
-        board.boon.deck = shuffle(JSON.parse(JSON.stringify(Boons)))
+        board.boon.deck = shuffle(Boons)
         console.log("Boon deck has been shuffled")
         console.log(board.boon.deck)
     }
@@ -362,9 +383,11 @@ function checkConsumables(players){
 }
 
 //Use consumable
-function useConsumable(item){
-    item.ability()
-    item.consumed = true
+function useConsumable(item, target){
+    if (!item.consumed){
+        item.ability(target)
+        item.consumed = true
+    }
 }
 
 //Select Support Player
@@ -515,9 +538,24 @@ function moveToAttackPhase(){
         return submission
     }
 
-    //Apply DMG to scenario function
-    function applyDMGtoScenario(dmg, level) {
-        board.scenarios[level].dmgCounter+= dmg
+    //Dmg calc for scenario
+    function applyDMGtoScenario(player, dmg, level) {
+        let calcDmg = dmg,
+            inv = player.inventory.filter(item => item.timing === "attack")
+        //Search inventory for any damage buff items or ability tokens
+        console.log(inv)
+        //If any buffs are found, for each buff invoke their ability to modify dmg
+        if (inv){
+            for(let i = 0; i < inv.length; i++){
+                console.log("Starting: ", calcDmg)
+                calcDmg = inv[i].ability(calcDmg)
+                console.log("New dmg: ", calcDmg)
+            }
+        }
+        
+        //Apply new damage amount to scenario
+        board.scenarios[level].dmgCounter+= calcDmg
+        console.log(calcDmg, " has been applied to the scenario")
     }
 
 //If the # of dice is met, and the attack fits the style, dmg is issued
@@ -534,8 +572,8 @@ function attack(player, attackNum, attackHand) {
     }
     //If the number of dice required is met AND the character mechanic is met, assign dmg
     if (numDiceCheck(diceReq, attackSubmission) && style(attackSubmission, chosenAttack)){
-        console.log("Attack succeeds. " + dmg + " damage has been issued")
-        applyDMGtoScenario(dmg, board.level)
+        console.log("Attack succeeds. " + dmg + " damage has been submitted")
+        applyDMGtoScenario(player, dmg, board.level)
         //The used dice should automatically be deleted/discarded one the function ends
         console.log(board.attackHand)
     } else {
@@ -579,24 +617,44 @@ function endAttackPhase(attackHand) {
 //Applies dmg to all players, used for AOE Attacks
 //I didn't specifically hard code board.players to allow for future expansion
 function applyDMGAOE(players, dmg){
-    for (let i = 0; i < players.length; i++){
-        players[i].dmgCounter+= dmg
+    let calcDmg = dmg
+    for (let p = 0; p < players.length; i++){
+        let inv = players[p].inventory.filter(item => item.timing === "counterAttack")
+        console.log("Player damage is now: ",players[i].dmgCounter)
+
+        if (inv) {
+            for(let i = 0; i < players.length; i++){
+                calcDmg = inv[i].ability(calcDmg)
+            }
+        }
+        players[i].dmgCounter+= calcDmg
+        console.log("Player damage is now: ",players[i].dmgCounter)
+
     }
 }
 
 
 //Primary event counterattack.
-//I think currentScenario is always submitted as board.scenarios[board.level], player is *usually* activePlayer
 //I left player open in case varations for the game are designed
     //If a dungeon is designed where the party gets split, and AOE is thus split, this will require reworking.
 function eventCounterAttack(currentScenario, player){
+    console.log("Player damage is now: ",player.dmgCounter)
     let currentStage = currentScenario.card.stage[currentScenario.stageCounter]
     if (currentStage.aoe === true){
         applyDMGAOE(board.players, currentStage.dmg)
     } else {
-        player.dmgCounter+= currentStage.dmg
+        let inv = player.inventory.filter(item => item.timing === "counterAttack"),
+            calcDmg = currentStage.dmg
+        if (inv) {
+            for(let i = 0; i < inv.length; i++){
+                calcDmg = inv[i].ability(calcDmg)
+            }
+        }
+        player.dmgCounter+= calcDmg
+        console.log("Player damage is now: ",player.dmgCounter)
     }
 }
+
 
 
 
@@ -614,6 +672,7 @@ function stageHPchecker(currentScenario){
     if (currentScenario.dmgCounter >= currentStage.hp){
         currentScenario.stageCounter++
         currentScenario.dmgCounter = 0
+        isAnyoneDead(board.players)
         alert("Stage defeated!")
         scenarioAllStagesDefeated(currentScenario)
     } else {
@@ -623,22 +682,32 @@ function stageHPchecker(currentScenario){
 }
 
 function scenarioAllStagesDefeated(currentScenario){
-    if (currentScenario.stageCounter > (currentScenario.card.stage.length - 1) && !isAnyoneDead(board.players)){
+    if (currentScenario.stageCounter > (currentScenario.card.stage.length - 1)){
         alert("Scenario Cleared!")
         ScenarioCleared()
     }
 }
 
 function isAnyoneDead(players){
+    let inv = []
+    for (let p = 0; p < players.length; i++){
+        inv = players[p].inventory.push(filter(item => item.timing === "playerDeath"))
+    }
     for (let i = 0; i < players.length; i++){
         if (players[i].dmgCounter >= players[i].playstyle.hpMax[board.level]){
             console.log(players[i].username, " was calculated to be dead, but there might be more.")
+            if (inv) {
+                inv[0].ability(players[p])
+                console.log("DIVING INTERVENTION!")
+                continue
+            }
+        }
             alert("GAME OVER")
             return true
-        }
     }
     return false
 }
+
 
 //--------------------//
 //End of Turn End Phase Functions
@@ -829,6 +898,7 @@ function unexhaustAllPlayers(players){
         function CounterAttackPhase() {
             console.log("Start of counterattack")
             let activePlayer = board.players.find(player => player.status === "active")
+            console.log(activePlayer)
             //Event executes an attack
             eventCounterAttack(board.scenarios[board.level], activePlayer)
                 //Check for any attack modifiers

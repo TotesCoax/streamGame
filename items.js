@@ -22,9 +22,10 @@ let lootDeck = [
     timing: "counterAttack",
     description:"The holder of this item reduces damage by 1 per damage instance",
     consumed:false,
-    ability:function(){
-        alert(this.name + " effect has been applied")
-        console.log(this.name + " effect has been applied by " + this.holder)
+    ability: function(dmg) {
+        let newDmg = dmg - 1
+        console.log(this.name + " effect has been applied. ", dmg, "->",newDmg)
+        return newDmg
     }},
 
     {name:"Ring",
@@ -32,9 +33,10 @@ let lootDeck = [
     timing: "startTurn",
     description:"The holder of this item gets 1 extra reroll per turn",
     consumed:false,
-    ability:function(){
-        alert(this.name + " effect has been applied")
-        console.log(this.name + " effect has been applied by " + this.holder)
+    ability: function(player) {
+        newRerolls = player.currentRerollsMax + 1
+        console.log(this.name + " effect has been applied. ", player.currentRerollsMax, " -> ", newRerolls)
+        player.currentRerollsMax = newRerolls
     }},
 
     {name:"Sword",
@@ -42,9 +44,10 @@ let lootDeck = [
     timing: "attack",
     description:"The holder of this item increases all damage dealt by 1 per damage instance",
     consumed:false,
-    ability:function(){
-        alert(this.name + " effect has been applied")
-        console.log(this.name + " effect has been applied by " + this.holder)
+    ability: function(dmg) {
+        let newDmg = dmg + 1
+        console.log(this.name + " effect has been applied. ", dmg, "->",newDmg)
+        return newDmg
     }},
 
     {name:"Ability Potion",
@@ -52,9 +55,14 @@ let lootDeck = [
     timing: "startTurn",
     description:"Restore 1 use of ability to target player.",
     consumed:false,
-    ability:function(){
-        alert(this.name + " effect has been applied")
-        console.log(this.name + " effect has been applied by " + this.holder)
+    ability: function(player) {
+        let newAbil = player.abilityCounter + 1
+        if (newAbil > player.abilityScenarioMax){
+            alert("This would push abilities past your current max allowed.")
+        } else {
+            console.log(this.name + " effect has been applied. ",player.abilityCounter," -> ",newAbil)
+            player.abilityCounter = newAbil
+        }
     }},
 
     {name:"Ability Potion",
@@ -62,9 +70,14 @@ let lootDeck = [
     timing: "startTurn",
     description:"Restore 1 use of ability to target player.",
     consumed:false,
-    ability:function(){
-        alert(this.name + " effect has been applied")
-        console.log(this.name + " effect has been applied by " + this.holder)
+    ability: function(player) {
+        let newAbil = player.abilityCounter + 1
+        if (newAbil > player.abilityScenarioMax){
+            alert("This would push abilities past your current max allowed.")
+        } else {
+            console.log(this.name + " effect has been applied. ",player.abilityCounter," -> ",newAbil)
+            player.abilityCounter = newAbil
+        }
     }},
 
     {name:"Healing Potion",
@@ -72,9 +85,9 @@ let lootDeck = [
     timing: "startTurn",
     description:"Target player heals up to their max HP.",
     consumed:false,
-    ability:function(){
-        alert(this.name + " effect has been applied")
-        console.log(this.name + " effect has been applied by " + this.holder)
+    ability: function(player) {
+        player.dmgCounter = 0
+        console.log(this.name + " effect has been applied.", player.dmgCounter,)
     }},
 
     {name:"Healing Potion",
@@ -82,9 +95,9 @@ let lootDeck = [
     timing: "startTurn",
     description:"Target player heals up to their max HP.",
     consumed:false,
-    ability:function(){
-        alert(this.name + " effect has been applied")
-        console.log(this.name + " effect has been applied by " + this.holder)
+    ability: function() {
+        player.dmgCounter = 0
+        console.log(this.name + " effect has been applied.", player.dmgCounter,)
     }},
 
     {name:"Sacred Relic",
@@ -92,8 +105,9 @@ let lootDeck = [
     timing: "playerDeath",
     description:"When any player is reduced to 0 or less HP, restore that player's HP to 1. This consumes the item.",
     consumed:false,
-    ability:function(){
-        alert(this.name + " effect has been applied")
+    ability: function(player) {
+        let currentMax = player.playstyle.hpMax[board.level]
+        player.dmgCounter = currentMax - 1
         console.log(this.name + " effect has been applied by " + this.holder)
     }}
 ]

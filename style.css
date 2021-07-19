@@ -14,6 +14,11 @@ html {
     display: none;
 }
 
+    /* This is to create a display toggle based on active/support player status */
+.player-display-toggle {
+    display: none;
+}
+
 /*General Card formatting */
 
 .card {
@@ -76,14 +81,27 @@ html {
 
 /*Active players formatting*/
 
+.position {
+    display: flex;
+    flex-direction: column;
+}
+
 .active {
-    height: 400px;
     background: lightcoral
 }
 
+    /* This auto-unhides relevant display */
+.active .player-display-toggle {
+    display: block;
+}
+
 .support {
-    height: 200px;
-    background-color: lightseagreen;
+    background-color: lightcyan;
+}
+
+    /* This auto-unhides relevant display */
+.support .player-display-toggle.ability {
+    display: block;
 }
 
 .roll-dash {
@@ -93,7 +111,6 @@ html {
 }
 
 .player-hand {
-    height: 20%;
     display: flex;
     justify-content: center;}
 

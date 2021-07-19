@@ -122,3 +122,14 @@ function updateDiceValuesHTML(incomingDicePool){
     }
 
 }
+
+//Function to move player cards around based on status
+function movingPlayerCards() {
+    let activeDestination = document.getElementById("activePlayerCardHook"),
+        activePlayerToMove = document.querySelector("#playerContainer .active"),
+        supportDestination = document.getElementById("supportPlayerCardHook"),
+        supportPlayerToMove = document.querySelector("#playerContainer .support")
+
+    activeDestination.appendChild(activePlayerToMove)
+    supportDestination.appendChild(supportPlayerToMove)
+}

@@ -95,7 +95,7 @@ let lootDeck = [
     timing: "startTurn",
     description:"Target player heals up to their max HP.",
     consumed:false,
-    ability: function() {
+    ability: function(player) {
         player.dmgCounter = 0
         console.log(this.name + " effect has been applied.", player.dmgCounter,)
     }},
@@ -107,7 +107,8 @@ let lootDeck = [
     consumed:false,
     ability: function(player) {
         let currentMax = player.playstyle.hpMax[board.level]
+        console.log("Current dmg coutner: ", player.dmgCounter)
         player.dmgCounter = currentMax - 1
-        console.log(this.name + " effect has been applied by " + this.holder)
+        console.log(this.name + " effect has been applied. New dmg counter: ", player.dmgCounter)
     }}
 ]

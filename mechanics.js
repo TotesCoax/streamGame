@@ -545,7 +545,7 @@ function moveToAttackPhase(){
         //Search inventory for any damage buff items or ability tokens
         console.log(inv)
         //If any buffs are found, for each buff invoke their ability to modify dmg
-        if (inv){
+        if (inv.length > 0){
             for(let i = 0; i < inv.length; i++){
                 console.log("Starting: ", calcDmg)
                 calcDmg = inv[i].ability(calcDmg)
@@ -602,6 +602,7 @@ function endAttackPhase(attackHand) {
     if (attackHand.length > 0){
         CounterAttackPhase()
     } else {
+        console.log("Switch triggered!")
         EndPhase()
     }
 }
@@ -618,16 +619,19 @@ function endAttackPhase(attackHand) {
 //I didn't specifically hard code board.players to allow for future expansion
 function applyDMGAOE(players, dmg){
     let calcDmg = dmg
+    //For each player loop
     for (let p = 0; p < players.length; i++){
+        //Look for any defense items
         let inv = players[p].inventory.filter(item => item.timing === "counterAttack")
-        console.log("Player damage is now: ",players[i].dmgCounter)
-
-        if (inv) {
-            for(let i = 0; i < players.length; i++){
+        console.log("Player damage is now: ",players[p].dmgCounter)
+        //For each item in their inventory, run dmg calculations
+        if (inv.length > 0) {
+            for(let i = 0; i < inv.length; i++){
                 calcDmg = inv[i].ability(calcDmg)
             }
         }
-        players[i].dmgCounter+= calcDmg
+        //Apply dmg after calcs
+        players[p].dmgCounter+= calcDmg
         console.log("Player damage is now: ",players[i].dmgCounter)
 
     }
@@ -645,7 +649,7 @@ function eventCounterAttack(currentScenario, player){
     } else {
         let inv = player.inventory.filter(item => item.timing === "counterAttack"),
             calcDmg = currentStage.dmg
-        if (inv) {
+        if (inv.length > 0) {
             for(let i = 0; i < inv.length; i++){
                 calcDmg = inv[i].ability(calcDmg)
             }
@@ -672,7 +676,6 @@ function stageHPchecker(currentScenario){
     if (currentScenario.dmgCounter >= currentStage.hp){
         currentScenario.stageCounter++
         currentScenario.dmgCounter = 0
-        isAnyoneDead(board.players)
         alert("Stage defeated!")
         scenarioAllStagesDefeated(currentScenario)
     } else {
@@ -690,20 +693,27 @@ function scenarioAllStagesDefeated(currentScenario){
 
 function isAnyoneDead(players){
     let inv = []
-    for (let p = 0; p < players.length; i++){
-        inv = players[p].inventory.push(filter(item => item.timing === "playerDeath"))
+    //Searching the inventories for any items to save the day
+    //Generating a sub-inventory of items we could use
+    for (let p = 0; p < players.length; p++){
+        inv.push(players[p].inventory.find(item => item.timing === "playerDeath"))
     }
+    //Searching for any dead players loops
     for (let i = 0; i < players.length; i++){
+        //If any player is found to be dead, check for any saving items
         if (players[i].dmgCounter >= players[i].playstyle.hpMax[board.level]){
             console.log(players[i].username, " was calculated to be dead, but there might be more.")
-            if (inv) {
-                inv[0].ability(players[p])
+            //If those items are found, start using them!
+            if (inv.length > 0) {
+                let itemToUse = inv.find(item => item.consumed === false)
+                useConsumable(itemToUse, players[i])
                 console.log("DIVING INTERVENTION!")
                 continue
+            } else {
+                alert("GAME OVER")
+                return true
             }
         }
-            alert("GAME OVER")
-            return true
     }
     return false
 }
@@ -900,10 +910,12 @@ function unexhaustAllPlayers(players){
             let activePlayer = board.players.find(player => player.status === "active")
             console.log(activePlayer)
             //Event executes an attack
+            console.log("The stage raw dmg value is: ", board.scenarios[board.level].card.stage[board.scenarios[board.level].stageCounter].dmg)
             eventCounterAttack(board.scenarios[board.level], activePlayer)
                 //Check for any attack modifiers
                 //Assign DMG to target(s)
             console.log("Stage has counterattacked")
+            isAnyoneDead(board.players)
             EndPhase()
         }
         //Turn End Phase

@@ -61,11 +61,11 @@
                     HP: <span>88</span>
                 </div>
             </div>
-            <div class="ability hidden">
+            <div class="ability player-display-toggle">
                 <button class="ability-uses">X</button>
                 <span>Text for the ability.</span>
             </div>
-            <div class="attack-box stat-box hidden">
+            <div class="attack-box stat-box player-display-toggle">
             </div>
         </div>
     </template>
@@ -98,48 +98,15 @@
         </div>
         <div id="rollingPlayers" class="stat-box">
         <!-- Active Player Card -->
-            <div id="activePlayerCard" class="player active card">
-                <div id="activePlayerPortrait" class="portrait">
-                    <!-- <img src="twitchProfilePic" alt="active player portrait"> -->
-                </div>
-                <div id="activePlayerName" class="player-name">
-                    Username
-                </div>
-                <div id="activePlayerClass" class="player-class">
-                    Class
-                </div>
-                <div id="activePlayerStatus" class="stat-box">
-                    <div id="activePlayerDMG" class="counter">
-                        DMG: <span>00</span>
-                    </div>
-                    <div id="activePlayerHP" class="counter">
-                        HP: <span>88</span>
-                    </div>
-                </div>
-                <div id="activePlayerAbility" class="ability">
-                    <button id="activePlayerAbilityUsesLeft" class="ability-uses">X</button>
-                    Text for the ability.
-                </div>
-                <div id="activePlayerAttacks" class="attack-box stat-box">
-                    <div id="attack1" class="player-attack">
-                        <div class="attack-requirements">
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                            <span class="attack-req">X</span>
-                        </div>
-                        <div class="attack-name">Attack Name</div>
-                        <div class="attack-damage">YY</div>
-                        <div class="attack-augment">Pierce 5</div>
-                    </div>
+            <div id="activePlayerPosition" class="position">
+                <div id="activePlayerCardHook">
+
                 </div>
                 <div id="actveRolls" class="roll-dash">
-                    <button id="rollButton" type="button">Roll</button>
-                    <p>Rolls left:<span id="roll-counter">0</span></p>
+                    <div class="rollHUD">
+                        <button id="rollButton" type="button">Roll</button>
+                        <p>Rerolls left:<span id="roll-counter">0</span></p>
+                    </div>
                     <div id="activePlayerHand" class="player-hand">
 
                     </div>
@@ -147,32 +114,18 @@
             </div>
 
             <!-- Support Player Card -->
-            <div id="supportPlayerCard" class="player card">
-                <div id="actveRolls" class="roll-dash">
+            <div id="supportPlayerPosition" class="position">
+                <div id="supportRolls" class="roll-dash">
+                    <div class="rollHUD">
+                        <button id="rollButton" type="button">Roll</button>
+                        <p>Rerolls left:<span id="roll-counter">0</span></p>
+                    </div>
                     <div id="supportPlayerHand" class="player-hand">
 
                     </div>
-                </div>
-                <div id="supportPlayerAbility" class="ability">
-                    <button id="supportPlayerAbilityUsesLeft" class="ability-uses">X</button>
-                    Text for the ability.
-                </div>
-                <div id="supportPlayerPortrait" class="portrait">
-                    <!-- <img src="twitchProfilePic" alt="support player portrait"> -->
-                </div>
-                <div id="supportPlayerStatus" class="stat-box">
-                    <div id="supportPlayerDMG" class="counter">
-                        DMG: <span>00</span>
+                    <div id="supportPlayerCardHook">
+                        
                     </div>
-                    <div id="supportPlayerHP" class="counter">
-                        HP: <span>88</span>
-                    </div>
-                </div>
-                <div id="supportPlayerName" class="player-name">
-                    Username
-                </div>
-                <div id="supportPlayerClass" class="player-class">
-                    Class
                 </div>
             </div>
         </div>

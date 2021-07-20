@@ -1,10 +1,11 @@
 NOW things to do 
 
 
+
     build user interface
         -> have client code pick apart transmitted board object
-            -Player and Scenario parser mostly works
-            ->need to workout a way to adjust classes based on player.status
+            DONE->Player and Scenario parser mostly works
+            DONE->need to workout a way to adjust classes based on player.status
         -> also the functionality programming (use socket.io?)
 
 
@@ -12,7 +13,7 @@ NOW things to do
 Near future THINGS TO DO
 
     Correct the reroll system
-        Sync each reroll -> rules state they must be rerolled at the same time
+        DONE(?) Sync each reroll -> rules state they must be rerolled at the same time
             This just requires consolidating the current functions into a single activation
                 Still want to keep them separate for item potentially
         Reroll adjusting stage effects also need to be carved out.
@@ -20,21 +21,28 @@ Near future THINGS TO DO
 
     Lock/Unlock tier 2 and 3 attacks for players based on level
         need to program in a checker of sorts
+        -really just need to program in something to stop them from accessing higher attacks early rather than unlocking them later, as the data is always on the card.
 
-    program in abilities
+    When will players be allowed to trade items? (can reuse giveItem() function)
+        ->At the start of each stage?
+        ->Def allowed to give them on acquisition
 
-    program in items
+    DONE program in abilities
 
-    program in stage effects
+    DONE program in items
+
+    DONE program in stage effects
+
+    prevent user from selecting a playstyle that has already been chosen
 
     implement attack augments:
         pierce
         heal
         split (50/50)
 
-    Eccentric/Serene additions
+    Eccentric/Serene playstyle additions
 
-    Add progress bar HTML tag to player cards and get functioning health bar display (value kept for testing environment)
+    Add <meter> bar HTML tag to player cards and get functioning health bar display (value kept for testing environment)
         on hover have health bar display actual values
 
 

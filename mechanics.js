@@ -69,6 +69,9 @@ class Player {
         this.status = "inactive"
         //Exhausted is for selecting supports
         this.exhausted = false
+        //Section for debuffs
+        //A player is poisoned when this is >0, and takes poison damage each turn, is not affected by effects or items.
+        this.poison = 0
     }
 }
 
@@ -137,17 +140,26 @@ let board = {
     }
 }
 
+//Game state object to help handle some stage effects
+let gameState = {
+    turnCounter: 0,
+    switchCounter: 0,
+    noConsumables: false,
+    noAbilities: false
+}
+
 //Gameboard object to export - this hides deck information from the front end
 let boardExport = {
     players: board.players,
     level: board.level,
-    senarios: board.scenarios,
+    scenarios: board.scenarios,
     dicePool: {
         active: board.dicePool.active,
         support: board.dicePool.support
     },
     attackHand: board.attackHand,
-    boon: board.boon.drawn
+    boon: board.boon.drawn,
+    gameState: gameState
 }
 
 //Dev object - I created this to make some coding shorthands for testing - set after Rolling phase.
@@ -255,15 +267,14 @@ function giveItem(player, itemName) {
 function setupScenario(deck, level){
     prepareScenario(deck, level)
     console.log("The scenario for level " + (Number(level) + 1) + " has been prepared.")
-    
 }
 
 //Activate a scenario
 //This clones and shuffles the deck and draws on scenario, then adds that scenario to global board object
 function prepareScenario(deck, level){
     console.log("Pulling the scenario card");
-    let clone = shuffle(JSON.parse(JSON.stringify(deck[level])))
-    board.scenarios.push(new Scenario(clone.shift()))
+    let clone = shuffle(deck[level])
+    board.scenarios.push(new Scenario(clone[0]))
     console.log("The scenario card has been pulled")
     console.log(board.scenarios)
 }
@@ -289,10 +300,24 @@ function setHands(scenario){
 
 //Currently this is a blanket reset without targetting any specific pool of players based on the max they are allowed by the stage.
 function setRerolls() {
+    //Setting the rerolls for every player
+    console.log("Setting the reroll counts for each player")
     for (let i = 0; i < board.players.length; i++){
         board.players[i].currentRerolls = board.players[i].currentRerollsMax
+        console.log(board.players[i].username, board.players[i].currentRerolls);
     }
-    console.log("Rerolls have been set to the default value of 2");
+    //Looking for items that boost rerolls
+    board.players.forEach(player => {
+        if (player.inventory.find(item => timing === "reroll")){
+            player.inventory.find(item => timing === "reroll").ability(player)
+        }
+    })
+    console.log("Rerolls have been set")
+}
+
+//Applying the effect of the current stage
+function applyStageEffect(currentStage){
+    currentStage.effect(board.players)
 }
 
 //--------------------//
@@ -384,9 +409,17 @@ function checkConsumables(players){
 
 //Use consumable
 function useConsumable(item, target){
-    if (!item.consumed){
-        item.ability(target)
-        item.consumed = true
+    //Checking to see if game state allows consumables
+    if (gameState.noConsumables === false){
+        //Checking if item is consumed
+        if (!item.consumed){
+            item.ability(target)
+            item.consumed = true
+        } else {
+            alert("This item has already been used!")
+        }
+    } else {
+        alert("Something is preventing you from using items!")
     }
 }
 
@@ -412,6 +445,23 @@ function selectSupportPlayer(players){
         supportChoice.status = "support"
         console.log("Support has been chosen:", supportChoice.username)
     }
+}
+
+//This function will search and apply any damage over time effects
+function damageOverTimeEffect(){
+
+    //Checking for poison status on players
+    board.players.forEach(player => {
+        if (player.poison > 0){
+            console.log(player, " is poisoned and will take: ", player.poison, "damage")
+            console.log(player.dmgCounter, " -> ", player.dmgCounter += player.poison)
+            player.dmgCounter += player.poison
+        }
+    //Checking for that one scenario that poisons itself as a mechanic
+    if (board.scenarios[board.level].poison > 0){
+        board.scenarios[board.level].dmgCounter += board.scenarios[board.level].poison
+    }
+    })
 }
 
 
@@ -603,6 +653,7 @@ function endAttackPhase(attackHand) {
         CounterAttackPhase()
     } else {
         console.log("Switch triggered!")
+        gameState.switchCounter += 1
         EndPhase()
     }
 }
@@ -677,6 +728,8 @@ function stageHPchecker(currentScenario){
         currentScenario.stageCounter++
         currentScenario.dmgCounter = 0
         alert("Stage defeated!")
+        gameState.noAbilities = false
+        gameState.noConsumables = false
         scenarioAllStagesDefeated(currentScenario)
     } else {
         
@@ -687,6 +740,9 @@ function stageHPchecker(currentScenario){
 function scenarioAllStagesDefeated(currentScenario){
     if (currentScenario.stageCounter > (currentScenario.card.stage.length - 1)){
         alert("Scenario Cleared!")
+        console.log("achieved switch rate of: ", ((gameState.switchCounter / gameState.turnCounter) * 100),"%")
+        gameState.turnCounter = 0
+        gameState.switchCounter = 0
         ScenarioCleared()
     }
 }
@@ -827,22 +883,19 @@ function unexhaustAllPlayers(players){
     }
     //Setup for each new stage reveal (once per stage)
     function NewStageSetup() {
+        currentStage = board.scenarios[board.level].card.stage[board.scenarios[board.level].stageCounter]
         //Check for any Event Stage effects
-        console.log("This is where we would check for stage effects")
         //Apply the Stage effect
-        console.log("This is where we would apply the stage effects")
-        //Check for any item (equipment) modifiers
-        //Apply any modifiers 
-        //Check the event rolls tally
-        console.log("Reroll amount check")
-        //Check for any reroll modifiers (event or items)
-        //Apply any reroll modifiers to respective party
-        console.log("Apply Reroll modifiers")
-        console.log("NewStageSetup had finished")
+        currentStage.effect(board.players)
+        console.log("Stage affect has been applied")
+        console.log("Stage level item effects have been applied")
+        console.log("NewStageSetup has finished")
         NewPlayerTurnSetup()
     }
     //Setup for each Player's turn
     function NewPlayerTurnSetup() {
+        gameState.turnCounter += 1
+        console.log("It is now turn: ", gameState.turnCounter);
         //Active Player is declared
         selectActivePlayer(board.players)
         //Check if all other players are exhausted
@@ -860,6 +913,8 @@ function unexhaustAllPlayers(players){
 
     //Rolling phase
     function RollingPhase(){
+        //Check for any reroll modifiers (event or items)
+        //Apply any reroll modifiers to respective party
         setRerolls()
         //Create player "hands" based on the scenario's restrictions
         setHands(board.scenarios[board.level])

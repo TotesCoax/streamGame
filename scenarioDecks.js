@@ -37,8 +37,7 @@ let scenario1Deck = [
             def:0,
             aoe:false,
             effect:function(){
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                console.log("This stage has no effect")
             }
         },
         {
@@ -48,8 +47,7 @@ let scenario1Deck = [
             def:0,
             aoe:false,
             effect:function(){
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                console.log("This stage has no effect")
             }
         },
         {
@@ -59,8 +57,7 @@ let scenario1Deck = [
             def:0,
             aoe:false,
             effect:function(){
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                console.log("This stage has no effect")
             }
         },
         {
@@ -70,8 +67,7 @@ let scenario1Deck = [
             def:0,
             aoe:false,
             effect:function(){
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                console.log("This stage has no effect")
             }
         }]
     },
@@ -88,10 +84,9 @@ let scenario1Deck = [
             hp:20,
             dmg:3,
             def:0,
-            aoe:"true",
+            aoe:true,
             effect:function(){
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                console.log("This stage has no effect")
             }
         },
         {
@@ -101,8 +96,7 @@ let scenario1Deck = [
             def:0,
             aoe:false,
             effect:function(){
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                console.log("This stage has no effect")
             }
         }
 
@@ -120,9 +114,15 @@ let scenario1Deck = [
             dmg:2,
             def:0,
             aoe:true,
-            effect:function(){
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+            effect:function panic(players){
+                //Rerolls -1
+                players.forEach(player => {
+                    console.log(player.username, "rerolls: ", player.currentRerollsMax)
+                    player.currentRerollsMax -= 1
+                    console.log(player.username, "rerolls: ", player.currentRerollsMax)
+                })
+                //I elected to do for each player since the rerolls set EVERYONE to 2 as well, and I might implement a way to switch Actvie/Support people later.
+                console.log("Panic consumes the party");
             }
         }
     ]}
@@ -138,16 +138,19 @@ let scenario2Deck = [
     suppDice:3,
     stage:[
         {
-            name:"PLAYER has been poisoned! Get the antidote!",
+            name:"Poisoned!",
             hp:30,
             dmg:1,
             def:0,
             aoe:false,
-            effect:function(){
+            effect:function poisoned(players){
                 //No Consumables
+                gameState.noConsumables = true
                 //At the start of each player's turn POISONED PLAYER (randomly chosen) suffers X (4 is default for game) dmg
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                //the poison tick is handled by another function in the turns
+                let poisonedPlayer = players[Math.floor(Math.random() * (players.length)) + 1]
+                poisonedPlayer.poison = 4
+                console.log(poisonedPlayer.username, " has been poisoned!")
             }
         }
     ]},
@@ -165,8 +168,7 @@ let scenario2Deck = [
             def:0,
             aoe:true,
             effect:function(){
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                console.log("This stage has no effect")
             }
         },
         {
@@ -177,8 +179,8 @@ let scenario2Deck = [
             aoe:false,
             effect:function(){
                 //No Abilities
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                gameState.noAbilities = true
+                console.log("No abilities may be used")
             }
         },
         {
@@ -188,8 +190,7 @@ let scenario2Deck = [
             def:5,
             aoe:false,
             effect:function(){
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                console.log("This stage has no effect")
             }
         }
 
@@ -208,8 +209,7 @@ let scenario2Deck = [
             def:3,
             aoe:false,
             effect:function(){
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                console.log("This stage has no effect")
             }
         }
     ]}
@@ -230,8 +230,7 @@ let scenario3Deck = [
             def:0,
             aoe:true,
             effect:function(){
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                console.log("This stage has no effect")
             }
         },
         {
@@ -241,8 +240,7 @@ let scenario3Deck = [
             def:0,
             aoe:false,
             effect:function(){
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                console.log("This stage has no effect")
             }
         }
 
@@ -260,10 +258,9 @@ let scenario3Deck = [
             dmg:99,
             def:96,
             aoe:false,
-            effect:function(){
+            effect:function countdown(){
                 //At the start of each players turn, this enemy suffers 1 dmg, ignoring defense
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                board.scenarios[board.level].poison = 1
             }
         }
     ]},
@@ -282,8 +279,8 @@ let scenario3Deck = [
             aoe:false,
             effect:function(){
                 //No Consumables
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                gameState.noConsumables = true
+                console.log("No consumables active")
             }
         },
         {
@@ -294,8 +291,8 @@ let scenario3Deck = [
             aoe:true,
             effect:function(){
                 //No Consumables
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                gameState.noConsumables = true
+                console.log("No consumables active")
             }
         },
         {
@@ -306,8 +303,8 @@ let scenario3Deck = [
             aoe:false,
             effect:function(){
                 //No Consumables
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                gameState.noConsumables = true
+                console.log("No consumables active")
             }
         },
         {
@@ -318,8 +315,8 @@ let scenario3Deck = [
             aoe:true,
             effect:function(){
                 //No Consumables
-                alert(this.name + " effect has been applied")
-                console.log(this.name + " effect has been applied")
+                gameState.noConsumables = true
+                console.log("No consumables active")
             }
         }
     ]}

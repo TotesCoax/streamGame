@@ -30,13 +30,13 @@ let lootDeck = [
 
     {name:"Ring",
     type:"equipment",
-    timing: "startTurn",
+    timing: "reroll",
     description:"The holder of this item gets 1 extra reroll per turn",
     consumed:false,
     ability: function(player) {
-        newRerolls = player.currentRerollsMax + 1
+        newRerolls = player.currentRerolls + 1
         console.log(this.name + " effect has been applied. ", player.currentRerollsMax, " -> ", newRerolls)
-        player.currentRerollsMax = newRerolls
+        player.currentRerolls = newRerolls
     }},
 
     {name:"Sword",

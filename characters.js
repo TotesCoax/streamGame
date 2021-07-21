@@ -16,7 +16,7 @@ let Playstyle = {
             {tier: 2, diceReq: 8, dmg:27, name: "Finisher", desc: "It's not pretty but it gets the job done"}
         ],
         ability: function(target) {
-            let newValue = prompt("What would you like to change it to? Must be 1 or 6")
+            let newValue = Number(prompt("What would you like to change it to? Must be 1 or 6"))
             if (newValue === 1 || newValue === 6 ) {
             target.value = newValue
             } else {

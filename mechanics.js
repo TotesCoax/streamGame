@@ -675,8 +675,9 @@ function applyDMGAOE(players, dmg){
     //For each player loop
     for (let p = 0; p < players.length; i++){
         //Look for any defense items
-        let inv = players[p].inventory.filter(item => item.timing === "counterAttack")
         console.log("Player damage is now: ",players[p].dmgCounter)
+        let inv = players[p].inventory.filter(item => item.timing === "counterAttack")
+        console.log("Defense items found: ", inv)
         //For each item in their inventory, run dmg calculations
         if (inv.length > 0) {
             for(let i = 0; i < inv.length; i++){
@@ -685,7 +686,7 @@ function applyDMGAOE(players, dmg){
         }
         //Apply dmg after calcs
         players[p].dmgCounter+= calcDmg
-        console.log("Player damage is now: ",players[i].dmgCounter)
+        console.log("Player damage is now: ",players[p].dmgCounter)
 
     }
 }

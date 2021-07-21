@@ -40,7 +40,11 @@ let Playstyle = {
         basicAttack: function(attackSubmission, chosenAttack){
             console.log(attackSubmission, chosenAttack)
             if (attackSubmission.length === 1 && attackSubmission[0].value === 6){
-                applyDMGtoScenario(chosenAttack.dmg, board.level)
+                console.log("The basic attack succeeds")
+                return true
+            } else {
+                console.log("The basic attack fails")
+                return false
             }
         }
     },
@@ -104,7 +108,11 @@ let Playstyle = {
         basicAttack: function(attackSubmission, chosenAttack){
             console.log(attackSubmission, chosenAttack)
             if (this.mechanic(attackSubmission, chosenAttack) && attackSubmission.length === 2){
-                applyDMGtoScenario(chosenAttack.dmg, board.level)
+                console.log("The basic attack succeeds")
+                return true
+            } else {
+                console.log("The basic attack fails")
+                return false
             }
         }
 
@@ -153,7 +161,11 @@ let Playstyle = {
         basicAttack: function(attackSubmission, chosenAttack){
             console.log(attackSubmission, chosenAttack)
             if (attackSubmission.length === 1 && attackSubmission[0].value === 1){
-                applyDMGtoScenario(chosenAttack.dmg, board.level)
+                console.log("The basic attack succeeds")
+                return true
+            } else {
+                console.log("The basic attack fails")
+                return false
             }
         }
 
@@ -202,7 +214,11 @@ let Playstyle = {
         basicAttack: function(attackSubmission, chosenAttack){
             console.log(attackSubmission, chosenAttack)
             if (attackSubmission.length === 1 && ((attackSubmission[0].value === 6)||(attackSubmission[0].value === 5))){
-                applyDMGtoScenario(chosenAttack.dmg, board.level)
+                console.log("The basic attack succeeds")
+                return true
+            } else {
+                console.log("The basic attack fails")
+                return false
             }
         }
 
@@ -226,6 +242,7 @@ let Playstyle = {
         ability: function(targetValue, targetArray, direction) {
             //I'll do this later.
         }
+        
     },
     */
 

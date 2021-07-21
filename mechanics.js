@@ -618,7 +618,9 @@ function attack(player, attackNum, attackHand) {
     //Checking for basic attack submission - because they have their own special rules for each character
     if (attackNum === 0){
         console.log("Basic attack detected")
-        player.playstyle.basicAttack(attackSubmission, chosenAttack)
+        if (player.playstyle.basicAttack(attackSubmission, chosenAttack)){
+            applyDMGtoScenario(player, dmg, board.level)
+        }
     }
     //If the number of dice required is met AND the character mechanic is met, assign dmg
     if (numDiceCheck(diceReq, attackSubmission) && style(attackSubmission, chosenAttack)){

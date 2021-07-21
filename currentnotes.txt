@@ -1,5 +1,15 @@
 NOW things to do 
 
+    If a player keeps all, are they still deducted a reroll? - something to consider/fix.
+        -> currently they do get deducted.
+
+    Need to make a template for the attackhand
+        - also need to figure out a way to submit dice to attacks from item
+            - initial idea is draggable items for the dice
+
+    when the dice are returned to the attackhand after a failed attack, they need to have submitted set to false.
+
+    endPhase needs to trigger appropriate starts for next phase
 
 
     build user interface
@@ -16,7 +26,7 @@ Near future THINGS TO DO
         DONE(?) Sync each reroll -> rules state they must be rerolled at the same time
             This just requires consolidating the current functions into a single activation
                 Still want to keep them separate for item potentially
-        Reroll adjusting stage effects also need to be carved out.
+        DONE Reroll adjusting stage effects also need to be carved out.
             Perhaps introduce a clear effects function for stages so that we may modify effects on each stage?
 
     Lock/Unlock tier 2 and 3 attacks for players based on level

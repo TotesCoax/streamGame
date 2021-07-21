@@ -1,4 +1,4 @@
-let gameboard = board
+let gameboard = boardExport
 
 
 //GENERATE HTML ELEMENT FUNCTIONS
@@ -17,11 +17,11 @@ function fillUpScenario(){
 
     newScen.id = `scenario${gameboard.level}`
     //newScen.children[0] = Image
-    newScen.children[1].children[1].innerText = currScen.activeDice
-    newScen.children[1].children[2].innerText = currScen.suppDice
-    newScen.children[2].innerText = currScen.name
+    newScen.querySelector(".active-player-rolls").innerText = currScen.activeDice
+    newScen.querySelector(".support-player-rolls").innerText = currScen.suppDice
+    newScen.querySelector(".scenario-title").innerText = currScen.name
     //Populating the stage array
-    let stageHTML = newScen.children[3],
+    let stageHTML = newScen.querySelector(".scenario-stage-hook"),
         stageImport = currScen.stage,
         stageTemplate = document.getElementById("scenarioStageTemplate")
 
@@ -30,9 +30,9 @@ function fillUpScenario(){
         let newStage = stageHTML.lastElementChild
 
         newStage.id = `stage${s}`
-        newStage.children[0].innerText = stageImport[s].hp
-        newStage.children[1].innerText = stageImport[s].dmg
-        newStage.children[2].innerText = stageImport[s].name
+        newStage.querySelector(".stage-hp-stat").innerText = stageImport[s].hp
+        newStage.querySelector(".stage-dmg-stat").innerText = stageImport[s].dmg
+        newStage.querySelector(".stage-name").innerText = stageImport[s].name
     }
 }
 
@@ -46,18 +46,18 @@ function fillUpPlayers(){
     for (let i = 0; i < gameboard.players.length; i++){
         playerContainer.appendChild(temp.content.cloneNode(true))
         //playerInsert is always the last element created in the array
-        let playerInsert = playerContainer.lastElementChild
+        let playerInsert = playerContainer.lastElementChild,
             playerStats = gameboard.players[i]
 
         playerInsert.id = playerStats.username.toLowerCase()
         playerInsert.classList.add(playerStats.status)
-        playerInsert.children[1].innerText = playerStats.username.toUpperCase()
-        playerInsert.children[2].innerText = playerStats.playstyle.title
-        playerInsert.children[3].children[1].firstElementChild.innerText = playerStats.playstyle.hpMax[gameboard.level]
-        playerInsert.children[4].children[0].innerText = playerStats.playstyle.abilityMax[gameboard.level][gameboard.players.length - 2]
-        playerInsert.children[4].children[1].innerText = playerStats.playstyle.abilityText
+        playerInsert.querySelector(".player-name").innerText = playerStats.username.toUpperCase()
+        playerInsert.querySelector(".player-class").innerText = playerStats.playstyle.title
+        playerInsert.querySelector(".player-hp").innerText = playerStats.playstyle.hpMax[gameboard.level]
+        playerInsert.querySelector(".ability-uses").innerText = playerStats.playstyle.abilityMax[gameboard.level][gameboard.players.length - 2]
+        playerInsert.querySelector(".ability-text").innerText = playerStats.playstyle.abilityText
         //Populating the attack array
-        let attackHTML = playerInsert.children[5],
+        let attackHTML = playerInsert.querySelector(".attack-box"),
             attackImport = playerStats.playstyle.attack,
             attackTemp = document.getElementById("playerAttackTemplate")
 
@@ -67,9 +67,9 @@ function fillUpPlayers(){
             let newAttack = attackHTML.lastElementChild
 
             newAttack.id = `attack${a}`
-            newAttack.children[0].innerText = attackImport[a].diceReq
-            newAttack.children[1].innerText = attackImport.name
-            newAttack.children[2].innerText = attackImport[a].dmg
+            newAttack.querySelector(".attack-req-dice").innerText = attackImport[a].diceReq
+            newAttack.querySelector(".attack-name").innerText = attackImport[a].name
+            newAttack.querySelector(".attack-damage").innerText = attackImport[a].dmg
         }
     }
 }
@@ -88,7 +88,7 @@ function fillUpDiceRollingPhase() {
         let newDie = activeContainer.lastElementChild,
             dieVal = gameboard.dicePool.active[d].value
         console.log(dieVal)
-        newDie.getElementsByClassName("die")[0].innerText = dieVal
+        newDie.querySelector(".die").innerText = dieVal
     }
 
     for (let d = 0; d < gameboard.dicePool.support.length; d++){
@@ -96,7 +96,7 @@ function fillUpDiceRollingPhase() {
         let newDie = suppContainer.lastElementChild,
             dieVal = gameboard.dicePool.support[d].value
         console.log(dieVal)
-        newDie.getElementsByClassName("die")[0].innerText = dieVal
+        newDie.querySelector(".die").innerText = dieVal
     }
 
 }

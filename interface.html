@@ -23,7 +23,7 @@
                 <div class="support-player-rolls roll-count">Y</div>
             </div>
             <div class="scenario-title stat-box">Scenario Title</div>
-            <div class="scenario-stage stat-box">
+            <div class="scenario-stage-hook stat-box">
 
             </div>
         </div>
@@ -32,11 +32,12 @@
     <template id="scenarioStageTemplate">
         <div class="scenario-stage">
             <div class="stage-icon">
-                HP: <span class="stageHPCounter">XX</span></div>
+                HP: <span class="stage-hp-stat">XX</span></div>
             <div class="stage-icon">
-                DMG: <span class="stageDMGstat">YY</span></div>
-            <div class="stage-description">
-                <span class="stageDetails">This stage is stageful.</span></div>
+                DMG: <span class="stage-dmg-stat">YY</span></div>
+            <div class="stage-name">
+                This stage is stageful
+            </div>
         </div>
     </template>
     <!-- End Scenario templates -->
@@ -63,9 +64,10 @@
             </div>
             <div class="ability player-display-toggle">
                 <button class="ability-uses">X</button>
-                <span>Text for the ability.</span>
+                <span class="ability-text">Text for the ability.</span>
             </div>
             <div class="attack-box stat-box player-display-toggle">
+
             </div>
         </div>
     </template>
@@ -77,7 +79,7 @@
             </div>
             <div class="attack-name">Attack Name</div>
             <div class="attack-damage">YY</div>
-            <div class="attack-augment">Pierce 5</div>
+            <div class="attack-augment">(n/a)</div>
         </div>
     </template>
 

@@ -128,9 +128,28 @@ html {
     text-align: center;
 }
 
+/* Attacks formatting */
+
+.player-attack:nth-child(even) {
+    background: lightyellow;
+}
+
 .attack-requirements {
-    font-size: 6pt;
-    background: lightseagreen;
+    font-size: .75em;
+    background: rgba(119, 136, 153, 0.333);
+}
+
+.attack-details {
+    background: white;
+    display: flex;
+    justify-content: space-between;
+}
+
+span.attack-damage {
+    background-color: red;
+    color: white;
+    padding: .1em;
+    border-radius: 25%;
 }
 
 /* Inactive Players Formatting */

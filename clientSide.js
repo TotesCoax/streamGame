@@ -44,6 +44,7 @@ function fillUpPlayers(){
     //console.log(temp.content.firstElementChild.id)
     //Populating the player array
     for (let i = 0; i < gameboard.players.length; i++){
+        console.log(`Inserting player: ${gameboard.players[i].username}` )
         playerContainer.appendChild(temp.content.cloneNode(true))
         //playerInsert is always the last element created in the array
         let playerInsert = playerContainer.lastElementChild,
@@ -56,6 +57,7 @@ function fillUpPlayers(){
         playerInsert.querySelector(".player-hp").innerText = playerStats.playstyle.hpMax[gameboard.level]
         playerInsert.querySelector(".ability-uses").innerText = playerStats.playstyle.abilityMax[gameboard.level][gameboard.players.length - 2]
         playerInsert.querySelector(".ability-text").innerText = playerStats.playstyle.abilityText
+        console.log("Easy  stuff filled, moving to attack array")
         //Populating the attack array
         let attackHTML = playerInsert.querySelector(".attack-box"),
             attackImport = playerStats.playstyle.attack,
@@ -63,11 +65,28 @@ function fillUpPlayers(){
 
         // console.log(attackHTML, attackImport, attackTemp)
         for (let a = 0; a < attackImport.length; a++){
+            console.log(`Inserting attack: ${attackImport[a].name}`)
             attackHTML.appendChild(attackTemp.content.cloneNode(true))
             let newAttack = attackHTML.lastElementChild
 
-            newAttack.id = `attack${a}`
+            newAttack.id = `${attackImport[a].name.split(" ").join("")}`
             newAttack.querySelector(".attack-req-dice").innerText = attackImport[a].diceReq
+            console.log(attackImport[a].threshold)
+            if (!isNaN(attackImport[a].threshold)) {
+                console.log("Threshold detected, Activating switch.", playerStats.playstyle.mechanic.name);
+                switch (playerStats.playstyle.mechanic.name) {
+                    case "staunch":
+                        console.log("Staunch detected")
+                        playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerText = "sum of dice values &geq; " + attackImport[a].threshold
+                        break;
+                    case "sly":
+                        console.log("Sly detected")
+                        playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerText = "sum of dice values &leq; " + attackImport[a].threshold
+                        break;
+                    default:
+                        break;
+                }
+            }
             newAttack.querySelector(".attack-name").innerText = attackImport[a].name
             newAttack.querySelector(".attack-damage").innerText = attackImport[a].dmg
         }
@@ -126,10 +145,15 @@ function updateDiceValuesHTML(incomingDicePool){
 //Function to move player cards around based on status
 function movingPlayerCards() {
     let activeDestination = document.getElementById("activePlayerCardHook"),
-        activePlayerToMove = document.querySelector("#playerContainer .active"),
+        activePlayerToMove = document.querySelector(".active.player"),
         supportDestination = document.getElementById("supportPlayerCardHook"),
-        supportPlayerToMove = document.querySelector("#playerContainer .support")
+        supportPlayerToMove = document.querySelector(".support.player"),
+        inactiveDestination = document.getElementById("playerContainer"),
+        activeToInactivePlayer = document.querySelector("#activePlayerCardHook .inactive")
 
     activeDestination.appendChild(activePlayerToMove)
     supportDestination.appendChild(supportPlayerToMove)
+    if (activeToInactivePlayer){
+        inactiveDestination.appendChild(activeToInactivePlayer)
+    }
 }

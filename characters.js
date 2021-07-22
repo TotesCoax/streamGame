@@ -63,29 +63,33 @@ let Playstyle = {
             {tier: 1, diceReq: 6, dmg:12, name: "Port de bras", desc: "A six step combo with hits on the strike and return"},
             {tier: 2, diceReq: 8, dmg:24, name: "Magnum", desc: "Dear god, it's beautiful."}
         ],
-        ability: function(target) {
-            switch (target.value) {
-                case 1:
-                    target.value = 6
-                    break;
-                case 2:
-                    target.value = 5
-                    break;
-                case 3:
-                    target.value = 4
-                    break;
-                case 4:
-                    target.value = 3
-                    break;
-                case 5:
-                    target.value = 2
-                    break;
-                case 6:
-                    target.value = 1
-                    break;
-                default:
-                    alert("Improper value submitted")
-                    break;
+        ability: function(diceArray) {
+            if (diceArray.length < 2){
+                diceArray.forEach(die =>{
+                    switch (die.value) {
+                        case 1:
+                            die.value = 6
+                            break;
+                        case 2:
+                            die.value = 5
+                            break;
+                        case 3:
+                            die.value = 4
+                            break;
+                        case 4:
+                            die.value = 3
+                            break;
+                        case 5:
+                            die.value = 2
+                            break;
+                        case 6:
+                            die.value = 1
+                            break;
+                        default:
+                            alert("Improper value submitted")
+                            break;
+                    }
+                })
             }
         },
         mechanicExplain: "An elegant fighter requires dice values for non-basic attacks to be sequentially ascending.",
@@ -136,9 +140,9 @@ let Playstyle = {
                 alert("Too many dice submitted")
                 return false;
             }
-            for (let i = 0; i < targetArray.length; i++){
-                targetArray[i].value = 5
-            }
+            targetArray.forEach(die =>{
+                die.value = 5
+            })
         },
         mechanicExplain: "A staunch fighter requires the sum of dice values for non-basic attacks to be OVER an amount specified for that attack.",
         mechanic: function staunch(attackSubmission, chosenAttack){
@@ -188,9 +192,9 @@ let Playstyle = {
                 alert("Too many dice submitted")
                 return false;
             }
-            for (let i = 0; i < targetArray.length; i++){
+            targetArray.forEach(die => {
                 targetArray[i].value = 2
-            }
+            })
         },
         mechanicExplain: "A sly fighter requires the sum of dice values for non-basic attacks to be UNDER an amount specified for that attack.",
         mechanic: function sly(attackSubmission, chosenAttack){

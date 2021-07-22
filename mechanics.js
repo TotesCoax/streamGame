@@ -250,9 +250,9 @@ function giveItem(player, itemName) {
         console.log("Setting the abilty counts for the scenario")
         for (let i = 0; i < players.length; i++){
             let numberOfPlayers = players.length - 2 //There must always be two players, and this works with the abilityMax array to grant the right number
-            //console.log("For player: " + players[i].username + " Ability max from card:" + players[i].playstyle.abilityMax[level][numberOfPlayers])
+            console.log("For player: " + players[i].username + " Ability max from card:" + players[i].playstyle.abilityMax[level][numberOfPlayers])
             players[i].abilityScenarioMax = players[i].playstyle.abilityMax[level][numberOfPlayers]
-            //console.log("Default bility count set to:" + players[i].abilityScenarioMax)
+            console.log("Default bility count set to:" + players[i].abilityScenarioMax)
         }
         console.log("The ability counter has been prepared")
     }
@@ -308,8 +308,9 @@ function setRerolls() {
     }
     //Looking for items that boost rerolls
     board.players.forEach(player => {
-        if (player.inventory.find(item => timing === "reroll")){
-            player.inventory.find(item => timing === "reroll").ability(player)
+        if (player.inventory.find(item => item.timing === "reroll")){
+            console.log("Reroll item found!")
+            player.inventory.find(item => item.timing === "reroll").ability(player)
         }
     })
     console.log("Rerolls have been set")
@@ -462,6 +463,10 @@ function damageOverTimeEffect(){
         board.scenarios[board.level].dmgCounter += board.scenarios[board.level].poison
     }
     })
+}
+
+function cleansePoison(players){
+    players.forEach(player => player.poison = 0)
 }
 
 
@@ -849,6 +854,12 @@ function unexhaustAllPlayers(players){
     players.forEach(player => player.exhausted = "false")
 }
 
+function refreshAbilities(players) {
+    players.forEach(player => {
+        player.abilityCounter = player.abilityScenarioMax
+    })
+}
+
 
 //--------------------//
 //End Scenario Cleared Phase Functions
@@ -910,6 +921,7 @@ function unexhaustAllPlayers(players){
         selectSupportPlayer(board.players)
         //verify the support is not exhausted
         console.log("NewPlayerTurnSetup has completed")
+        RollingPhase()
         }
 
 
@@ -1014,6 +1026,7 @@ function unexhaustAllPlayers(players){
                 //Characters cleared of exhausted status
                 unexhaustAllPlayers(board.players)
                 //Ability points refreshed to max
-                prepareAbilities(board.level, board.players)
+                refreshAbilities(board.players)
                 //Any lingering augment effects are cleared
+                cleansePoison(board.players)
             }

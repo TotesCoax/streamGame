@@ -1,5 +1,7 @@
 NOW things to do 
 
+    verify abilities are being refreshed after each scenario is cleared
+    
     If a player keeps all, are they still deducted a reroll? - something to consider/fix.
         -> currently they do get deducted.
 
@@ -17,6 +19,9 @@ NOW things to do
             DONE->Player and Scenario parser mostly works
             DONE->need to workout a way to adjust classes based on player.status
         -> also the functionality programming (use socket.io?)
+
+    Include basic attack requirements in the card so you can bring that over to the HUD to show players
+        -> include a value propety and rework the functions to call up this value rather than having it hard coded into the function
 
 
 
@@ -51,6 +56,8 @@ Near future THINGS TO DO
         split (50/50)
 
     Eccentric/Serene playstyle additions
+        -> their counters will be in inventory, but give them type of counter, so at the end of scenario you can remove all counters in inventory.
+            -> their timing can be treated as needed and should be able to sneak in to existing functions
 
     Add <meter> bar HTML tag to player cards and get functioning health bar display (value kept for testing environment)
         on hover have health bar display actual values

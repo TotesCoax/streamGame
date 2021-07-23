@@ -4,7 +4,8 @@
 // Die Object
 
 class Die {
-    constructor(i) {
+    constructor(id) {
+        this.id = id
         this.value = 0
         this.keep = false
         this.submitted = false
@@ -27,7 +28,7 @@ class Die {
                 break;
         }
     }
-//This is used in the attack phase
+//This is used in the attack phase, attack function looks for submitted dice.
     toggleSubmit() {
         switch (this.submitted) {
             case true:
@@ -82,7 +83,7 @@ class Scenario {
         this.card = scenarioCard
         //This is used to track dmg between stages
         this.dmgCounter = 0
-        //I don't think I need this...
+        //This can be used to generate CSS formatting
         this.defeated = false
         //This tracks which stage the players are on for each scenario.
         this.stageCounter = 0
@@ -148,7 +149,7 @@ let gameState = {
     noAbilities: false
 }
 
-//Gameboard object to export - this hides deck information from the front end
+//Gameboard object to export - use this to hide game information from the front end
 let boardExport = {
     players: board.players,
     level: board.level,
@@ -177,7 +178,7 @@ function setDev(){
     console.log("Dev object has been set")
 }
 
-//Dev Functions
+//Dev Functions - this might get promoted for players to give items.
 function giveItem(player, itemName) {
     let itemObject = board.itemDeck.find(item => item.name === itemName),
         itemIndex = board.itemDeck.indexOf(itemObject)
@@ -242,10 +243,9 @@ function giveItem(player, itemName) {
         console.log(board.boon.deck)
     }
 
-    //Prepare/refresh all player abilities counter based on the number of players and their level, level is board.level in most cases.
+    //Prepare all player abilities counter based on the number of players and their level, level is board.level in most cases.
     //This should be run before any scenario effects that might modify their ability usage
-    //This runs once in preGame setup but then all other instances are in the post-scenario healing phase.
-    //I like this as a pre-game once and post-scen second, in case I introduce random events between scenarios they can have abilities ready to use (making them unavailible in the next scenario as a cost to pass the event)
+    //This runs once in preGame setup but then all other instances use refresh function in end phase section
     function prepareAbilities(level, players){
         console.log("Setting the abilty counts for the scenario")
         for (let i = 0; i < players.length; i++){
@@ -287,7 +287,7 @@ function setHands(scenario){
 
     function populateHand(hand, num){
         for (let i = 0; i < num; i++){
-        hand[i] = new Die()
+        hand[i] = new Die(Math.round(Date.now() * Math.random()))
         }
         //console.log(hand)
     }
@@ -560,13 +560,13 @@ function moveToAttackPhase(){
     function createAttackHand() {
         let counter = 0
         for (let i = 0; i < board.dicePool.active.length; i++){
-            board.attackHand[counter] = new Die()
+            board.attackHand[counter] = new Die(Math.round(Date.now() * Math.random()))
             board.attackHand[counter].value = board.dicePool.active[i].value
             board.attackHand[counter].keep = true
             counter++
         }
         for (let i = 0; i < board.dicePool.support.length; i++){
-            board.attackHand[counter] = new Die()
+            board.attackHand[counter] = new Die(Math.round(Date.now() * Math.random()))
             board.attackHand[counter].value = board.dicePool.support[i].value
             board.attackHand[counter].keep = true
             counter++

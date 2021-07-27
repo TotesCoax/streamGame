@@ -355,7 +355,7 @@ function selectActivePlayer(players){
         //This instance would take place only for the first time each scenario (all are inactive)
         if (inactivePlayers === players.length){
             console.log("First turn protocol engaged")
-            let input = prompt("Who is the active player? (enter username for testing)").toLowerCase()
+            let input = prompt("Enter username for active player")
             console.log("input: ", input)
             let activeChoice = players.find(player => player.username === input)
             console.log(activeChoice)
@@ -435,7 +435,7 @@ function selectSupportPlayer(players){
     }
     console.log("valid choices",validChoices)
     //This should search for a valid username when I remove the prompt and add in a select box.
-    let input = prompt("Who do you choose as your support? (enter username for testing)").toLowerCase()
+    let input = prompt("Enter username for support player.")
     console.log("input: ", input)
     let supportChoice = players.find(player => player.username === input)
     console.log("support choice: ",supportChoice)
@@ -615,8 +615,9 @@ function moveToAttackPhase(){
     }
 
 //If the # of dice is met, and the attack fits the style, dmg is issued
-function attack(player, attackNameNoSpaces) {
-    let attackSubmission = createAttackSubmission(board.attackHand),
+function attack(attackNameNoSpaces) {
+    let player = board.players.find(player => player.status === "active"),
+        attackSubmission = createAttackSubmission(board.attackHand),
         chosenAttack = player.playstyle.attack.find(attack => attack.name.split(" ").join("").toLowerCase() === attackNameNoSpaces.toLowerCase()),
         diceReq = chosenAttack.diceReq,
         dmg = chosenAttack.dmg,
@@ -656,7 +657,9 @@ function numDiceCheck(diceReq, attackSubmission){
 }
 
 
-function endAttackPhase(attackHand) {
+function endAttackPhase() {
+    let attackHand = board.attackHand
+
     if (attackHand.length > 0){
         CounterAttackPhase()
     } else {
@@ -679,7 +682,7 @@ function endAttackPhase(attackHand) {
 function applyDMGAOE(players, dmg){
     let calcDmg = dmg
     //For each player loop
-    for (let p = 0; p < players.length; i++){
+    for (let p = 0; p < players.length; p++){
         //Look for any defense items
         console.log("Player damage is now: ",players[p].dmgCounter)
         let inv = players[p].inventory.filter(item => item.timing === "counterAttack")
@@ -739,21 +742,23 @@ function stageHPchecker(currentScenario){
         alert("Stage defeated!")
         gameState.noAbilities = false
         gameState.noConsumables = false
-        scenarioAllStagesDefeated(currentScenario)
+        if (currentScenario.stageCounter > (currentScenario.card.stage.length - 1)){
+            alert("Scenario Cleared!")
+            console.log("achieved switch rate of: ", ((gameState.switchCounter / gameState.turnCounter) * 100),"%")
+            gameState.turnCounter = 0
+            gameState.switchCounter = 0
+            ScenarioCleared()
+        } else {
+            NewStageSetup()
+        }
     } else {
-        
+        NewPlayerTurnSetup
     }
 
 }
 
 function scenarioAllStagesDefeated(currentScenario){
-    if (currentScenario.stageCounter > (currentScenario.card.stage.length - 1)){
-        alert("Scenario Cleared!")
-        console.log("achieved switch rate of: ", ((gameState.switchCounter / gameState.turnCounter) * 100),"%")
-        gameState.turnCounter = 0
-        gameState.switchCounter = 0
-        ScenarioCleared()
-    }
+
 }
 
 function isAnyoneDead(players){
@@ -1030,4 +1035,5 @@ function refreshAbilities(players) {
                 refreshAbilities(board.players)
                 //Any lingering augment effects are cleared
                 cleansePoison(board.players)
+                NewScenarioSetup()
             }

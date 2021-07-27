@@ -91,6 +91,7 @@
                     <span class="attack-damage">YY</span>
                     <span class="attack-augment"></span>
                 </div>
+                <button class="attack-button" onclick="sendAttack(event)">Attack</button>
             </div>
         </div>
     </template>
@@ -109,7 +110,7 @@
         <template id="dieTemplateRoll">
             <div class="hand-slot">
                 <div class="die">X</div>
-                <button class="keep-die" type="button">Keep</button>
+                <button class="keep-die" type="button" onclick="sendKeepDie(event)">Keep</button>
             </div>
         </template>
         <!-- End of roll die template -->
@@ -117,7 +118,7 @@
         <template id="dieTemplateAttack">
             <div class="hand-slot">
                 <div class="die">X</div>
-                <button class="submit-die" type="button">Submit</button>
+                <button class="submit-die" type="button" onclick="sendSubmitDie(event)">Submit</button>
             </div>
         </template>
         <!-- End of attack hand template -->
@@ -126,8 +127,14 @@
 <!-- End Template section -->
 
     <div id="gameboardContainer">
-        <div class="gameboard-level">
-            Board Level: <span class="gameboard-level-counter"></span>
+        <div id="devTracker" class="stat-box">
+            Dev Tracker:
+            <div class="gameboard-level">
+                Board Level: <span class="gameboard-level-counter">X</span>
+            </div>
+            <div class="stage-progress">
+                Stage counter: <span class="stage-counter">X</span>
+            </div>
         </div>
         <div id="scenarioContainer">
 
@@ -138,10 +145,12 @@
                 <div id="activePlayerCardHook">
 
                 </div>
-                <div id="actveRolls" class="roll-dash">
+                <div id="activeRolls" class="roll-dash">
                     <div class="rollHUD">
-                        <button id="rollButton" type="button">Roll</button>
-                        <p>Rerolls left:<span id="roll-counter">0</span></p>
+                        <button id="rollButton" type="button" onclick="sendRoll('active')">Roll</button>
+                        <button id="moveToAttack" type="button" onclick="sendAttackPhase()">Go To Attack Phase</button>
+                        <button id="endAttack" type="button" onclick="sendEndAttackPhase()">End Attack Phase</button>
+                        <p>Rerolls left:<span class="roll-counter">0</span></p>
                     </div>
                     <div id="activePlayerHand" class="player-hand">
 
@@ -153,8 +162,8 @@
             <div id="supportPlayerPosition" class="position">
                 <div id="supportRolls" class="roll-dash">
                     <div class="rollHUD">
-                        <button id="rollButton" type="button">Roll</button>
-                        <p>Rerolls left:<span id="roll-counter">0</span></p>
+                        <button id="rollButton" type="button" onclick="sendRoll('support')">Roll</button>
+                        <p>Rerolls left:<span class="roll-counter">0</span></p>
                     </div>
                     <div id="supportPlayerHand" class="player-hand">
 
@@ -186,5 +195,7 @@
     <script src="../gameEngineStuff/decks/scenarioDecks.js"></script>
     <script src="../gameEngineStuff/mechanics.js"></script>
     <script src="clientSide.js"></script>
+    <script src="goTime.js"></script>
+    </script>
 </body>
 </html>

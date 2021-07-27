@@ -3,6 +3,14 @@ let gameboard = boardExport
 
 //GENERATE HTML ELEMENT FUNCTIONS
 
+function fillUpHTML() {
+    fillUpScenario()
+    fillUpPlayers()
+    fillUpDiceRollingPhase()
+    document.querySelector(".gameboard-level-counter").innerText = gameboard.level
+    document.querySelector(".stage-counter").innerText = gameboard.scenarios[gameboard.level].stageCounter
+}
+
 //Populates the UI with the current scenario.
 //I don't think It will currently hide the second scenario.
 function fillUpScenario(){
@@ -88,19 +96,21 @@ function fillUpPlayers(){
             }
             newAttack.querySelector(".attack-name").innerText = attackImport[a].name
             newAttack.querySelector(".attack-damage").innerText = attackImport[a].dmg
+            newAttack.querySelector(".attack-button").dataset.attackNameTrim = attackImport[a].name.split(" ").join("")
         }
     }
+    movingPlayerCards()
 }
 
 //This function sets the initial die objects
 //This should be run once at the start of a new player turn.
-//If run again this function just adds more dice to the pool
+//If run again this function just adds more dice elements to the pool
 function fillUpDiceRollingPhase() {
     let dieTemplate = document.getElementById("dieTemplateRoll"),
         activeContainer = document.getElementById("activePlayerHand"),
         suppContainer = document.getElementById("supportPlayerHand")
     console.log(dieTemplate, activeContainer, suppContainer)
-
+//Active player dice
     for (let d = 0; d < gameboard.dicePool.active.length; d++){
         activeContainer.appendChild(dieTemplate.content.cloneNode(true))
         let newDie = activeContainer.lastElementChild,
@@ -110,7 +120,7 @@ function fillUpDiceRollingPhase() {
         newDie.querySelector(".die").innerText = dieVal
         newDie.querySelector(".die").id = dieID
     }
-
+//Support Player dice
     for (let d = 0; d < gameboard.dicePool.support.length; d++){
         suppContainer.appendChild(dieTemplate.content.cloneNode(true))
         let newDie = suppContainer.lastElementChild,
@@ -120,7 +130,15 @@ function fillUpDiceRollingPhase() {
         newDie.querySelector(".die").innerText = dieVal
         newDie.querySelector(".die").id = dieID
     }
-
+//Reroll amount update
+let activePlayer = gameboard.players.find(player => player.status.toLowerCase() === "active"),
+    supportPlayer = gameboard.players.find(player => player.status.toLowerCase() === "support"),
+    activeRerollHTML = document.querySelector("#activeRolls .roll-counter"),
+    suppRerollHTML = document.querySelector("#supportRolls .roll-counter")
+//console.log(activeRerollHTML, suppRerollHTML)
+//For some reason it does not like me using inner text in the variable so I have to make it like this.
+    activeRerollHTML.innerText = activePlayer.currentRerolls
+    suppRerollHTML.innerText = supportPlayer.currentRerolls
 }
 
 function fillUpAttackHand(){
@@ -193,7 +211,90 @@ function movingPlayerCards() {
 
 
 
-
-
 //INTERACTION ELEMENTS
 //code in refreshes to all of these too.
+
+//Send keep die command
+
+function sendKeepDie(e) {
+    console.log(e.target.previousElementSibling.id)
+
+    let foundDie
+
+    if (board.dicePool.active.find(die => die.id === Number(e.target.previousElementSibling.id))) {
+        foundDie = board.dicePool.active.find(die => die.id === Number(e.target.previousElementSibling.id))
+    } else if (board.dicePool.support.find(die => die.id === Number(e.target.previousElementSibling.id))){
+        foundDie = board.dicePool.support.find(die => die.id === Number(e.target.previousElementSibling.id))
+    }
+    foundDie.toggleKeep()
+    console.log(foundDie)
+}
+
+function sendSubmitDie(e){
+    console.log(e.target.previousElementSibling.id)
+
+    let foundDie = board.attackHand.find(die => die.id === Number(e.target.previousElementSibling.id))
+
+    foundDie.toggleSubmit()
+    console.log(foundDie)
+
+}
+
+function sendAttackPhase() {
+    moveToAttackPhase()
+    fillUpAttackHand()
+}
+
+function sendAttack(e){
+    console.log(e.target.dataset.attackNameTrim)
+    attack(e.target.dataset.attackNameTrim)
+    refreshAttackHand()
+}
+
+function refreshAttackHand(){
+    let AH = document.querySelector("#attackHandContainer")
+
+    while (AH.firstChild) {
+        AH.removeChild(AH.firstChild)
+    }
+    fillUpAttackHand()
+}
+
+function sendRoll(playerStatus){
+    let player = gameboard.players.find(player => player.status === playerStatus)
+    switch (playerStatus) {
+        case "active":
+            rollActive(player)
+            updateDiceValuesHTML(gameboard.dicePool)
+            break;
+        case "support":
+            rollSupport(player)
+            updateDiceValuesHTML(gameboard.dicePool)
+            break;
+        default:
+            console.log("Something went wrong")
+            break;
+    }
+}
+
+function updateRerollCount(player){
+    let rerollHTML = document.querySelector(`#${player.username.toLowerCase()}`)
+}
+
+function sendEndAttackPhase(){
+    endAttackPhase()
+    refreshDMGValues()
+}
+
+function refreshDMGValues(){
+    let scenDMGCounterHTML = document.querySelector(`#scenario${gameboard.level} .scenario-dmg-counter`),
+        boardLevelCounterHTML = document.querySelector("#devTracker .gameboard-level-counter"),
+        stageCounterHTML = document.querySelector("#devTracker .stage-counter")
+    scenDMGCounterHTML.innerText = gameboard.scenarios[gameboard.level].dmgCounter 
+    boardLevelCounterHTML.innerText = gameboard.level
+    stageCounterHTML.innerText = gameboard.scenarios[gameboard.level].stageCounter
+    gameboard.players.forEach(player => {
+        document.querySelector(`#${player.username} .player-dmg-counter`).innerText = player.dmgCounter
+    })
+    console.log("Values have been refreshed")
+}

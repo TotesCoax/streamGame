@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream Game UI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Template holder section -->
+
+    <!-- Scenario Card templates -->
+        <!-- Scenario card template -->
+        <template id="scenarioCardTemplate">
+            <div class="scenario-card card">
+                <div class="scenario-image">
+                    <!-- <img src="blank" alt="this is the scenario image"> -->
+                </div>
+                <div  class="roll-amounts stat-box">
+                    <div>Roll Counts:</div>
+                    <div class="active-player-rolls roll-count">X</div>
+                    <div class="support-player-rolls roll-count">Y</div>
+                </div>
+                <div class="stat-box">Damage: <span class="scenario-dmg-counter">00</span></div>
+                <div class="scenario-title stat-box">Scenario Title</div>
+                <div class="scenario-stage-hook stat-box">
+                    <!-- This is where the stage templates get put -->
+                </div>
+            </div>
+        </template>
+        <!-- End of Scenario card template -->
+        <!-- Scenario Stage template -->
+        <template id="scenarioStageTemplate">
+            <div class="scenario-stage">
+                <div class="stage-icon">
+                    HP: <span class="stage-hp-stat">XX</span></div>
+                <div class="stage-icon">
+                    DMG: <span class="stage-dmg-stat">YY</span></div>
+                <div class="stage-name">
+                    This stage is stageful
+                </div>
+            </div>
+        </template>
+        <!-- End Scenario Stage template -->
+    <!-- End Scenario templates -->
+
+    <!-- Player Card Templates -->
+    <template id="playerCardTemplate">
+        <div class="player card">
+            <div class="portrait">
+                <!-- <img src="twitchProfilePic" alt="active player portrait"> -->
+            </div>
+            <div class="player-name">
+                Username
+            </div>
+            <div class="player-class">
+                Class
+            </div>
+            <div class="hp-bar stat-box">
+                <div class="player-dmg">
+                    DMG: <span class="player-dmg-counter">00</span>
+                </div>
+                <div class="player-hp">
+                    HP: <span class="player-hp-counter">88</span>
+                </div>
+            </div>
+            <div class="ability player-display-toggle">
+                <button class="ability-uses">X</button>
+                <span class="ability-text">Text for the ability.</span>
+            </div>
+            <div class="attack-box stat-box player-display-toggle">
+                <!-- This is where the attack templates get put -->
+            </div>
+            <div class="inventory">
+
+            </div>
+        </div>
+    </template>
+    <!-- Attack section template -->
+    <template id="playerAttackTemplate">
+        <div class="player-attack">
+            <div class="attack-requirements">
+                <span class="attack-req-dice">X</span> dice
+                <span class="attack-req-threshold"></span>
+            </div>
+            <div class="attack-details">
+                <div class="attack-name">Attack Name</div>
+                <div class="attack-output">
+                    <span class="attack-damage">YY</span>
+                    <span class="attack-augment"></span>
+                </div>
+            </div>
+        </div>
+    </template>
+    <!-- End player card templates -->
+    <!-- Player Inventory item template -->
+    <template id="playerItemTemplate">
+        <div class="playerItem">
+            <div class="playerItemName"></div>
+            <div class="playerItemDescription"></div>
+        </div>
+    </template>
+    <!-- End of Player item templates -->
+
+    <!-- Die Templates -->
+        <!-- Roll die template -->
+        <template id="dieTemplateRoll">
+            <div class="hand-slot">
+                <div class="die">X</div>
+                <button class="keep-die" type="button">Keep</button>
+            </div>
+        </template>
+        <!-- End of roll die template -->
+        <!-- Attack hand die template -->
+        <template id="dieTemplateAttack">
+            <div class="hand-slot">
+                <div class="die">X</div>
+                <button class="submit-die" type="button">Submit</button>
+            </div>
+        </template>
+        <!-- End of attack hand template -->
+    <!-- End Die Templates -->
+
+<!-- End Template section -->
+
+    <div id="gameboardContainer">
+        <div class="gameboard-level">
+            Board Level: <span class="gameboard-level-counter"></span>
+        </div>
+        <div id="scenarioContainer">
+
+        </div>
+        <div id="rollingPlayers" class="stat-box">
+        <!-- Active Player Card -->
+            <div id="activePlayerPosition" class="position">
+                <div id="activePlayerCardHook">
+
+                </div>
+                <div id="actveRolls" class="roll-dash">
+                    <div class="rollHUD">
+                        <button id="rollButton" type="button">Roll</button>
+                        <p>Rerolls left:<span id="roll-counter">0</span></p>
+                    </div>
+                    <div id="activePlayerHand" class="player-hand">
+
+                    </div>
+                </div>
+            </div>
+
+        <!-- Support Player Card -->
+            <div id="supportPlayerPosition" class="position">
+                <div id="supportRolls" class="roll-dash">
+                    <div class="rollHUD">
+                        <button id="rollButton" type="button">Roll</button>
+                        <p>Rerolls left:<span id="roll-counter">0</span></p>
+                    </div>
+                    <div id="supportPlayerHand" class="player-hand">
+
+                    </div>
+                    <div id="supportPlayerCardHook">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attack Hand Container -->
+        <div id="attackHandContainer" class="attack-hand">
+            <div>Attack hand dice:</div>
+
+        </div>
+
+        <!-- Player Container -->
+        <div id="playerContainer">
+
+        </div>
+
+        <!-- Gameboard end div -->
+    </div>
+
+    <script src="../gameEngineStuff/decks/boons.js"></script>
+    <script src="../gameEngineStuff/decks/characters.js"></script>
+    <script src="../gameEngineStuff/decks/items.js"></script>
+    <script src="../gameEngineStuff/decks/scenarioDecks.js"></script>
+    <script src="../gameEngineStuff/mechanics.js"></script>
+    <script src="clientSide.js"></script>
+</body>
+</html>

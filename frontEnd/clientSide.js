@@ -3,7 +3,6 @@ let gameboard = boardExport
 
 //GENERATE HTML ELEMENT FUNCTIONS
 
-
 //Populates the UI with the current scenario.
 //I don't think It will currently hide the second scenario.
 function fillUpScenario(){
@@ -54,11 +53,11 @@ function fillUpPlayers(){
         playerInsert.classList.add(playerStats.status)
         playerInsert.querySelector(".player-name").innerText = playerStats.username.toUpperCase()
         playerInsert.querySelector(".player-class").innerText = playerStats.playstyle.title
-        playerInsert.querySelector(".player-hp").innerText = playerStats.playstyle.hpMax[gameboard.level]
+        playerInsert.querySelector(".player-hp-counter").innerText = playerStats.playstyle.hpMax[gameboard.level]
         playerInsert.querySelector(".ability-uses").innerText = playerStats.playstyle.abilityMax[gameboard.level][gameboard.players.length - 2]
         playerInsert.querySelector(".ability-text").innerText = playerStats.playstyle.abilityText
         console.log("Easy  stuff filled, moving to attack array")
-        //Populating the attack array
+        //Populating the attack array for new player
         let attackHTML = playerInsert.querySelector(".attack-box"),
             attackImport = playerStats.playstyle.attack,
             attackTemp = document.getElementById("playerAttackTemplate")
@@ -97,7 +96,7 @@ function fillUpPlayers(){
 //This should be run once at the start of a new player turn.
 //If run again this function just adds more dice to the pool
 function fillUpDiceRollingPhase() {
-    let dieTemplate = document.getElementById("dieTemplate"),
+    let dieTemplate = document.getElementById("dieTemplateRoll"),
         activeContainer = document.getElementById("activePlayerHand"),
         suppContainer = document.getElementById("supportPlayerHand")
     console.log(dieTemplate, activeContainer, suppContainer)
@@ -105,24 +104,55 @@ function fillUpDiceRollingPhase() {
     for (let d = 0; d < gameboard.dicePool.active.length; d++){
         activeContainer.appendChild(dieTemplate.content.cloneNode(true))
         let newDie = activeContainer.lastElementChild,
-            dieVal = gameboard.dicePool.active[d].value
-        console.log(dieVal)
+            dieVal = gameboard.dicePool.active[d].value,
+            dieID = gameboard.dicePool.active[d].id
+        console.log(dieVal, dieID)
         newDie.querySelector(".die").innerText = dieVal
+        newDie.querySelector(".die").id = dieID
     }
 
     for (let d = 0; d < gameboard.dicePool.support.length; d++){
         suppContainer.appendChild(dieTemplate.content.cloneNode(true))
         let newDie = suppContainer.lastElementChild,
-            dieVal = gameboard.dicePool.support[d].value
-        console.log(dieVal)
+            dieVal = gameboard.dicePool.support[d].value,
+            dieID = gameboard.dicePool.support[d].id
+        console.log(dieVal, dieID)
         newDie.querySelector(".die").innerText = dieVal
+        newDie.querySelector(".die").id = dieID
     }
 
 }
 
+function fillUpAttackHand(){
+    let dieTemplate = document.getElementById("dieTemplateAttack"),
+        attackHandContainer = document.getElementById("attackHandContainer")
+
+        for (let d = 0; d < gameboard.attackHand.length; d++){
+            attackHandContainer.appendChild(dieTemplate.content.cloneNode(true))
+            let newDie = attackHandContainer.lastElementChild,
+                dieVal = gameboard.attackHand[d].value,
+                dieID = gameboard.attackHand[d].id
+            console.log(dieVal, dieID)
+            newDie.querySelector(".die").innerText = dieVal
+            newDie.querySelector(".die").id = dieID
+        }
+    }
+
+function insertItemIntoInventory(playerUsername, item) {
+    let destination = document.querySelector(`#${playerUsername.toLowerCase()} .inventory`),
+        template = document.getElementById("playerItemTemplate")
+
+    destination.appendChild(template.content.cloneNode(true))
+
+    let newItem = destination.lastElementChild
+    newItem.id = item.name.split(" ").join("")
+    newItem.querySelector(".playerItemName").innerText = item.name
+    newItem.querySelector(".playerItemDescription").innerText = item.description
+}
 
 
-//REFRESH VALUES FUNCTIONS
+
+//REFRESH VALUES FUNCTIONS - > These might be unneeded as the update can be coded into the server interaction code
 
 //This function updates the values of the displaying dice based on the data from the board object
 //should be run at the end of each roll command
@@ -143,6 +173,7 @@ function updateDiceValuesHTML(incomingDicePool){
 }
 
 //Function to move player cards around based on status
+//This should be run at the start of each turn I think.
 function movingPlayerCards() {
     let activeDestination = document.getElementById("activePlayerCardHook"),
         activePlayerToMove = document.querySelector(".active.player"),
@@ -157,3 +188,12 @@ function movingPlayerCards() {
         inactiveDestination.appendChild(activeToInactivePlayer)
     }
 }
+
+
+
+
+
+
+
+//INTERACTION ELEMENTS
+//code in refreshes to all of these too.

@@ -71,7 +71,7 @@ class Player {
         //Exhausted is for selecting supports
         this.exhausted = false
         //Section for debuffs
-        //A player is poisoned when this is >0, and takes poison damage each turn, is not affected by effects or items.
+        //A player is poisoned when this is >0, and takes poison damage each turn, is not mitigated by effects or items.
         this.poison = 0
     }
 }
@@ -124,7 +124,7 @@ function resetHand(hand) {
 }
 
 
-//Gameboard object. To create some global variables and also spots to fetch HTML data from
+//Gameboard object. To create some global variables
 let board = {
     players: [],
     level: 0,
@@ -141,7 +141,7 @@ let board = {
     }
 }
 
-//Game state object to help handle some stage effects
+//Game state object to help handle some stage effects and track some fun things.
 let gameState = {
     turnCounter: 0,
     switchCounter: 0,
@@ -178,8 +178,8 @@ function setDev(){
     console.log("Dev object has been set")
 }
 
-//Dev Functions - this might get promoted for players to give items.
-function giveItem(player, itemName) {
+//Dev Functions - this might get reworked for players to give items.
+function devGiveItem(player, itemName) {
     let itemObject = board.itemDeck.find(item => item.name === itemName),
         itemIndex = board.itemDeck.indexOf(itemObject)
 
@@ -224,10 +224,10 @@ function giveItem(player, itemName) {
     }
 
     //Prepare the item deck
-
+    //This snags the item deck object and shuffles it around.
+    //This shuffled in place so I do need to find a way to clone objects that also brings functions.
     function prepareItemDeck(){
         console.log("Preparing the item deck")
-        //Cloning and shuffling the item deck, moving it
         board.itemDeck = shuffle(lootDeck)
         console.log("Item deck has been shuffled")
         console.log(board.itemDeck)
@@ -299,6 +299,7 @@ function setHands(scenario){
 }
 
 //Currently this is a blanket reset without targetting any specific pool of players based on the max they are allowed by the stage.
+//I am keeping it like this to allow some player swaps mid-turn if I want to implement that.
 function setRerolls() {
     //Setting the rerolls for every player
     console.log("Setting the reroll counts for each player")
@@ -614,14 +615,14 @@ function moveToAttackPhase(){
     }
 
 //If the # of dice is met, and the attack fits the style, dmg is issued
-function attack(player, attackNum, attackHand) {
-    let attackSubmission = createAttackSubmission(attackHand),
-    chosenAttack = player.playstyle.attack[attackNum],
-    diceReq = chosenAttack.diceReq,
-    dmg = chosenAttack.dmg,
-    style = player.playstyle.mechanic
+function attack(player, attackNameNoSpaces) {
+    let attackSubmission = createAttackSubmission(board.attackHand),
+        chosenAttack = player.playstyle.attack.find(attack => attack.name.split(" ").join("").toLowerCase() === attackNameNoSpaces.toLowerCase()),
+        diceReq = chosenAttack.diceReq,
+        dmg = chosenAttack.dmg,
+        style = player.playstyle.mechanic
     //Checking for basic attack submission - because they have their own special rules for each character
-    if (attackNum === 0){
+    if (player.playstyle.attack.findIndex(attack => attack.name.split(" ").join("").toLowerCase() === attackNameNoSpaces.toLowerCase()) === 0){
         console.log("Basic attack detected")
         if (player.playstyle.basicAttack(attackSubmission, chosenAttack)){
             applyDMGtoScenario(player, dmg, board.level)
@@ -637,7 +638,7 @@ function attack(player, attackNum, attackHand) {
         console.log("The attack did not succeed")
         //returns the attack submission to the pool
         for (let i = 0; i < attackSubmission.length; i++){
-            board.attackHand.push(attackSubmission[i])            
+            board.attackHand.push(attackSubmission[i])
         }
         board.attackHand.sort(function(a,b) {
             return a.value - b.value

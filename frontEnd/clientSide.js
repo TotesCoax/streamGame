@@ -36,7 +36,7 @@ function fillUpScenario(){
         stageHTML.appendChild(stageTemplate.content.cloneNode(true))
         let newStage = stageHTML.lastElementChild
 
-        newStage.id = `stage${s}`
+        newStage.id = `scenario${gameboard.level}stage${s}`
         newStage.querySelector(".stage-hp-stat").innerText = stageImport[s].hp
         newStage.querySelector(".stage-dmg-stat").innerText = stageImport[s].dmg
         newStage.querySelector(".stage-name").innerText = stageImport[s].name
@@ -84,11 +84,11 @@ function fillUpPlayers(){
                 switch (playerStats.playstyle.mechanic.name) {
                     case "staunch":
                         console.log("Staunch detected")
-                        playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerText = "sum of dice values &geq; " + attackImport[a].threshold
+                        playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerText = "sum of dice values \&geq; " + attackImport[a].threshold
                         break;
                     case "sly":
                         console.log("Sly detected")
-                        playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerText = "sum of dice values &leq; " + attackImport[a].threshold
+                        playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerText = "sum of dice values \&leq; " + attackImport[a].threshold
                         break;
                     default:
                         break;
@@ -115,33 +115,34 @@ function fillUpDiceRollingPhase() {
         activeContainer.appendChild(dieTemplate.content.cloneNode(true))
         let newDie = activeContainer.lastElementChild,
             dieVal = gameboard.dicePool.active[d].value,
-            dieID = gameboard.dicePool.active[d].id
+            dieID = gameboard.dicePool.active[d].id,
+            dieKeep = gameboard.dicePool.active[d].keep
         console.log(dieVal, dieID)
         newDie.querySelector(".die").innerText = dieVal
         newDie.querySelector(".die").id = dieID
+        if (dieKeep){
+            newDie.querySelector(".die").classList.add("keep")
+        }
     }
 //Support Player dice
     for (let d = 0; d < gameboard.dicePool.support.length; d++){
         suppContainer.appendChild(dieTemplate.content.cloneNode(true))
         let newDie = suppContainer.lastElementChild,
             dieVal = gameboard.dicePool.support[d].value,
-            dieID = gameboard.dicePool.support[d].id
+            dieID = gameboard.dicePool.support[d].id,
+            dieKeep = gameboard.dicePool.support[d].keep
         console.log(dieVal, dieID)
         newDie.querySelector(".die").innerText = dieVal
         newDie.querySelector(".die").id = dieID
+        if (dieKeep){
+            newDie.querySelector(".die").classList.add("keep")
+        }
     }
-//Reroll amount update
-let activePlayer = gameboard.players.find(player => player.status.toLowerCase() === "active"),
-    supportPlayer = gameboard.players.find(player => player.status.toLowerCase() === "support"),
-    activeRerollHTML = document.querySelector("#activeRolls .roll-counter"),
-    suppRerollHTML = document.querySelector("#supportRolls .roll-counter")
-//console.log(activeRerollHTML, suppRerollHTML)
-//For some reason it does not like me using inner text in the variable so I have to make it like this.
-    activeRerollHTML.innerText = activePlayer.currentRerolls
-    suppRerollHTML.innerText = supportPlayer.currentRerolls
+    updateRerollCount()
 }
 
 function fillUpAttackHand(){
+    console.log("Filling up attack hand HTML")
     let dieTemplate = document.getElementById("dieTemplateAttack"),
         attackHandContainer = document.getElementById("attackHandContainer")
 
@@ -174,25 +175,22 @@ function insertItemIntoInventory(playerUsername, item) {
 
 //This function updates the values of the displaying dice based on the data from the board object
 //should be run at the end of each roll command
-function updateDiceValuesHTML(incomingDicePool){
-    let activeDiceArray = document.querySelectorAll("#activePlayerHand .die"),
-        supportDiceArray = document.querySelectorAll("#supportPlayerHand .die"),
-        newActivePool = incomingDicePool.active,
-        newSupportPool = incomingDicePool.support
+function refreshDiceValuesHTML(){
+    let activeDiceArray = document.querySelector("#activePlayerHand"),
+        supportDiceArray = document.querySelector("#supportPlayerHand")
 
-    for(let a = 0; a < newActivePool.length; a++){
-        activeDiceArray[a].innerText = newActivePool[a].value
+    while (activeDiceArray.firstChild){
+        activeDiceArray.removeChild(activeDiceArray.firstChild)
     }
-
-    for(let s = 0; s < newSupportPool.length; s++){
-        supportDiceArray[s].innerText = newSupportPool[s].value
+    while (supportDiceArray.firstChild){
+        supportDiceArray.removeChild(supportDiceArray.firstChild)
     }
-
+    fillUpDiceRollingPhase()
 }
-
 //Function to move player cards around based on status
 //This should be run at the start of each turn I think.
 function movingPlayerCards() {
+    settingStatusHTML()
     let activeDestination = document.getElementById("activePlayerCardHook"),
         activePlayerToMove = document.querySelector(".active.player"),
         supportDestination = document.getElementById("supportPlayerCardHook"),
@@ -207,6 +205,18 @@ function movingPlayerCards() {
     }
 }
 
+function settingStatusHTML() {
+    let playerStats = gameboard.players
+    
+    playerStats.forEach(player => {
+       let playerHTML = document.getElementById(`${player.username.toLowerCase()}`)
+       playerHTML.classList.remove("active", "support", "inactive")
+       playerHTML.classList.add(`${player.status}`)
+    })
+    document.querySelectorAll(".scenario-stage").forEach(stage => stage.classList.remove("currScen"))
+    document.querySelector(`#scenario${gameboard.level}stage${gameboard.scenarios[gameboard.level].stageCounter}`).classList.add("currScen")
+}
+
 
 
 
@@ -215,7 +225,6 @@ function movingPlayerCards() {
 //code in refreshes to all of these too.
 
 //Send keep die command
-
 function sendKeepDie(e) {
     console.log(e.target.previousElementSibling.id)
 
@@ -225,8 +234,11 @@ function sendKeepDie(e) {
         foundDie = board.dicePool.active.find(die => die.id === Number(e.target.previousElementSibling.id))
     } else if (board.dicePool.support.find(die => die.id === Number(e.target.previousElementSibling.id))){
         foundDie = board.dicePool.support.find(die => die.id === Number(e.target.previousElementSibling.id))
+    } else if (!foundDie){
+        console.log("No die found")
     }
     foundDie.toggleKeep()
+    e.target.previousElementSibling.classList.toggle("keep")
     console.log(foundDie)
 }
 
@@ -236,6 +248,7 @@ function sendSubmitDie(e){
     let foundDie = board.attackHand.find(die => die.id === Number(e.target.previousElementSibling.id))
 
     foundDie.toggleSubmit()
+    e.target.previousElementSibling.classList.toggle("submit")
     console.log(foundDie)
 
 }
@@ -249,6 +262,7 @@ function sendAttack(e){
     console.log(e.target.dataset.attackNameTrim)
     attack(e.target.dataset.attackNameTrim)
     refreshAttackHand()
+    refreshDMGValues()
 }
 
 function refreshAttackHand(){
@@ -265,11 +279,13 @@ function sendRoll(playerStatus){
     switch (playerStatus) {
         case "active":
             rollActive(player)
-            updateDiceValuesHTML(gameboard.dicePool)
+            refreshDiceValuesHTML(gameboard.dicePool)
+            updateRerollCount()
             break;
         case "support":
             rollSupport(player)
-            updateDiceValuesHTML(gameboard.dicePool)
+            refreshDiceValuesHTML(gameboard.dicePool)
+            updateRerollCount()
             break;
         default:
             console.log("Something went wrong")
@@ -277,13 +293,25 @@ function sendRoll(playerStatus){
     }
 }
 
-function updateRerollCount(player){
-    let rerollHTML = document.querySelector(`#${player.username.toLowerCase()}`)
+function updateRerollCount(){
+    let activePlayer = gameboard.players.find(player => player.status.toLowerCase() === "active"),
+    supportPlayer = gameboard.players.find(player => player.status.toLowerCase() === "support"),
+    activeRerollHTML = document.querySelector("#activeRolls .roll-counter"),
+    suppRerollHTML = document.querySelector("#supportRolls .roll-counter")
+//console.log(activeRerollHTML, suppRerollHTML)
+//For some reason it does not like me using inner text in the variable so I have to make it like this.
+    activeRerollHTML.innerText = activePlayer.currentRerolls
+    suppRerollHTML.innerText = supportPlayer.currentRerolls
 }
 
 function sendEndAttackPhase(){
     endAttackPhase()
     refreshDMGValues()
+    movingPlayerCards()
+    boardExport = board
+    gameboard = boardExport
+    refreshAttackHand()
+    refreshDiceValuesHTML()
 }
 
 function refreshDMGValues(){

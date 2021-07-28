@@ -627,26 +627,34 @@ function attack(attackNameNoSpaces) {
         console.log("Basic attack detected")
         if (player.playstyle.basicAttack(attackSubmission, chosenAttack)){
             applyDMGtoScenario(player, dmg, board.level)
+        } else {
+            returnDiceToAttackHand(attackSubmission)
         }
-    }
-    //If the number of dice required is met AND the character mechanic is met, assign dmg
-    if (numDiceCheck(diceReq, attackSubmission) && style(attackSubmission, chosenAttack)){
+        //If the number of dice required is met AND the character mechanic is met, assign dmg
+    } else if (diceReq > 1 && numDiceCheck(diceReq, attackSubmission) && style(attackSubmission, chosenAttack)){
         console.log("Attack succeeds. " + dmg + " damage has been submitted")
         applyDMGtoScenario(player, dmg, board.level)
         //The used dice should automatically be deleted/discarded one the function ends
         console.log(board.attackHand)
     } else {
-        console.log("The attack did not succeed")
-        //returns the attack submission to the pool
-        for (let i = 0; i < attackSubmission.length; i++){
-            board.attackHand.push(attackSubmission[i])
-        }
-        board.attackHand.sort(function(a,b) {
-            return a.value - b.value
-        })
-        console.log(board.attackHand)
-        return false
+        returnDiceToAttackHand(attackSubmission)
     }
+
+}
+
+function returnDiceToAttackHand(dice){
+    console.log("The attack did not succeed, returning dice to attack pool.")
+    //returns the attack submission to the pool
+    for (let i = 0; i < dice.length; i++){
+        dice[i].submitted = false
+        board.attackHand.push(dice[i])
+    }
+    board.attackHand.sort(function(a,b) {
+        return a.value - b.value
+    })
+    console.log(board.attackHand)
+    return false
+
 }
 
 //Check for required number of dice
@@ -664,6 +672,7 @@ function endAttackPhase() {
         CounterAttackPhase()
     } else {
         console.log("Switch triggered!")
+        alert("Switch triggered!!")
         gameState.switchCounter += 1
         EndPhase()
     }
@@ -735,6 +744,7 @@ function eventCounterAttack(currentScenario, player){
 
 //Checks the current stage's dmg counter against it's max HP
 function stageHPchecker(currentScenario){
+    console.log("Stage checker starting!")
     let currentStage = currentScenario.card.stage[currentScenario.stageCounter]
     if (currentScenario.dmgCounter >= currentStage.hp){
         currentScenario.stageCounter++
@@ -749,10 +759,12 @@ function stageHPchecker(currentScenario){
             gameState.switchCounter = 0
             ScenarioCleared()
         } else {
+            console.log("New Stage being setup!")
             NewStageSetup()
         }
     } else {
-        NewPlayerTurnSetup
+        console.log("New player turn being setup!")
+        NewPlayerTurnSetup()
     }
 
 }
@@ -766,8 +778,11 @@ function isAnyoneDead(players){
     //Searching the inventories for any items to save the day
     //Generating a sub-inventory of items we could use
     for (let p = 0; p < players.length; p++){
-        inv.push(players[p].inventory.find(item => item.timing === "playerDeath"))
+        if (players[p].inventory.find(item => item.timing === "playerDeath")){
+            inv.push(players[p].inventory.find(item => item.timing === "playerDeath"))
+        }
     }
+    console.log(inv, inv.length)
     //Searching for any dead players loops
     for (let i = 0; i < players.length; i++){
         //If any player is found to be dead, check for any saving items
@@ -776,8 +791,10 @@ function isAnyoneDead(players){
             //If those items are found, start using them!
             if (inv.length > 0) {
                 let itemToUse = inv.find(item => item.consumed === false)
-                useConsumable(itemToUse, players[i])
-                console.log("DIVING INTERVENTION!")
+                if (itemToUse){
+                    useConsumable(itemToUse, players[i])
+                    console.log("DIVING INTERVENTION!")
+                }
                 continue
             } else {
                 alert("GAME OVER")
@@ -999,6 +1016,7 @@ function refreshAbilities(players) {
                 console.log("Start of End phase")
             //Check if phase has more dmg than current HP
             stageHPchecker(board.scenarios[board.level])
+            board.attackHand = []
                 //If so, clear DMG and move to next phase
                 //If no next phase, scenario cleared
             //Check if any PLAYER has more dmg than their current HP max

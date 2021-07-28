@@ -36,6 +36,14 @@ html {
     opacity: .5;
 }
 
+.playerItem {
+    background: grey;
+}
+
+.playerItem div {
+    color: white;
+}
+
 /*Active scenario formatting*/
 
 .scenario-card {
@@ -76,6 +84,10 @@ html {
 
 .scenario-stage {
     border: 1px dotted black;
+}
+
+.scenario-stage.currScen {
+    background: lightseagreen;
 }
 
 
@@ -126,6 +138,14 @@ html {
     border: 1px solid black;
     border-radius: 5px;
     text-align: center;
+}
+
+.die.keep {
+    background: lightpink;
+}
+
+.die.submit {
+    background: lightskyblue;
 }
 
 /* Attacks formatting */

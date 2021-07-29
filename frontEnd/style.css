@@ -46,6 +46,10 @@ html {
 
 /*Active scenario formatting*/
 
+#scenarioContainer {
+    height: 100%;
+}
+
 .scenario-card {
     width: 500px;
     height: 300px;
@@ -122,7 +126,7 @@ html {
     background: lightgreen;
 }
 
-.player-hand, .attack-hand {
+.player-hand {
     display: flex;
     justify-content: center;}
 
@@ -150,8 +154,16 @@ html {
 
 /* Attacks formatting */
 
+.player-attack {
+    display: flex;
+}
+
 .player-attack:nth-child(even) {
     background: lightyellow;
+}
+
+.attack-info {
+    width: 100%;
 }
 
 .attack-requirements {
@@ -159,10 +171,8 @@ html {
     background: rgba(119, 136, 153, 0.333);
 }
 
-.attack-details {
+.attack-name {
     background: white;
-    display: flex;
-    justify-content: space-between;
 }
 
 span.attack-damage {
@@ -170,6 +180,7 @@ span.attack-damage {
     color: white;
     padding: .1em;
     border-radius: 25%;
+    font-size: 1.5em;
 }
 
 /* Inactive Players Formatting */

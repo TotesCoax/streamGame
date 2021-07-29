@@ -236,7 +236,7 @@ let scenario3Deck = [
         {
             name:"Enraged",
             hp:50,
-            dmg:0,
+            dmg:15,
             def:0,
             aoe:false,
             effect:function(){

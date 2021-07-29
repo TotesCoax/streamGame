@@ -81,18 +81,20 @@
     <!-- Attack section template -->
     <template id="playerAttackTemplate">
         <div class="player-attack">
-            <div class="attack-requirements">
-                <span class="attack-req-dice">X</span> dice
-                <span class="attack-req-threshold"></span>
-            </div>
-            <div class="attack-details">
-                <div class="attack-name">Attack Name</div>
-                <div class="attack-output">
-                    <span class="attack-damage">YY</span>
-                    <span class="attack-augment"></span>
+            <div class="attack-info">
+                <div class="attack-requirements">
+                    <span class="attack-req-dice">X</span> dice
+                    <span class="attack-req-threshold"></span>
                 </div>
-                <button class="attack-button" onclick="sendAttack(event)">Attack</button>
+                <div class="attack-details">
+                    <div class="attack-name">Attack Name</div>
+                </div>
             </div>
+            <div class="attack-output">
+                <span class="attack-damage">YY</span>
+                <span class="attack-augment"></span>
+            </div>
+            <button class="attack-button" onclick="sendAttack(event)">Attack</button>
         </div>
     </template>
     <!-- End player card templates -->
@@ -140,10 +142,10 @@
 
         </div>
         <div id="rollingPlayers" class="stat-box">
-        <!-- Active Player Card -->
+            <!-- Active Player Card -->
             <div id="activePlayerPosition" class="position">
                 <div id="activePlayerCardHook">
-
+                    
                 </div>
                 <div id="activeRolls" class="roll-dash">
                     <div class="rollHUD">
@@ -153,12 +155,21 @@
                         <p>Rerolls left:<span class="roll-counter">0</span></p>
                     </div>
                     <div id="activePlayerHand" class="player-hand">
-
+                        
                     </div>
                 </div>
             </div>
+            
+            <!-- Attack Hand Container -->
+            <div class="attack-hand">
+                <div>Attack hand dice:</div>
+                <div id="attackHandContainer" class="player-hand">
 
-        <!-- Support Player Card -->
+                </div>
+    
+            </div>
+
+            <!-- Support Player Card -->
             <div id="supportPlayerPosition" class="position">
                 <div id="supportRolls" class="roll-dash">
                     <div class="rollHUD">
@@ -175,11 +186,6 @@
             </div>
         </div>
 
-        <!-- Attack Hand Container -->
-        <div id="attackHandContainer" class="attack-hand">
-            <div>Attack hand dice:</div>
-
-        </div>
 
         <!-- Player Container -->
         <div id="playerContainer">

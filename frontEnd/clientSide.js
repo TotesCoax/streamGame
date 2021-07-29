@@ -306,12 +306,13 @@ function updateRerollCount(){
 
 function sendEndAttackPhase(){
     endAttackPhase()
-    refreshDMGValues()
+    checkScenarioHTML()
     movingPlayerCards()
     boardExport = board
     gameboard = boardExport
     refreshAttackHand()
     refreshDiceValuesHTML()
+    refreshDMGValues()
 }
 
 function refreshDMGValues(){
@@ -323,6 +324,15 @@ function refreshDMGValues(){
     stageCounterHTML.innerText = gameboard.scenarios[gameboard.level].stageCounter
     gameboard.players.forEach(player => {
         document.querySelector(`#${player.username} .player-dmg-counter`).innerText = player.dmgCounter
+        document.querySelector(`#${player.username} .player-hp-counter`).innerText = player.playstyle.hpMax[gameboard.level]
     })
     console.log("Values have been refreshed")
+}
+
+function checkScenarioHTML(){
+    let scenCardHTML = document.querySelectorAll(".scenario-card")
+
+    if (gameboard.scenarios.length != scenCardHTML.length){
+        fillUpScenario()
+    }
 }

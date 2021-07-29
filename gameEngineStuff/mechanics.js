@@ -461,6 +461,7 @@ function damageOverTimeEffect(){
         }
     //Checking for that one scenario that poisons itself as a mechanic
     if (board.scenarios[board.level].poison > 0){
+        console.log(board.scenarios[board.level].card.name, "detected. Applying poison countdown")
         board.scenarios[board.level].dmgCounter += board.scenarios[board.level].poison
     }
     })
@@ -932,7 +933,7 @@ function refreshAbilities(players) {
     //Setup for each Player's turn
     function NewPlayerTurnSetup() {
         gameState.turnCounter += 1
-        console.log("It is now turn: ", gameState.turnCounter);
+        console.log("It is now turn: ", gameState.turnCounter)
         //Active Player is declared
         selectActivePlayer(board.players)
         //Check if all other players are exhausted
@@ -940,6 +941,7 @@ function refreshAbilities(players) {
         //Consumable Item phase
         //Check for any consumables
         //Prompt if the holder would like to use item
+        damageOverTimeEffect()
         //Select a support
         selectSupportPlayer(board.players)
         //verify the support is not exhausted
@@ -1008,8 +1010,9 @@ function refreshAbilities(players) {
                 //Check for any attack modifiers
                 //Assign DMG to target(s)
             console.log("Stage has counterattacked")
-            isAnyoneDead(board.players)
-            EndPhase()
+            if(isAnyoneDead(board.players)) {
+                EndPhase()
+            }
         }
         //Turn End Phase
             function EndPhase(){
@@ -1053,5 +1056,9 @@ function refreshAbilities(players) {
                 refreshAbilities(board.players)
                 //Any lingering augment effects are cleared
                 cleansePoison(board.players)
-                NewScenarioSetup()
+                if (board.level > scenarios.length - 1){
+                    NewScenarioSetup()
+                } else {
+                    alert("It seems you have won the game. Congratulations are in order.")
+                }
             }

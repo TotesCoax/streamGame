@@ -169,6 +169,29 @@ function insertItemIntoInventory(playerUsername, item) {
     newItem.querySelector(".playerItemDescription").innerText = item.description
 }
 
+function fillUpPlayerSelection(players){
+    let alertContainer = document.querySelector("#overlay .alert")
+
+    players.forEach(player => {
+        let newDiv = document.createElement("div")
+            newBtn = document.createElement("input")
+        newBtn.setAttribute("type", "radio")
+        newBtn.value = player.username
+        newBtn.id = player.username
+        newBtn.name = "playerSelect"
+        newDiv.appendChild(newBtn)
+        let newLbl = document.createElement("label")
+        newLbl.setAttribute("for", player.username)
+        newLbl.innerText = player.username
+        newDiv.appendChild(newLbl)
+        alertContainer.appendChild(newDiv)
+    })
+    let newSubmit = document.createElement("button")
+    newSubmit.onclick = function(){console.log('Click!')}
+    newSubmit.innerText = "Submit!"
+    alertContainer.appendChild(newSubmit)
+}
+
 
 
 //REFRESH VALUES FUNCTIONS - > These might be unneeded as the update can be coded into the server interaction code
@@ -216,7 +239,6 @@ function settingStatusHTML() {
     document.querySelectorAll(".scenario-stage").forEach(stage => stage.classList.remove("currScen"))
     document.querySelector(`#scenario${gameboard.level}stage${gameboard.scenarios[gameboard.level].stageCounter}`).classList.add("currScen")
 }
-
 
 
 
@@ -336,3 +358,4 @@ function checkScenarioHTML(){
         fillUpScenario()
     }
 }
+

@@ -169,9 +169,12 @@ function insertItemIntoInventory(playerUsername, item) {
     newItem.querySelector(".playerItemDescription").innerText = item.description
 }
 
-function fillUpPlayerSelection(players){
-    let alertContainer = document.querySelector("#overlay .alert")
+function promptPlayerSelection(players){
+    let alertContainer = document.querySelector("#overlay .alert"),
+        newForm = document.createElement("form")
 
+    newForm.id = "playerSelect"
+    newForm.method = "post"
     players.forEach(player => {
         let newDiv = document.createElement("div")
             newBtn = document.createElement("input")
@@ -184,12 +187,24 @@ function fillUpPlayerSelection(players){
         newLbl.setAttribute("for", player.username)
         newLbl.innerText = player.username
         newDiv.appendChild(newLbl)
-        alertContainer.appendChild(newDiv)
+        newForm.appendChild(newDiv)
     })
     let newSubmit = document.createElement("button")
-    newSubmit.onclick = function(){console.log('Click!')}
+    newSubmit.type = "button"
+    newSubmit.onclick = function(){
+        let form = document.querySelector("#playerSelect"),
+            choice
+        
+        for (let i = 0; i < form.length; i++){
+            if (form[i].checked === true){
+                choice = form[i]
+            }
+        }
+        return choice.value
+    }
     newSubmit.innerText = "Submit!"
-    alertContainer.appendChild(newSubmit)
+    newForm.appendChild(newSubmit)
+    alertContainer.appendChild(newForm)
 }
 
 

@@ -1010,7 +1010,8 @@ function refreshAbilities(players) {
                 //Check for any attack modifiers
                 //Assign DMG to target(s)
             console.log("Stage has counterattacked")
-            if(isAnyoneDead(board.players)) {
+            if(!isAnyoneDead(board.players)) {
+                console.log("Nobody seems to be dead. Continuing...");
                 EndPhase()
             }
         }
@@ -1056,7 +1057,7 @@ function refreshAbilities(players) {
                 refreshAbilities(board.players)
                 //Any lingering augment effects are cleared
                 cleansePoison(board.players)
-                if (board.level > scenarios.length - 1){
+                if (board.level < scenarios.length - 1){
                     NewScenarioSetup()
                 } else {
                     alert("It seems you have won the game. Congratulations are in order.")

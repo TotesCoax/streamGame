@@ -63,6 +63,8 @@ function fillUpPlayers(){
         playerInsert.querySelector(".player-class").innerText = playerStats.playstyle.title
         playerInsert.querySelector(".player-hp-counter").innerText = playerStats.playstyle.hpMax[gameboard.level]
         playerInsert.querySelector(".ability-uses").innerText = playerStats.playstyle.abilityMax[gameboard.level][gameboard.players.length - 2]
+        playerInsert.querySelector(".ability-uses").dataset.username = playerStats.username.toLowerCase()
+        playerInsert.querySelector(".ability-uses").addEventListener("click", sendAbility)
         playerInsert.querySelector(".ability-text").innerText = playerStats.playstyle.abilityText
         console.log("Easy  stuff filled, moving to attack array")
         //Populating the attack array for new player
@@ -191,20 +193,22 @@ function promptPlayerSelection(players){
     })
     let newSubmit = document.createElement("button")
     newSubmit.type = "button"
-    newSubmit.onclick = function(){
-        let form = document.querySelector("#playerSelect"),
-            choice
-        
-        for (let i = 0; i < form.length; i++){
-            if (form[i].checked === true){
-                choice = form[i]
-            }
-        }
-        return choice.value
-    }
+    newSubmit.addEventListener("click", sendPlayerChoice)
     newSubmit.innerText = "Submit!"
     newForm.appendChild(newSubmit)
     alertContainer.appendChild(newForm)
+}
+
+function sendPlayerChoice(e) {
+    let form = document.querySelector("#playerSelect"),
+    choice
+
+for (let i = 0; i < form.length; i++){
+    if (form[i].checked === true){
+        choice = form[i]
+    }
+}
+console.log(choice.value)
 }
 
 
@@ -293,6 +297,7 @@ function sendSubmitDie(e){
 function sendAttackPhase() {
     moveToAttackPhase()
     fillUpAttackHand()
+    document.querySelector(".attack-hand").classList.toggle("hidden")
 }
 
 function sendAttack(e){
@@ -302,6 +307,14 @@ function sendAttack(e){
     refreshDMGValues()
 }
 
+function sendAbility(e) {
+    console.log(e.target.dataset.username)
+    let submitter = e.target.dataset.username,
+        playerObject = board.players.find(player => player.username === submitter)
+
+    console.log(playerObject.playstyle.ability) 
+}
+
 function refreshAttackHand(){
     let AH = document.querySelector("#attackHandContainer")
 
@@ -309,6 +322,15 @@ function refreshAttackHand(){
         AH.removeChild(AH.firstChild)
     }
     fillUpAttackHand()
+}
+
+function endAttackHand() {
+    let AH = document.querySelector("#attackHandContainer")
+
+    while (AH.firstChild) {
+        AH.removeChild(AH.firstChild)
+    }
+    document.querySelector(".attack-hand").classList.toggle("hidden")
 }
 
 function sendRoll(playerStatus){
@@ -348,6 +370,7 @@ function sendEndAttackPhase(){
     boardExport = board
     gameboard = boardExport
     refreshAttackHand()
+    document.querySelector(".attack-hand").classList.toggle("hidden")
     refreshDiceValuesHTML()
     refreshDMGValues()
 }

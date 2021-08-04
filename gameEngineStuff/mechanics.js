@@ -195,18 +195,15 @@ function devGiveItem(player, itemName) {
     //Test Player generator
     //Perhaps include a sort of ready check in the future before this function executes
     //This will later be filled with some fancy shit that lets twitch users log in and control
-    function populatePlayers(){
+    function populatePlayers(players){
             //Count the number of players
-        let numPlayers = prompt("How many players?")
-            //set the player array
-        board.players.length = Number(numPlayers)
             //Populate the player array
-        for (let i = 0; i < board.players.length; i++){
+        for (let i = 0; i < players.length; i++){
             //Create a Player object for each user logged in
-            let user = prompt("Username?"),
-                style = prompt("Style?")
+            let user = players[i].username,
+                style = players[i].style
             board.players[i] = new Player(user, style)
-            //console.log(board.players[i]);
+            console.log(board.players[i].username, " has been added")
         }
         console.log("Player array has been populated")
         console.log(board.players)
@@ -897,9 +894,9 @@ function refreshAbilities(players) {
 
 
 //Pre-game Setup
-    function NewGameSetup() {
+    function NewGameSetup(playersArrayFromServer) {
         //Populate the players
-        //populatePlayers()
+        //populatePlayers(playersArrayFromServer)
         TESTFILLpopulatePlayers()
         //Initial Preparation of player abilities
         prepareAbilities(board.level, board.players)
@@ -931,11 +928,11 @@ function refreshAbilities(players) {
         NewPlayerTurnSetup()
     }
     //Setup for each Player's turn
-    function NewPlayerTurnSetup() {
+    function NewPlayerTurnSetup(playerChoicesArrayFromClient) {
         gameState.turnCounter += 1
         console.log("It is now turn: ", gameState.turnCounter)
         //Active Player is declared
-        selectActivePlayer(board.players)
+        selectActivePlayer(playerChoicesArrayFromClient)
         //Check if all other players are exhausted
         //If all others are exhausted, unexhaust all
         //Consumable Item phase
@@ -943,7 +940,7 @@ function refreshAbilities(players) {
         //Prompt if the holder would like to use item
         damageOverTimeEffect()
         //Select a support
-        selectSupportPlayer(board.players)
+        selectSupportPlayer(playerChoicesArrayFromClient)
         //verify the support is not exhausted
         console.log("NewPlayerTurnSetup has completed")
         RollingPhase()

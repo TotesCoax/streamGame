@@ -1,5 +1,3 @@
-//This is a test for the git hub
-
 //Object Factories
 
 // Die Object

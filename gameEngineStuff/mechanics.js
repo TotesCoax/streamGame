@@ -150,7 +150,7 @@ let gameState = {
 }
 
 //Gameboard object to export - use this to hide game information from the front end
-let boardExport = {
+boardExport = {
     players: board.players,
     level: board.level,
     scenarios: board.scenarios,

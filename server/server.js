@@ -1,4 +1,10 @@
-const io = require('socket.io')();
+const io = require('socket.io')({
+    cors: {
+      origin: "*",
+    }
+  });
+
+console.log("Server is on!")
 
 io.on('connection', client => {
     client.emit('init', { data: 'Connection established!'})

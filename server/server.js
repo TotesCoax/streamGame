@@ -13,8 +13,4 @@ io.on('connection', client => {
 
 io.listen(3000)
 
-function serverSendReadyCheck(){
-    //This is run after the game is set up and will inform the players they need to pick Active and Support players
-    console.log("Server Ready check!")
-}
 

@@ -5,30 +5,36 @@ NOW things to do
     If a player keeps all, are they still deducted a reroll? - something to consider/fix.
         -> currently they do get deducted.
 
-    Need to make a template for the attackhand
-        - also need to figure out a way to submit dice to attacks from item
+    --DONE-- Need to make a template for the attackhand
+        - also need to figure out a way to submit dice to attacks from item -> It's a button for now.
             - initial idea is draggable items for the dice
 
-    when the dice are returned to the attackhand after a failed attack, they need to have submitted set to false.
+    -- DONE when the dice are returned to the attackhand after a failed attack, they need to have submitted set to false.
 
-    endPhase needs to trigger appropriate starts for next phase
+    -- DONE (pending testing) endPhase needs to trigger appropriate starts for next phase
 
 
     build user interface
         -> have client code pick apart transmitted board object
             DONE->Player and Scenario parser mostly works
             DONE->need to workout a way to adjust classes based on player.status
+            ->Interactivity:
+                - DONE Dice rolling
+                - Ability Usage
+                - Items
         -> also the functionality programming (use socket.io?)
 
     Include basic attack requirements in the card so you can bring that over to the HUD to show players
-        -> include a value propety and rework the functions to call up this value rather than having it hard coded into the function
+        -> include a value propety and rework the functions to call up this value rather than having it hard coded into the function?
 
 
 
 Near future THINGS TO DO
 
+    Convert decks and cards into classes to make them far more modular and easier to import.
+
     Correct the reroll system
-        DONE(?) Sync each reroll -> rules state they must be rerolled at the same time
+        Sync each reroll -> rules state they must be rerolled at the same time
             This just requires consolidating the current functions into a single activation
                 Still want to keep them separate for item potentially
         DONE Reroll adjusting stage effects also need to be carved out.

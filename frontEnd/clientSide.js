@@ -1,10 +1,10 @@
-const socket = io("http://localhost:3000")
+// const socket = io("http://localhost:3000")
 
-socket.on("init", handleInit)
+// socket.on("init", handleInit)
 
-function handleInit(msg) {
-    console.log(msg)
-}
+// function handleInit(msg) {
+//     console.log(msg)
+// }
 
 let gameboard = boardExport
 
@@ -72,7 +72,7 @@ function fillUpPlayers(){
         playerInsert.querySelector(".player-hp-counter").innerText = playerStats.playstyle.hpMax[gameboard.level]
         playerInsert.querySelector(".ability-uses").innerText = playerStats.playstyle.abilityMax[gameboard.level][gameboard.players.length - 2]
         playerInsert.querySelector(".ability-uses").dataset.username = playerStats.username.toLowerCase()
-        playerInsert.querySelector(".ability-uses").addEventListener("click", sendAbility)
+        playerInsert.querySelector(".ability-uses").addEventListener("click", activateAbility)
         playerInsert.querySelector(".ability-text").innerText = playerStats.playstyle.abilityText
         console.log("Easy  stuff filled, moving to attack array")
         //Populating the attack array for new player
@@ -179,13 +179,26 @@ function insertItemIntoInventory(playerUsername, item) {
     newItem.querySelector(".playerItemDescription").innerText = item.description
 }
 
-function promptPlayerSelection(players){
-    let alertContainer = document.querySelector("#overlay .alert"),
+//Prompt functions -- FINISH LATER
+
+function clearPrompt(){
+    let overlay = document.querySelector("#overlay"),
+        alertContainer = document.querySelector("#overlay .alert")
+
+        while (alertContainer.firstChild) {
+            alertContainer.removeChild(alertContainer.firstChild)
+        }
+    overlay.classList.toggle("hidden")
+    }
+
+function promptPlayerSelection(validChoices){
+    let overlay = document.querySelector("#overlay"),
+        alertContainer = document.querySelector("#overlay .alert"),
         newForm = document.createElement("form")
 
     newForm.id = "playerSelect"
     newForm.method = "post"
-    players.forEach(player => {
+    validChoices.forEach(player => {
         let newDiv = document.createElement("div")
             newBtn = document.createElement("input")
         newBtn.setAttribute("type", "radio")
@@ -201,24 +214,29 @@ function promptPlayerSelection(players){
     })
     let newSubmit = document.createElement("button")
     newSubmit.type = "button"
-    newSubmit.addEventListener("click", sendPlayerChoice)
+    newSubmit.addEventListener("click", checkPlayerChoice)
     newSubmit.innerText = "Submit!"
     newForm.appendChild(newSubmit)
     alertContainer.appendChild(newForm)
+    overlay.classList.toggle("hidden")
 }
 
-function sendPlayerChoice(e) {
+function checkPlayerChoice() {
     let form = document.querySelector("#playerSelect"),
-    choice
+        choice
 
-for (let i = 0; i < form.length; i++){
-    if (form[i].checked === true){
-        choice = form[i]
+    for (let i = 0; i < form.length; i++){
+        if (form[i].checked === true){
+            choice = form[i]
+        }
+    }
+    if (!choice){
+        alert("Please select an option then hit submit.")
+    } else {
+        console.log(choice.value)
+        clearPrompt()
     }
 }
-console.log(choice.value)
-}
-
 
 
 //REFRESH VALUES FUNCTIONS - > These might be unneeded as the update can be coded into the server interaction code
@@ -299,7 +317,6 @@ function sendSubmitDie(e){
     foundDie.toggleSubmit()
     e.target.previousElementSibling.classList.toggle("submit")
     console.log(foundDie)
-
 }
 
 function sendAttackPhase() {
@@ -315,12 +332,67 @@ function sendAttack(e){
     refreshDMGValues()
 }
 
+function activateAbility(e){
+    console.log(e.target)
+    let newBtn = document.createElement("button")
+
+    newBtn.innerText = "Confirm"
+    newBtn.dataset.username = e.target.dataset.username
+    newBtn.addEventListener("click", sendAbility)
+    newBtn.classList.add("removeAfterAbility")
+    e.target.after(newBtn)
+
+    let diceOptions = document.querySelectorAll(".die")
+    diceOptions.forEach(die =>{
+        die.addEventListener("click", toggleChoice)
+    })
+    console.log(diceOptions)
+}
+
+function toggleChoice(e){
+    e.target.classList.toggle("choice")
+}
+
 function sendAbility(e) {
     console.log(e.target.dataset.username)
     let submitter = e.target.dataset.username,
-        playerObject = board.players.find(player => player.username === submitter)
+        playerObject = board.players.find(player => player.username === submitter),
+        chosenDice = document.querySelectorAll(".die.choice")
+    console.log(chosenDice)
+    let diceElements = document.querySelectorAll(".die")
 
-    console.log(playerObject.playstyle.ability) 
+    diceElements.forEach(die => {
+        die.removeEventListener("click", toggleChoice)
+        die.classList.remove("choice")
+    })
+    console.log("Removal of ability choice stuff.");
+    let diceSubmission = findDieObject(chosenDice)
+    console.log("Dice submission", diceSubmission)
+
+    playerObject.playstyle.ability(diceSubmission)
+}
+
+function findDieObject(diceArray){
+    console.log("Finding dice Function")
+    let foundDice = []
+
+    for(let i = 0; i < diceArray.length; i++){
+        if (board.attackHand.find(die => diceArray[i].id === die.id)){
+            console.log("Found in attack hand")
+            foundDice.push(board.attackHand.find(die => diceArray[i].id === die.id))
+        }
+        if (board.dicePool.active.find(die => diceArray[i].id === die.id)){
+            console.log("Found in active pool")
+            foundDice.push(board.dicePool.active.find(die => diceArray[i].id === die.id))
+        }
+        if (board.dicePool.support.find(die => diceArray[i].id === die.id)){
+            console.log("Found in support pool")
+            foundDice.push(board.dicePool.support.find(die => diceArray[i].id === die.id))
+        }
+    }
+    console.log(foundDice)
+    return foundDice
+
 }
 
 function refreshAttackHand(){

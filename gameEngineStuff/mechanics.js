@@ -927,11 +927,11 @@ function refreshAbilities(players) {
         NewPlayerTurnSetup()
     }
     //Setup for each Player's turn
-    function NewPlayerTurnSetup(playerChoicesArrayFromClient) {
+    function NewPlayerTurnSetup() {
         gameState.turnCounter += 1
         console.log("It is now turn: ", gameState.turnCounter)
         //Active Player is declared
-        selectActivePlayer(playerChoicesArrayFromClient)
+        selectActivePlayer(board.players)
         //Check if all other players are exhausted
         //If all others are exhausted, unexhaust all
         //Consumable Item phase
@@ -939,7 +939,7 @@ function refreshAbilities(players) {
         //Prompt if the holder would like to use item
         damageOverTimeEffect()
         //Select a support
-        selectSupportPlayer(playerChoicesArrayFromClient)
+        selectSupportPlayer(board.players)
         //verify the support is not exhausted
         console.log("NewPlayerTurnSetup has completed")
         RollingPhase()

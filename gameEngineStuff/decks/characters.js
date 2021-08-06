@@ -15,10 +15,15 @@ let Playstyle = {
             {tier: 1, diceReq: 6, dmg:16, name: "Combo", desc: "You swing wildly and somehow connect on a few occasions"},
             {tier: 2, diceReq: 8, dmg:27, name: "Finisher", desc: "It's not pretty but it gets the job done"}
         ],
-        ability: function(target) {
+        ability: function(diceArray) {
+            console.log(diceArray)
+            if (diceArray.length > 1){
+                alert("Too many dice submitted!")
+                return
+            }
             let newValue = Number(prompt("What would you like to change it to? Must be 1 or 6"))
             if (newValue === 1 || newValue === 6 ) {
-            target.value = newValue
+            diceArray[0].value = newValue
             } else {
                 alert("Incorrect value was given")
             }

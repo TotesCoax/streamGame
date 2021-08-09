@@ -21,7 +21,6 @@ class Die {
             case true:
                 this.keep = false
                 break;
-        
             case false:
                 this.keep = true
                 break;
@@ -38,7 +37,6 @@ class Die {
                 this.submitted = true
                 break;
         }
-
     }
 //I don't think I need this anymore.
     reset() {
@@ -51,7 +49,6 @@ class Die {
 
 
 //Player object
-
 class Player {
     constructor(username, playstyle) {
         this.username = username.toLowerCase()
@@ -149,7 +146,7 @@ let gameState = {
 }
 
 //Gameboard object to export - use this to hide game information from the front end
-boardExport = {
+let boardExport = {
     players: board.players,
     level: board.level,
     scenarios: board.scenarios,
@@ -327,38 +324,48 @@ function applyStageEffect(currentStage){
 //--------------------//
 
 //Select Active Player
-function selectActivePlayer(players){
-    let inactivePlayers = 0
+function cyclePlayerStatus(players){
     //Check previously duo players status and update them
     for (let i = 0; i < players.length; i++){
         console.log(players[i].username, players[i].status)
         switch (players[i].status) {
             case "active":
                 players[i].status = "inactive"
+                console.log(players[i].username, " is now inactive.");
                 break;
 
             case "support":
                 players[i].status = "active"
+                console.log(players[i].username, " is now active.");
                 break;
     
             default:
-                inactivePlayers++
-                console.log(players[i].username + ": no status update. ", inactivePlayers, players.length)
+                console.log(players[i].username + ": no status update. ", players.length)
                 break;
             }
         }
-        console.log("Switch case completed. Checking for first turn", inactivePlayers,"=?", players.length)
-        //This instance would take place only for the first time each scenario (all are inactive)
-        if (inactivePlayers === players.length){
-            console.log("First turn protocol engaged")
-            let input = prompt("Enter username for active player")
-            console.log("input: ", input)
-            let activeChoice = players.find(player => player.username === input)
-            console.log(activeChoice)
-            activeChoice.status = "active"
+    console.log("cyclePlayerStatus has completed.")
+}
+
+//This takes the response from the client to set the player status.
+function setPlayerStatus(choiceObject){
+    let chosenPlayer = board.players.find(player =>
+        player.username === choiceObject.username)
+    chosenPlayer.status = choiceObject.status
+    console.log(chosenPlayer)
+}
+
+function requestPlayerStatusChoice(status){
+    console.log("Game is saying I need to know who is: ", status)
+    let validChoices = []
+    for (let i = 0; i < board.players.length; i++){
+        console.log(board.players[i].username)
+        if ((board.players[i].exhausted === false) && (board.players[i].status !== "active")){
+            validChoices.push(board.players[i].username)
+            console.log(validChoices)
         }
-    console.log("selectActivePlayer has completed")
-    allExhaustedRefresh(players)
+    }
+    promptPlayerSelection(validChoices, status)
 }
 
 //All Exhausted and refresh check
@@ -422,28 +429,28 @@ function useConsumable(item, target){
 }
 
 //Select Support Player
-function selectSupportPlayer(players){
-    let validChoices = []
-    for (let i = 0; i < players.length; i++){
-        if ((players[i].exhausted === false) && (players[i].status !== "active")){
-            validChoices.push(players[i].username)
-        }
-    }
-    console.log("valid choices",validChoices)
-    //This should search for a valid username when I remove the prompt and add in a select box.
-    let input = prompt("Enter username for support player.")
-    console.log("input: ", input)
-    let supportChoice = players.find(player => player.username === input)
-    console.log("support choice: ",supportChoice)
-    if (supportChoice.exhausted === true){
-        alert("That player is exhausted")
-        selectSupportPlayer(players)
-    } else {
-        supportChoice.exhausted = true
-        supportChoice.status = "support"
-        console.log("Support has been chosen:", supportChoice.username)
-    }
-}
+// function selectSupportPlayer(players){
+//     let validChoices = []
+//     for (let i = 0; i < players.length; i++){
+//         if ((players[i].exhausted === false) && (players[i].status !== "active")){
+//             validChoices.push(players[i].username)
+//         }
+//     }
+//     console.log("valid choices",validChoices)
+//     //This should search for a valid username when I remove the prompt and add in a select box.
+//     let input = prompt("Enter username for support player.")
+//     console.log("input: ", input)
+//     let supportChoice = players.find(player => player.username === input)
+//     console.log("support choice: ",supportChoice)
+//     if (supportChoice.exhausted === true){
+//         alert("That player is exhausted")
+//         selectSupportPlayer(players)
+//     } else {
+//         supportChoice.exhausted = true
+//         supportChoice.status = "support"
+//         console.log("Support has been chosen:", supportChoice.username)
+//     }
+// }
 
 //This function will search and apply any damage over time effects
 function damageOverTimeEffect(){
@@ -461,6 +468,8 @@ function damageOverTimeEffect(){
         board.scenarios[board.level].dmgCounter += board.scenarios[board.level].poison
     }
     })
+    //Check to see if this kills anyone
+    isAnyoneDead(board.players)
 }
 
 function cleansePoison(players){
@@ -931,24 +940,23 @@ function refreshAbilities(players) {
         gameState.turnCounter += 1
         console.log("It is now turn: ", gameState.turnCounter)
         //Active Player is declared
-        selectActivePlayer(board.players)
+        cyclePlayerStatus(board.players)
         //Check if all other players are exhausted
         //If all others are exhausted, unexhaust all
         //Consumable Item phase
         //Check for any consumables
         //Prompt if the holder would like to use item
-        damageOverTimeEffect()
         //Select a support
-        selectSupportPlayer(board.players)
         //verify the support is not exhausted
         console.log("NewPlayerTurnSetup has completed")
-        RollingPhase()
         }
 
 
 
     //Rolling phase
     function RollingPhase(){
+        //I moved DOT to here for a consistent trigger and to give players plenty of time to try to respond to it.
+        damageOverTimeEffect()
         //Check for any reroll modifiers (event or items)
         //Apply any reroll modifiers to respective party
         setRerolls()

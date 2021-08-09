@@ -1,3 +1,4 @@
+// const io = require("socket.io-client")
 // const socket = io("http://localhost:3000")
 
 // socket.on("init", handleInit)
@@ -191,29 +192,29 @@ function clearPrompt(){
     overlay.classList.toggle("hidden")
     }
 
-function promptPlayerSelection(validChoices){
+function promptPlayerSelection(validChoices, status){
     let overlay = document.querySelector("#overlay"),
         alertContainer = document.querySelector("#overlay .alert"),
         newForm = document.createElement("form")
 
     newForm.id = "playerSelect"
-    newForm.method = "post"
     validChoices.forEach(player => {
         let newDiv = document.createElement("div")
             newBtn = document.createElement("input")
         newBtn.setAttribute("type", "radio")
-        newBtn.value = player.username
-        newBtn.id = player.username
+        newBtn.value = player
+        newBtn.id = player
         newBtn.name = "playerSelect"
         newDiv.appendChild(newBtn)
         let newLbl = document.createElement("label")
-        newLbl.setAttribute("for", player.username)
-        newLbl.innerText = player.username
+        newLbl.setAttribute("for", player)
+        newLbl.innerText = player
         newDiv.appendChild(newLbl)
         newForm.appendChild(newDiv)
     })
     let newSubmit = document.createElement("button")
     newSubmit.type = "button"
+    newSubmit.dataset.status = status
     newSubmit.addEventListener("click", checkPlayerChoice)
     newSubmit.innerText = "Submit!"
     newForm.appendChild(newSubmit)
@@ -221,9 +222,10 @@ function promptPlayerSelection(validChoices){
     overlay.classList.toggle("hidden")
 }
 
-function checkPlayerChoice() {
+function checkPlayerChoice(e) {
     let form = document.querySelector("#playerSelect"),
-        choice
+        choice,
+        status = e.target.dataset.status
 
     for (let i = 0; i < form.length; i++){
         if (form[i].checked === true){
@@ -233,16 +235,28 @@ function checkPlayerChoice() {
     if (!choice){
         alert("Please select an option then hit submit.")
     } else {
-        console.log(choice.value)
+        sendPlayerChoice(choice.value, status)
         clearPrompt()
     }
 }
+
+function sendPlayerChoice(choice, status){
+    let choiceObject = {
+        username: choice,
+        status: status
+    }
+    console.log(choiceObject)
+    setPlayerStatus(choiceObject)
+}
+
+
 
 
 //REFRESH VALUES FUNCTIONS - > These might be unneeded as the update can be coded into the server interaction code
 
 //This function updates the values of the displaying dice based on the data from the board object
 //should be run at the end of each roll command
+//It removes current dice and refills with new dice objects with new values. I did it this way instead of just refreshing the value cuz it seemed more modular.
 function refreshDiceValuesHTML(){
     let activeDiceArray = document.querySelector("#activePlayerHand"),
         supportDiceArray = document.querySelector("#supportPlayerHand")
@@ -255,6 +269,22 @@ function refreshDiceValuesHTML(){
     }
     fillUpDiceRollingPhase()
 }
+
+function refreshDMGValues(){
+    let scenDMGCounterHTML = document.querySelector(`#scenario${gameboard.level} .scenario-dmg-counter`),
+        boardLevelCounterHTML = document.querySelector("#devTracker .gameboard-level-counter"),
+        stageCounterHTML = document.querySelector("#devTracker .stage-counter")
+    scenDMGCounterHTML.innerText = gameboard.scenarios[gameboard.level].dmgCounter 
+    boardLevelCounterHTML.innerText = gameboard.level
+    stageCounterHTML.innerText = gameboard.scenarios[gameboard.level].stageCounter
+    gameboard.players.forEach(player => {
+        document.querySelector(`#${player.username} .player-dmg-counter`).innerText = player.dmgCounter
+        document.querySelector(`#${player.username} .player-hp-counter`).innerText = player.playstyle.hpMax[gameboard.level]
+    })
+    console.log("Values have been refreshed")
+}
+
+
 //Function to move player cards around based on status
 //This should be run at the start of each turn I think.
 function movingPlayerCards() {
@@ -356,38 +386,48 @@ function toggleChoice(e){
 function sendAbility(e) {
     console.log(e.target.dataset.username)
     let submitter = e.target.dataset.username,
-        playerObject = board.players.find(player => player.username === submitter),
         chosenDice = document.querySelectorAll(".die.choice")
     console.log(chosenDice)
-    let diceElements = document.querySelectorAll(".die")
 
-    diceElements.forEach(die => {
-        die.removeEventListener("click", toggleChoice)
-        die.classList.remove("choice")
-    })
-    console.log("Removal of ability choice stuff.");
-    let diceSubmission = findDieObject(chosenDice)
-    console.log("Dice submission", diceSubmission)
+    let chosenDiceIDs = []
+    for(let i = 0; i < chosenDice.length; i++){
+        chosenDiceIDs[i] = chosenDice[i].id
+    }
+    console.log(chosenDiceIDs, submitter)
 
-    playerObject.playstyle.ability(diceSubmission)
+    //let diceElements = document.querySelectorAll(".die")
+    // diceElements.forEach(die => {
+    //     die.removeEventListener("click", toggleChoice)
+    //     die.classList.remove("choice")
+    // })
+    // let generatedContent = document.querySelectorAll(".removeAfterAbility")
+    // console.log(generatedContent)
+    // generatedContent.forEach(element => {
+    //     element.remove()
+    // })
+    // console.log("Removal of ability choice stuff.")
+    //let diceSubmission = findDieObject(chosenDiceIDs)
+    //console.log("Dice submission", diceSubmission)
+    // playerObject.playstyle.ability(diceSubmission)
 }
 
-function findDieObject(diceArray){
+//This will eventually be a server command.
+function findDieObject(arrayOfIDs){
     console.log("Finding dice Function")
     let foundDice = []
 
-    for(let i = 0; i < diceArray.length; i++){
-        if (board.attackHand.find(die => diceArray[i].id === die.id)){
+    for(let i = 0; i < arrayOfIDs.length; i++){
+        if (board.attackHand.find(die => arrayOfIDs[i] === die.id)){
             console.log("Found in attack hand")
-            foundDice.push(board.attackHand.find(die => diceArray[i].id === die.id))
+            foundDice.push(board.attackHand.find(die => arrayOfIDs[i] === die.id))
         }
-        if (board.dicePool.active.find(die => diceArray[i].id === die.id)){
+        if (board.dicePool.active.find(die => arrayOfIDs[i] === die.id)){
             console.log("Found in active pool")
-            foundDice.push(board.dicePool.active.find(die => diceArray[i].id === die.id))
+            foundDice.push(board.dicePool.active.find(die => arrayOfIDs[i] === die.id))
         }
-        if (board.dicePool.support.find(die => diceArray[i].id === die.id)){
+        if (board.dicePool.support.find(die => arrayOfIDs[i] === die.id)){
             console.log("Found in support pool")
-            foundDice.push(board.dicePool.support.find(die => diceArray[i].id === die.id))
+            foundDice.push(board.dicePool.support.find(die => arrayOfIDs[i] === die.id))
         }
     }
     console.log(foundDice)
@@ -443,6 +483,7 @@ function updateRerollCount(){
     suppRerollHTML.innerText = supportPlayer.currentRerolls
 }
 
+//This needs to be updated with server code
 function sendEndAttackPhase(){
     endAttackPhase()
     checkScenarioHTML()
@@ -455,19 +496,6 @@ function sendEndAttackPhase(){
     refreshDMGValues()
 }
 
-function refreshDMGValues(){
-    let scenDMGCounterHTML = document.querySelector(`#scenario${gameboard.level} .scenario-dmg-counter`),
-        boardLevelCounterHTML = document.querySelector("#devTracker .gameboard-level-counter"),
-        stageCounterHTML = document.querySelector("#devTracker .stage-counter")
-    scenDMGCounterHTML.innerText = gameboard.scenarios[gameboard.level].dmgCounter 
-    boardLevelCounterHTML.innerText = gameboard.level
-    stageCounterHTML.innerText = gameboard.scenarios[gameboard.level].stageCounter
-    gameboard.players.forEach(player => {
-        document.querySelector(`#${player.username} .player-dmg-counter`).innerText = player.dmgCounter
-        document.querySelector(`#${player.username} .player-hp-counter`).innerText = player.playstyle.hpMax[gameboard.level]
-    })
-    console.log("Values have been refreshed")
-}
 
 function checkScenarioHTML(){
     let scenCardHTML = document.querySelectorAll(".scenario-card")

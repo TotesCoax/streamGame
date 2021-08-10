@@ -157,7 +157,6 @@
                     <div class="rollHUD">
                         <button id="rollButton" type="button" onclick="sendRoll('active')">Roll</button>
                         <button id="moveToAttack" type="button" onclick="sendAttackPhase()">Go To Attack Phase</button>
-                        <button id="endAttack" type="button" onclick="sendEndAttackPhase()">End Attack Phase</button>
                         <p>Rerolls left:<span class="roll-counter">0</span></p>
                     </div>
                     <div id="activePlayerHand" class="player-hand">
@@ -170,8 +169,9 @@
             <div class="attack-hand hidden">
                 <div>Attack hand dice:</div>
                 <div id="attackHandContainer" class="player-hand">
-
+                    
                 </div>
+                <button id="endAttack" type="button" onclick="sendEndAttackPhase()">End Attack Phase</button>
     
             </div>
 

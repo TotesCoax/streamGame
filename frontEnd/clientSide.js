@@ -114,8 +114,6 @@ function fillUpPlayers(){
 }
 
 //This function sets the initial die objects
-//This should be run once at the start of a new player turn.
-//If run again this function just adds more dice elements to the pool
 function fillUpDiceRollingPhase() {
     let dieTemplate = document.getElementById("dieTemplateRoll"),
         activeContainer = document.getElementById("activePlayerHand"),
@@ -168,16 +166,22 @@ function fillUpAttackHand(){
         }
     }
 
-function insertItemIntoInventory(playerUsername, item) {
-    let destination = document.querySelector(`#${playerUsername.toLowerCase()} .inventory`),
-        template = document.getElementById("playerItemTemplate")
+function fillUpPlayerInventory(players) {
+    let template = document.getElementById("playerItemTemplate")
 
-    destination.appendChild(template.content.cloneNode(true))
+    players.forEach(player => {
+        if (player.inventory.length > 0){
+            player.inventory.forEach(item => {
+                let destination = document.querySelector(`#${player.username.toLowerCase()} .inventory`)
+                destination.appendChild(template.content.cloneNode(true))
+                let newItem = destination.lastElementChild
+                newItem.id = item.name.split(" ").join("")
+                newItem.querySelector(".playerItemName").innerText = item.name
+                newItem.querySelector(".playerItemDescription").innerText = item.description
+            })
+        }
+    })
 
-    let newItem = destination.lastElementChild
-    newItem.id = item.name.split(" ").join("")
-    newItem.querySelector(".playerItemName").innerText = item.name
-    newItem.querySelector(".playerItemDescription").innerText = item.description
 }
 
 //Prompt functions -- FINISH LATER
@@ -247,6 +251,52 @@ function sendPlayerChoice(choice, status){
     }
     console.log(choiceObject)
     setPlayerStatus(choiceObject)
+}
+
+function promptItemUsage(validChoicesObject){
+    let overlay = document.querySelector("#overlay"),
+    alertContainer = document.querySelector("#overlay .alert"),
+    newForm = document.createElement("form")
+    console.log(validChoicesObject)
+    newForm.id = "itemSelect"
+    validChoicesObject.forEach(itemObject => {
+        console.log(itemObject)
+        let newChoice = document.createElement("div"),
+            newPlayerName = document.createElement("span"),
+            newItemName = document.createElement("span"),
+            newUseBtn = document.createElement("button")
+        newPlayerName.innerText = itemObject.username
+        newItemName.innerText = itemObject.itemname
+        newUseBtn.type = "button"
+        newUseBtn.innerText = "Use"
+        newUseBtn.dataset.username = itemObject.username
+        newUseBtn.dataset.itemname = itemObject.itemname
+        newUseBtn.addEventListener("click", sendUseItem)
+        newChoice.append(newPlayerName, " can use ", newItemName)
+        newChoice.append(newUseBtn)
+        newForm.appendChild(newChoice)
+    })
+    let newSubmit = document.createElement("button")
+    newSubmit.type = "button"
+    newSubmit.addEventListener("click", moveToSupportPhase)
+    newSubmit.innerText = "Move on to next phase"
+    newForm.appendChild(newSubmit)
+    alertContainer.appendChild(newForm)
+    overlay.classList.toggle("hidden")
+}
+
+function sendUseItem(e){
+    console.log(e)
+    let useItemObject = {
+        player: e.target.dataset.username,
+        item: e.target.dataset.itemname
+    }
+    console.log(useItemObject)
+}
+
+function moveToSupportPhase(e){
+    clearPrompt()
+    selectSupportPhase()
 }
 
 
@@ -319,7 +369,8 @@ function settingStatusHTML() {
 
 
 //INTERACTION ELEMENTS
-//code in refreshes to all of these too.
+//code in refreshes to all of these too?
+//Eventually become socket emits
 
 //Send keep die command
 function sendKeepDie(e) {
@@ -394,21 +445,6 @@ function sendAbility(e) {
         chosenDiceIDs[i] = chosenDice[i].id
     }
     console.log(chosenDiceIDs, submitter)
-
-    //let diceElements = document.querySelectorAll(".die")
-    // diceElements.forEach(die => {
-    //     die.removeEventListener("click", toggleChoice)
-    //     die.classList.remove("choice")
-    // })
-    // let generatedContent = document.querySelectorAll(".removeAfterAbility")
-    // console.log(generatedContent)
-    // generatedContent.forEach(element => {
-    //     element.remove()
-    // })
-    // console.log("Removal of ability choice stuff.")
-    //let diceSubmission = findDieObject(chosenDiceIDs)
-    //console.log("Dice submission", diceSubmission)
-    // playerObject.playstyle.ability(diceSubmission)
 }
 
 //This will eventually be a server command.

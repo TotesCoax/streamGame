@@ -176,9 +176,8 @@ function setDev(){
 
 //Dev Functions - this might get reworked for players to give items.
 function devGiveItem(player, itemName) {
-    let itemObject = board.itemDeck.find(item => item.name === itemName),
+    let itemObject = board.itemDeck.find(item => item.name.toLowerCase() === itemName.toLowerCase()),
         itemIndex = board.itemDeck.indexOf(itemObject)
-
     player.inventory.push(itemObject)
     board.itemDeck.splice(itemIndex,1)
     console.log(itemObject, " has been moved to ", player.username)
@@ -323,7 +322,7 @@ function applyStageEffect(currentStage){
 //Player Turn Setup Functions
 //--------------------//
 
-//Select Active Player
+//Cycle the player statuses
 function cyclePlayerStatus(players){
     //Check previously duo players status and update them
     for (let i = 0; i < players.length; i++){
@@ -344,7 +343,7 @@ function cyclePlayerStatus(players){
                 break;
             }
         }
-    console.log("cyclePlayerStatus has completed.")
+    console.log("Players status has been cycled")
 }
 
 //This takes the response from the client to set the player status.
@@ -365,6 +364,7 @@ function requestPlayerStatusChoice(status){
             console.log(validChoices)
         }
     }
+    //This will become a socket emit.
     promptPlayerSelection(validChoices, status)
 }
 
@@ -393,17 +393,17 @@ function requestPlayerStatusChoice(status){
         }
 
 //Check for consumable items
-function checkConsumables(players){
+function checkConsumables(){
     let playersWithItems = []
     //Check each player for an inventory
-    for (let i = 0; i < players.length; i++){
+    for (let i = 0; i < board.players.length; i++){
         //if that player has an items in their inventory
-        if (players[i].inventory.length > 0){
+        if (board.players[i].inventory.length > 0){
             //check each item in their inventory if they are a type:consumable
-            for (let j = 0; j < players[i].inventory.length; j++){
-                if (player[i].inventory[j].type === "consumable")
+            for (let j = 0; j < board.players[i].inventory.length; j++){
+                if (board.players[i].inventory[j].type === "consumable")
                 //add the username and item name to a list to export
-                playersWithItems.push(players[i].username, players[i].inventory[j].name)
+                playersWithItems.push({username: board.players[i].username, itemname: board.players[i].inventory[j].name})
             }
         }
     }
@@ -672,9 +672,7 @@ function numDiceCheck(diceReq, attackSubmission){
 
 
 function endAttackPhase() {
-    let attackHand = board.attackHand
-
-    if (attackHand.length > 0){
+    if (board.attackHand.length > 0){
         CounterAttackPhase()
     } else {
         console.log("Switch triggered!")
@@ -942,14 +940,23 @@ function refreshAbilities(players) {
         //Active Player is declared
         cyclePlayerStatus(board.players)
         //Check if all other players are exhausted
+        allExhaustedRefresh(board.players)
         //If all others are exhausted, unexhaust all
+        console.log("NewPlayerTurnSetup has completed")
+    }
+    function startOfTurnItemsPhase(){
         //Consumable Item phase
         //Check for any consumables
+        let playersWithConsumables = checkConsumables(board.players)
         //Prompt if the holder would like to use item
+        promptItemUsage(playersWithConsumables)
+    }
+
+    function selectSupportPhase(){
         //Select a support
         //verify the support is not exhausted
-        console.log("NewPlayerTurnSetup has completed")
-        }
+        requestPlayerStatusChoice("support")
+    }
 
 
 

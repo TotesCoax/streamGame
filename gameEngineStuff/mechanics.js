@@ -413,7 +413,8 @@ function checkConsumables(){
 }
 
 //Use consumable
-function useConsumable(item, target){
+function useConsumable(itemChoiceObject){
+    let item = board.players.find(player => player.username === itemChoiceObject.username).inventory.find(item => item.name)
     //Checking to see if game state allows consumables
     if (gameState.noConsumables === false){
         //Checking if item is consumed
@@ -949,7 +950,11 @@ function refreshAbilities(players) {
         //Check for any consumables
         let playersWithConsumables = checkConsumables(board.players)
         //Prompt if the holder would like to use item
-        promptItemUsage(playersWithConsumables)
+        if(playersWithConsumables){
+            promptItemUsage(playersWithConsumables)
+        } else {
+            selectSupportPhase()
+        }
     }
 
     function selectSupportPhase(){

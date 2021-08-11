@@ -289,7 +289,8 @@ function sendUseItem(e){
     console.log(e)
     let useItemObject = {
         player: e.target.dataset.username,
-        item: e.target.dataset.itemname
+        item: e.target.dataset.itemname,
+        target: "something"
     }
     console.log(useItemObject)
 }

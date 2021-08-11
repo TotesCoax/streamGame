@@ -19,12 +19,38 @@ html {
     display: none;
 }
 
+/* Pop-up Alert Overlay formatting */
+
+#overlay {
+    position: fixed; /* Sit on top of the page content */
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+    z-index: 100; /* Specify a stack order in case you're using a different order for other elements */
+    cursor: pointer; /* Add a pointer on hover */
+  }
+
+  #overlay .alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    /* bring your own prefixes */
+    transform: translate(-50%, -50%);
+      background: white;
+      color: black;
+  }
+
 /*General Card formatting */
 
 .card {
     border: 5px solid black;
     border-radius: 10px;
     width: 250px;
+    position: relative;
 }
 
 .stat-box {
@@ -42,6 +68,16 @@ html {
 
 .playerItem div {
     color: white;
+}
+
+
+.player.target {
+    z-index: 100;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
 }
 
 /*Active scenario formatting*/
@@ -197,31 +233,3 @@ span.attack-damage {
     height: 100px;
 }
 
-/* Pop-up Alert Overlay formatting */
-
-#overlay {
-    position: fixed; /* Sit on top of the page content */
-    width: 100%; /* Full width (cover the whole page) */
-    height: 100%; /* Full height (cover the whole page) */
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0,0,0,0.5); /* Black background with opacity */
-    z-index: 100; /* Specify a stack order in case you're using a different order for other elements */
-    cursor: pointer; /* Add a pointer on hover */
-  }
-
-  #overlay .alert {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    /* bring your own prefixes */
-    transform: translate(-50%, -50%);
-      background: white;
-      color: black;
-  }
-
-  #overlay .alert button.green {
-      background: lightgreen;
-  }

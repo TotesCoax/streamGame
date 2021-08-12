@@ -78,6 +78,12 @@ html {
     width: 100%;
     top: 0;
     left: 0;
+    background-color: rgba(52, 171, 218, 0.33)
+}
+
+.infopane-item {
+    width: 100px;
+    border: 1px solid black;
 }
 
 /*Active scenario formatting*/
@@ -233,3 +239,14 @@ span.attack-damage {
     height: 100px;
 }
 
+/* Items formatting */
+
+.player-item {
+    width: 100px;
+    border: 1px solid black;
+}
+
+.player-item-name {
+    font-weight: bold;
+    text-decoration: underline;
+}

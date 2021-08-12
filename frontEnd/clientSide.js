@@ -66,7 +66,7 @@ function fillUpPlayers(){
         let playerInsert = playerContainer.lastElementChild,
             playerStats = gameboard.players[i]
 
-        playerInsert.id = playerStats.username.toLowerCase()
+        playerInsert.id = playerStats.username.toLowerCase().split(" ").join("")
         playerInsert.classList.add(playerStats.status)
         playerInsert.querySelector(".player-name").innerText = playerStats.username.toUpperCase()
         playerInsert.querySelector(".player-class").innerText = playerStats.playstyle.title
@@ -75,6 +75,8 @@ function fillUpPlayers(){
         playerInsert.querySelector(".ability-uses").dataset.username = playerStats.username.toLowerCase()
         playerInsert.querySelector(".ability-uses").addEventListener("click", activateAbility)
         playerInsert.querySelector(".ability-text").innerText = playerStats.playstyle.abilityText
+        let targetData = playerInsert.querySelector(".target")
+        targetData.dataset.username = playerStats.username.toLowerCase().split(" ").join("")
         console.log("Easy  stuff filled, moving to attack array")
         //Populating the attack array for new player
         let attackHTML = playerInsert.querySelector(".attack-box"),
@@ -175,13 +177,46 @@ function fillUpPlayerInventory(players) {
                 let destination = document.querySelector(`#${player.username.toLowerCase()} .inventory`)
                 destination.appendChild(template.content.cloneNode(true))
                 let newItem = destination.lastElementChild
-                newItem.id = item.name.split(" ").join("")
-                newItem.querySelector(".playerItemName").innerText = item.name
-                newItem.querySelector(".playerItemDescription").innerText = item.description
+                newItem.classList.add(item.name.split(" ").join("").toLowerCase())
+                if (item.consumed === true){
+                    newItem.classList.add("consumed")
+                }
+                newItem.querySelector(".player-item-name").innerText = item.name
+                newItem.querySelector(".player-item-description").innerText = item.description
+                newItem.querySelector("button").dataset.holder = player.username.split(" ").join("").toLowerCase()
+                newItem.querySelector('button').dataset.itemname = item.name.split(" ").join("").toLowerCase()
             })
         }
     })
 
+}
+// {username: board.players[i].username, itemname: board.players[i].inventory[j].name, consumed: board.players[i].inventory[j].consumed}
+function transmitItemPhase(playersWithConsumables) {
+    console.log(playersWithConsumables)
+    let infopane = document.querySelector("#infopanel"),
+        newDiv = document.createElement("div"),
+        newButton = document.createElement("button")
+
+        newDiv.classList.add("infopane-item")
+        newButton.innerText = "Move to next phase =>"
+        newButton.addEventListener("click", moveToSupportPhase)
+        playersWithConsumables.forEach(player => {
+            let newItem = document.createElement("div"),
+                newPlayerName = document.createElement("p")
+                
+            newItem.innerText = player.itemname
+            newPlayerName.innerText = player.username
+            newItem.append(newPlayerName)
+            newDiv.append(newItem)
+            infopane.append(newDiv)
+        })
+        infopane.append(newButton)
+        toggleItemButtonVisibility()
+}
+
+function toggleItemButtonVisibility(){
+    let itemButtons = document.querySelectorAll(".use-item-visibility")
+    itemButtons.forEach(item =>{ item.classList.toggle("hidden")})
 }
 
 //Prompt functions -- FINISH LATER
@@ -197,11 +232,11 @@ function clearPrompt(){
     }
 
 function promptPlayerSelection(validChoices, status){
+    console.log("Building request for: ", status)
     let overlay = document.querySelector("#overlay"),
         alertContainer = document.querySelector("#overlay .alert"),
         newForm = document.createElement("form")
-
-    newForm.id = "playerSelect"
+        alertContainer.appendChild(newForm)
     validChoices.forEach(player => {
         let newDiv = document.createElement("div")
             newBtn = document.createElement("input")
@@ -222,12 +257,11 @@ function promptPlayerSelection(validChoices, status){
     newSubmit.addEventListener("click", checkPlayerChoice)
     newSubmit.innerText = "Submit!"
     newForm.appendChild(newSubmit)
-    alertContainer.appendChild(newForm)
     overlay.classList.toggle("hidden")
 }
 
 function checkPlayerChoice(e) {
-    let form = document.querySelector("#playerSelect"),
+    let form = document.querySelector("#overlay .alert form"),
         choice,
         status = e.target.dataset.status
 
@@ -239,8 +273,8 @@ function checkPlayerChoice(e) {
     if (!choice){
         alert("Please select an option then hit submit.")
     } else {
-        sendPlayerChoice(choice.value, status)
         clearPrompt()
+        sendPlayerChoice(choice.value, status)
     }
 }
 
@@ -253,51 +287,39 @@ function sendPlayerChoice(choice, status){
     setPlayerStatus(choiceObject)
 }
 
-function promptItemUsage(validChoicesObject){
-    let overlay = document.querySelector("#overlay"),
-    alertContainer = document.querySelector("#overlay .alert"),
-    newForm = document.createElement("form")
-    console.log(validChoicesObject)
-    newForm.id = "itemSelect"
-    validChoicesObject.forEach(itemObject => {
-        console.log(itemObject)
-        let newChoice = document.createElement("div"),
-            newPlayerName = document.createElement("span"),
-            newItemName = document.createElement("span"),
-            newUseBtn = document.createElement("button")
-        newPlayerName.innerText = itemObject.username
-        newItemName.innerText = itemObject.itemname
-        newUseBtn.type = "button"
-        newUseBtn.innerText = "Use"
-        newUseBtn.dataset.username = itemObject.username
-        newUseBtn.dataset.itemname = itemObject.itemname
-        newUseBtn.addEventListener("click", sendUseItem)
-        newChoice.append(newPlayerName, " can use ", newItemName)
-        newChoice.append(newUseBtn)
-        newForm.appendChild(newChoice)
+function activateItem(e){
+    console.log(e.target)
+    //Generate Player Targetting
+    let playerTargets = document.querySelectorAll(".player.target")
+    playerTargets.forEach(player => {
+        player.classList.toggle("hidden")
+        player.addEventListener("click", sendUseItem)
     })
-    let newSubmit = document.createElement("button")
-    newSubmit.type = "button"
-    newSubmit.addEventListener("click", moveToSupportPhase)
-    newSubmit.innerText = "Move on to next phase"
-    newForm.appendChild(newSubmit)
-    alertContainer.appendChild(newForm)
-    overlay.classList.toggle("hidden")
 }
 
 function sendUseItem(e){
     console.log(e)
     let useItemObject = {
-        player: e.target.dataset.username,
+        player: e.target.dataset.holder,
         item: e.target.dataset.itemname,
-        target: "something"
+        target: e.target.dataset.username
     }
     console.log(useItemObject)
+    let playerTargets = document.querySelectorAll(".player.target")
+    playerTargets.forEach(player => {
+        player.classList.toggle("hidden")
+        player.removeEventListener("click", sendUseItem)
+    })
+    toggleItemButtonVisibility()
 }
 
-function moveToSupportPhase(e){
-    clearPrompt()
-    selectSupportPhase()
+function moveToSupportPhase(){
+    let infopane = document.querySelector("#infopanel")
+
+    while (infopane.firstChild) {
+        infopane.removeChild(infopane.firstChild)
+    }
+    selectSupportPhase() //Turn this into a socket emit
 }
 
 
@@ -333,6 +355,17 @@ function refreshDMGValues(){
         document.querySelector(`#${player.username} .player-hp-counter`).innerText = player.playstyle.hpMax[gameboard.level]
     })
     console.log("Values have been refreshed")
+}
+
+function refreshItems() {
+    let inventories = document.querySelector(".inventory")
+
+    inventories.forEach(player => {
+        while (player.firstChild){
+            player.removeChild(player.firstChild)
+        }
+    })
+    fillUpPlayerInventory()
 }
 
 

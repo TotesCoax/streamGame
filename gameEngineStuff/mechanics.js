@@ -142,8 +142,11 @@ let gameState = {
     turnCounter: 0,
     switchCounter: 0,
     noConsumables: false,
-    noAbilities: false
+    noAbilities: false,
+    itemPhase: false
 }
+
+
 
 //Gameboard object to export - use this to hide game information from the front end
 let boardExport = {
@@ -174,13 +177,17 @@ function setDev(){
     console.log("Dev object has been set")
 }
 
-//Dev Functions - this might get reworked for players to give items.
+//Dev Functions - this might get reworked for players to trade items. Right now only searches the item deck.
 function devGiveItem(player, itemName) {
     let itemObject = board.itemDeck.find(item => item.name.toLowerCase() === itemName.toLowerCase()),
         itemIndex = board.itemDeck.indexOf(itemObject)
-    player.inventory.push(itemObject)
-    board.itemDeck.splice(itemIndex,1)
-    console.log(itemObject, " has been moved to ", player.username)
+    if (itemObject){
+        player.inventory.push(itemObject)
+        board.itemDeck.splice(itemIndex,1)
+        console.log(itemObject, " has been moved to ", player.username)
+    } else {
+        console.log("No item of that name found")
+    }
 }
 
 //--------------------//
@@ -352,6 +359,11 @@ function setPlayerStatus(choiceObject){
         player.username === choiceObject.username)
     chosenPlayer.status = choiceObject.status
     console.log(chosenPlayer)
+    if (choiceObject.status === "active"){
+        startOfTurnItemsPhase()
+    } else {
+        RollingPhase()
+    }
 }
 
 function requestPlayerStatusChoice(status){
@@ -403,7 +415,7 @@ function checkConsumables(){
             for (let j = 0; j < board.players[i].inventory.length; j++){
                 if (board.players[i].inventory[j].type === "consumable")
                 //add the username and item name to a list to export
-                playersWithItems.push({username: board.players[i].username, itemname: board.players[i].inventory[j].name})
+                playersWithItems.push({username: board.players[i].username, itemname: board.players[i].inventory[j].name, consumed: board.players[i].inventory[j].consumed})
             }
         }
     }
@@ -414,7 +426,13 @@ function checkConsumables(){
 
 //Use consumable
 function useConsumable(itemChoiceObject){
-    let item = board.players.find(player => player.username === itemChoiceObject.username).inventory.find(item => item.name)
+    if (gameState.itemPhase === false){
+        alert("You can only use consumables at the start of the turn! ")
+        console.log("not in phase");
+        return
+    }
+    let item = board.players.find(player => player.username === itemChoiceObject.username).inventory.find(item => item.name),
+        target = board.players.find(player => player.usernameitem.split(" ").join("").toLowerCase() = itemChoiceObject.target.split(" ").join("").toLowerCase())
     //Checking to see if game state allows consumables
     if (gameState.noConsumables === false){
         //Checking if item is consumed
@@ -423,35 +441,18 @@ function useConsumable(itemChoiceObject){
             item.consumed = true
         } else {
             alert("This item has already been used!")
+            console.log("Item was previously consumed", item)
         }
     } else {
-        alert("Something is preventing you from using items!")
+        alert("An effect is preventing you from using items!")
     }
 }
 
-//Select Support Player
-// function selectSupportPlayer(players){
-//     let validChoices = []
-//     for (let i = 0; i < players.length; i++){
-//         if ((players[i].exhausted === false) && (players[i].status !== "active")){
-//             validChoices.push(players[i].username)
-//         }
-//     }
-//     console.log("valid choices",validChoices)
-//     //This should search for a valid username when I remove the prompt and add in a select box.
-//     let input = prompt("Enter username for support player.")
-//     console.log("input: ", input)
-//     let supportChoice = players.find(player => player.username === input)
-//     console.log("support choice: ",supportChoice)
-//     if (supportChoice.exhausted === true){
-//         alert("That player is exhausted")
-//         selectSupportPlayer(players)
-//     } else {
-//         supportChoice.exhausted = true
-//         supportChoice.status = "support"
-//         console.log("Support has been chosen:", supportChoice.username)
-//     }
-// }
+function isAnyoneActive(){
+    return board.players.find(player => {
+        player.status === "active"
+    })
+}
 
 //This function will search and apply any damage over time effects
 function damageOverTimeEffect(){
@@ -943,15 +944,22 @@ function refreshAbilities(players) {
         //Check if all other players are exhausted
         allExhaustedRefresh(board.players)
         //If all others are exhausted, unexhaust all
-        console.log("NewPlayerTurnSetup has completed")
+        console.log("NewPlayerTurnSetup has completed.")
+        if (isAnyoneActive() === undefined){
+            requestPlayerStatusChoice("active")
+        } else {
+            startOfTurnItemsPhase()
+        }
     }
     function startOfTurnItemsPhase(){
+        gameState.itemPhase = true
         //Consumable Item phase
         //Check for any consumables
         let playersWithConsumables = checkConsumables(board.players)
-        //Prompt if the holder would like to use item
-        if(playersWithConsumables){
-            promptItemUsage(playersWithConsumables)
+        //Sends an alert that they can use items if they want.
+        if(playersWithConsumables.length > 0){
+            console.log(playersWithConsumables)
+            transmitItemPhase(playersWithConsumables)
         } else {
             selectSupportPhase()
         }
@@ -967,6 +975,7 @@ function refreshAbilities(players) {
 
     //Rolling phase
     function RollingPhase(){
+        gameState.itemPhase = false
         //I moved DOT to here for a consistent trigger and to give players plenty of time to try to respond to it.
         damageOverTimeEffect()
         //Check for any reroll modifiers (event or items)

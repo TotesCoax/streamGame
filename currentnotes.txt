@@ -20,12 +20,14 @@ NOW things to do
             DONE->need to workout a way to adjust classes based on player.status
             ->Interactivity:
                 - DONE Dice rolling
-                - Ability Usage
+                - DONE Ability Usage
                 - Items
         -> also the functionality programming (use socket.io?)
 
     Include basic attack requirements in the card so you can bring that over to the HUD to show players
         -> include a value propety and rework the functions to call up this value rather than having it hard coded into the function?
+
+    Prevent the players from using consumables outside of the proper timing. Right now there is no server stop for this.
 
 
 

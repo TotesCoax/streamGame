@@ -12,10 +12,7 @@ let gameboard = boardExport
 
 //GENERATE HTML ELEMENT FUNCTIONS
 
-function fillUpHTML() {
-    fillUpScenario()
-    fillUpPlayers()
-    fillUpDiceRollingPhase()
+function fillUpDevStats() {
     document.querySelector(".gameboard-level-counter").innerText = gameboard.level
     document.querySelector(".stage-counter").innerText = gameboard.scenarios[gameboard.level].stageCounter
 }
@@ -112,7 +109,6 @@ function fillUpPlayers(){
             newAttack.querySelector(".attack-button").dataset.attackNameTrim = attackImport[a].name.split(" ").join("")
         }
     }
-    movingPlayerCards()
 }
 
 //This function sets the initial die objects
@@ -242,7 +238,6 @@ function promptPlayerSelection(validChoices, status){
             newBtn = document.createElement("input")
         newBtn.setAttribute("type", "radio")
         newBtn.value = player
-        newBtn.id = player
         newBtn.name = "playerSelect"
         newDiv.appendChild(newBtn)
         let newLbl = document.createElement("label")
@@ -330,7 +325,21 @@ function moveToSupportPhase(){
 //This function updates the values of the displaying dice based on the data from the board object
 //should be run at the end of each roll command
 //It removes current dice and refills with new dice objects with new values. I did it this way instead of just refreshing the value cuz it seemed more modular.
-function refreshDiceValuesHTML(){
+function refreshPlayers() {
+    let playerContainer = document.querySelector("#playerContainer"),
+        atkContainer = document.querySelector("#activePlayerCardHook"),
+        supContainer = document.querySelector("#supportPlayerCardHook")
+
+    while (playerContainer.firstChild) {
+        playerContainer.removeChild(playerContainer.firstChild)
+    }
+    atkContainer.removeChild(atkContainer.firstChild)
+    supContainer.removeChild(supContainer.firstChild)
+    fillUpPlayers()
+    movingPlayerCards()
+}
+
+function refreshDice(){
     let activeDiceArray = document.querySelector("#activePlayerHand"),
         supportDiceArray = document.querySelector("#supportPlayerHand")
 
@@ -528,13 +537,11 @@ function sendRoll(playerStatus){
     switch (playerStatus) {
         case "active":
             rollActive(player)
-            refreshDiceValuesHTML(gameboard.dicePool)
-            updateRerollCount()
+            refreshDice(gameboard.dicePool)
             break;
         case "support":
             rollSupport(player)
-            refreshDiceValuesHTML(gameboard.dicePool)
-            updateRerollCount()
+            refreshDice(gameboard.dicePool)
             break;
         default:
             console.log("Something went wrong")
@@ -556,22 +563,21 @@ function updateRerollCount(){
 //This needs to be updated with server code
 function sendEndAttackPhase(){
     endAttackPhase()
-    checkScenarioHTML()
-    movingPlayerCards()
+    refreshScenario()
     boardExport = board
     gameboard = boardExport
     refreshAttackHand()
     document.querySelector(".attack-hand").classList.toggle("hidden")
-    refreshDiceValuesHTML()
     refreshDMGValues()
 }
 
 
-function checkScenarioHTML(){
-    let scenCardHTML = document.querySelectorAll(".scenario-card")
+function refreshScenario(){
+    let scenarioContainer = document.querySelector("#scenarioContainer")
 
-    if (gameboard.scenarios.length != scenCardHTML.length){
-        fillUpScenario()
+    while (scenarioContainer.firstChild) {
+        scenarioContainer.removeChild(scenarioContainer.firstChild)
     }
+    fillUpScenario()
 }
 

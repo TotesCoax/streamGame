@@ -358,10 +358,14 @@ function setPlayerStatus(choiceObject){
     let chosenPlayer = board.players.find(player =>
         player.username === choiceObject.username)
     chosenPlayer.status = choiceObject.status
+    if (choiceObject.status === "support"){
+        chosenPlayer.exhausted = true
+    }
     console.log(chosenPlayer)
     if (choiceObject.status === "active"){
         startOfTurnItemsPhase()
     } else {
+        refreshPlayers()
         RollingPhase()
     }
 }
@@ -449,9 +453,9 @@ function useConsumable(itemChoiceObject){
 }
 
 function isAnyoneActive(){
-    return board.players.find(player => {
-        player.status === "active"
-    })
+    let foundPlayer = board.players.find(player => player.status === "active")
+    console.log("Active player?: ", foundPlayer)
+    return foundPlayer
 }
 
 //This function will search and apply any damage over time effects
@@ -764,13 +768,16 @@ function stageHPchecker(currentScenario){
             gameState.turnCounter = 0
             gameState.switchCounter = 0
             ScenarioCleared()
+            return
         } else {
             console.log("New Stage being setup!")
             NewStageSetup()
+            return
         }
     } else {
         console.log("New player turn being setup!")
         NewPlayerTurnSetup()
+        return
     }
 
 }
@@ -922,6 +929,7 @@ function refreshAbilities(players) {
         //Prepare the Scenario for the level
         setupScenario(scenarios, board.level)
         console.log("NewScenarioSetup has finished")
+        refreshScenario()
         NewStageSetup()
     }
     //Setup for each new stage reveal (once per stage)
@@ -933,6 +941,7 @@ function refreshAbilities(players) {
         console.log("Stage affect has been applied")
         console.log("Stage level item effects have been applied")
         console.log("NewStageSetup has finished")
+        fillUpDevStats()
         NewPlayerTurnSetup()
     }
     //Setup for each Player's turn
@@ -988,6 +997,7 @@ function refreshAbilities(players) {
         rollHand(board.dicePool.active)
         rollHand(board.dicePool.support)
         setDev()
+        refreshDice()
         //Declare any die rerolls (assign keep:true)
             //This will be done with client side code sending keep command back to server
         //Roll all dice where keep is false and reroll counter is greater than zero for respective player

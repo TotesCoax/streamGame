@@ -68,9 +68,9 @@ function fillUpPlayers(){
         playerInsert.querySelector(".player-name").innerText = playerStats.username.toUpperCase()
         playerInsert.querySelector(".player-class").innerText = playerStats.playstyle.title
         playerInsert.querySelector(".player-hp-counter").innerText = playerStats.playstyle.hpMax[gameboard.level]
-        playerInsert.querySelector(".ability-uses").innerText = playerStats.playstyle.abilityMax[gameboard.level][gameboard.players.length - 2]
-        playerInsert.querySelector(".ability-uses").dataset.username = playerStats.username.toLowerCase()
-        playerInsert.querySelector(".ability-uses").addEventListener("click", activateAbility)
+        playerInsert.querySelector(".ability-use-counter").innerText = playerStats.playstyle.abilityMax[gameboard.level][gameboard.players.length - 2]
+        playerInsert.querySelector(".ability-button").dataset.username = playerStats.username.toLowerCase()
+        playerInsert.querySelector(".ability-button").addEventListener("click", activateAbility)
         playerInsert.querySelector(".ability-text").innerText = playerStats.playstyle.abilityText
         let targetData = playerInsert.querySelector(".target")
         targetData.dataset.username = playerStats.username.toLowerCase().split(" ").join("")
@@ -146,6 +146,10 @@ function fillUpDiceRollingPhase() {
         }
     }
     updateRerollCount()
+    document.querySelectorAll(".roll-dash").forEach(element => {
+        element.classList.remove("hidden")
+    })
+
 }
 
 function fillUpAttackHand(){
@@ -231,8 +235,19 @@ function promptPlayerSelection(validChoices, status){
     console.log("Building request for: ", status)
     let overlay = document.querySelector("#overlay"),
         alertContainer = document.querySelector("#overlay .alert"),
-        newForm = document.createElement("form")
-        alertContainer.appendChild(newForm)
+        newForm = document.createElement("form"),
+        newNotice = document.createElement("div")
+    alertContainer.appendChild(newForm)
+    switch (status) {
+        case "active":
+            newNotice.innerText = "Please select an active player:"
+            break;
+    
+        default:
+            newNotice.innerText = "Please select your support:"
+            break;
+    }
+    newForm.appendChild(newNotice)
     validChoices.forEach(player => {
         let newDiv = document.createElement("div")
             newBtn = document.createElement("input")
@@ -333,8 +348,12 @@ function refreshPlayers() {
     while (playerContainer.firstChild) {
         playerContainer.removeChild(playerContainer.firstChild)
     }
-    atkContainer.removeChild(atkContainer.firstChild)
-    supContainer.removeChild(supContainer.firstChild)
+    if (atkContainer.firstChild){
+        atkContainer.removeChild(atkContainer.firstChild)
+    }
+    if (supContainer.firstChild){
+        supContainer.removeChild(supContainer.firstChild)
+    }
     fillUpPlayers()
     movingPlayerCards()
 }
@@ -362,13 +381,14 @@ function refreshDMGValues(){
     gameboard.players.forEach(player => {
         document.querySelector(`#${player.username} .player-dmg-counter`).innerText = player.dmgCounter
         document.querySelector(`#${player.username} .player-hp-counter`).innerText = player.playstyle.hpMax[gameboard.level]
+        document.querySelector(`#${player.username} .ability-use-counter`).innerText = player.abilityCounter
     })
     console.log("Values have been refreshed")
 }
 
 function refreshItems() {
-    let inventories = document.querySelector(".inventory")
-
+    let inventories = document.querySelectorAll(".inventory")
+    console.log(inventories);
     inventories.forEach(player => {
         while (player.firstChild){
             player.removeChild(player.firstChild)
@@ -447,6 +467,7 @@ function sendAttackPhase() {
     moveToAttackPhase()
     fillUpAttackHand()
     document.querySelector(".attack-hand").classList.toggle("hidden")
+    toggleRollHUDdisplay()
 }
 
 function sendAttack(e){
@@ -463,7 +484,7 @@ function activateAbility(e){
     newBtn.innerText = "Confirm"
     newBtn.dataset.username = e.target.dataset.username
     newBtn.addEventListener("click", sendAbility)
-    newBtn.classList.add("removeAfterAbility")
+    newBtn.classList.add("remove-after-ability")
     e.target.after(newBtn)
 
     let diceOptions = document.querySelectorAll(".die")
@@ -485,25 +506,46 @@ function sendAbility(e) {
 
     let chosenDiceIDs = []
     for(let i = 0; i < chosenDice.length; i++){
-        chosenDiceIDs[i] = chosenDice[i].id
+        chosenDiceIDs[i] = Number(chosenDice[i].id)
     }
-    console.log(chosenDiceIDs, submitter)
+    clientUseAbility(submitter, chosenDiceIDs)
+    removeAbilityStuff()
+}
+
+function removeAbilityStuff(){
+    document.querySelector("button.remove-after-ability").remove()
+}
+
+function clientUseAbility(username, target){
+    let player = board.players.find(player => player.username === username),
+        targetArray = findDieObject(target)
+
+
+    console.log(player, targetArray)
+    player.playstyle.ability(targetArray)
+    refreshDice()
+    refreshAttackHand()
+    refreshDMGValues()
 }
 
 //This will eventually be a server command.
 function findDieObject(arrayOfIDs){
     console.log("Finding dice Function")
     let foundDice = []
-
+    console.log(arrayOfIDs)
     for(let i = 0; i < arrayOfIDs.length; i++){
+        console.log(arrayOfIDs[i])
+        console.log("Searching Attack hand")
         if (board.attackHand.find(die => arrayOfIDs[i] === die.id)){
             console.log("Found in attack hand")
             foundDice.push(board.attackHand.find(die => arrayOfIDs[i] === die.id))
         }
+        console.log("Searching Active pool")
         if (board.dicePool.active.find(die => arrayOfIDs[i] === die.id)){
             console.log("Found in active pool")
             foundDice.push(board.dicePool.active.find(die => arrayOfIDs[i] === die.id))
         }
+        console.log("Searching Support pool")
         if (board.dicePool.support.find(die => arrayOfIDs[i] === die.id)){
             console.log("Found in support pool")
             foundDice.push(board.dicePool.support.find(die => arrayOfIDs[i] === die.id))
@@ -569,6 +611,7 @@ function sendEndAttackPhase(){
     refreshAttackHand()
     document.querySelector(".attack-hand").classList.toggle("hidden")
     refreshDMGValues()
+    toggleRollHUDdisplay()
 }
 
 
@@ -579,5 +622,12 @@ function refreshScenario(){
         scenarioContainer.removeChild(scenarioContainer.firstChild)
     }
     fillUpScenario()
+}
+
+function toggleRollHUDdisplay(){
+    document.querySelectorAll(".roll-dash").forEach(element => {
+        element.classList.toggle("hidden")
+    })
+
 }
 

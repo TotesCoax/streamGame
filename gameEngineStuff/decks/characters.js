@@ -66,7 +66,7 @@ let Playstyle = {
             {tier: 0, diceReq: 4, dmg:5, name: "En Croix", desc: "A four step combo with a minor flourish"},
             {tier: 0, diceReq: 5, dmg:8, name: "Rond de jambe", desc: "A five step combo with a major flourish"},
             {tier: 1, diceReq: 6, dmg:12, name: "Port de bras", desc: "A six step combo with hits on the strike and return"},
-            {tier: 2, diceReq: 8, dmg:24, name: "Magnum", desc: "Dear god, it's beautiful."}
+            {tier: 2, diceReq: 8, dmg:24, name: "Magnum Opus", desc: "Dear god, it's beautiful."}
         ],
         ability: function(diceArray) {
             if (diceArray.length < 2){
@@ -198,7 +198,7 @@ let Playstyle = {
                 return false;
             }
             targetArray.forEach(die => {
-                targetArray[i].value = 2
+                die.value = 2
             })
         },
         mechanicExplain: "A sly fighter requires the sum of dice values for non-basic attacks to be UNDER an amount specified for that attack.",

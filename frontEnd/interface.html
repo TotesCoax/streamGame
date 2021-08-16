@@ -66,9 +66,12 @@
                 <div class="player-hp">
                     HP: <span class="player-hp-counter">88</span>
                 </div>
+                <div class="ability-uses">
+                    Uses: <span class="ability-use-counter">X</span>
+                </div>
             </div>
             <div class="ability player-display-toggle">
-                <button class="ability-uses">X</button>
+                <button class="ability-button">Ability</button>
                 <span class="ability-text">Text for the ability.</span>
             </div>
             <div class="attack-box stat-box player-display-toggle">
@@ -150,7 +153,7 @@
             <div class="stage-progress">
                 Stage counter: <span class="stage-counter">X</span>
             </div>
-            <button type="button" onclick="NewGameSetup()">Start a new game with test data.</button>
+            <button id="newGameButton" type="button" onclick="NewGameSetup()">Start a new game with test data.</button>
         </div>
         <div id="scenarioContainer">
 
@@ -161,7 +164,7 @@
                 <div id="activePlayerCardHook">
                     
                 </div>
-                <div id="activeRolls" class="roll-dash">
+                <div id="activeRolls" class="roll-dash hidden">
                     <div class="rollHUD">
                         <button id="rollButton" type="button" onclick="sendRoll('active')">Roll</button>
                         <button id="moveToAttack" type="button" onclick="sendAttackPhase()">Go To Attack Phase</button>
@@ -185,7 +188,7 @@
 
             <!-- Support Player Card -->
             <div id="supportPlayerPosition" class="position">
-                <div id="supportRolls" class="roll-dash">
+                <div id="supportRolls" class="roll-dash hidden">
                     <div class="rollHUD">
                         <button id="rollButton" type="button" onclick="sendRoll('support')">Roll</button>
                         <p>Rerolls left:<span class="roll-counter">0</span></p>
@@ -193,9 +196,9 @@
                     <div id="supportPlayerHand" class="player-hand">
 
                     </div>
-                    <div id="supportPlayerCardHook">
-                        
-                    </div>
+                </div>
+                <div id="supportPlayerCardHook">
+                    
                 </div>
             </div>
         </div>
@@ -215,6 +218,5 @@
     <script src="../gameEngineStuff/decks/scenarioDecks.js"></script>
     <script src="../gameEngineStuff/mechanics.js"></script>
     <script src="clientSide.js"></script>
-    <script src="goTime.js"></script>
 </body>
 </html>

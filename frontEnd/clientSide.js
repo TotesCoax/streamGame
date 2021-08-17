@@ -108,6 +108,7 @@ function fillUpPlayers(){
             newAttack.querySelector(".attack-damage").innerText = attackImport[a].dmg
             newAttack.querySelector(".attack-button").dataset.attackNameTrim = attackImport[a].name.split(" ").join("")
         }
+        fillUpPlayerInventory(gameboard.players)
     }
 }
 
@@ -394,7 +395,7 @@ function refreshItems() {
             player.removeChild(player.firstChild)
         }
     })
-    fillUpPlayerInventory()
+    fillUpPlayerInventory(gameboard.players)
 }
 
 
@@ -479,19 +480,25 @@ function sendAttack(e){
 
 function activateAbility(e){
     console.log(e.target)
-    let newBtn = document.createElement("button")
-
-    newBtn.innerText = "Confirm"
-    newBtn.dataset.username = e.target.dataset.username
-    newBtn.addEventListener("click", sendAbility)
-    newBtn.classList.add("remove-after-ability")
-    e.target.after(newBtn)
-
-    let diceOptions = document.querySelectorAll(".die")
-    diceOptions.forEach(die =>{
-        die.addEventListener("click", toggleChoice)
-    })
-    console.log(diceOptions)
+    let player = board.players.find(entry => entry.username === e.target.dataset.username)
+    if(player.abilityCounter > 0){
+        
+        let newBtn = document.createElement("button")
+        
+        newBtn.innerText = "Confirm"
+        newBtn.dataset.username = e.target.dataset.username
+        newBtn.addEventListener("click", sendAbility)
+        newBtn.classList.add("remove-after-ability")
+        e.target.after(newBtn)
+        
+        let diceOptions = document.querySelectorAll(".die")
+        diceOptions.forEach(die =>{
+            die.addEventListener("click", toggleChoice)
+        })
+        console.log(diceOptions)
+    } else {
+        alert("You have no ability points left!")
+    }
 }
 
 function toggleChoice(e){
@@ -516,6 +523,7 @@ function removeAbilityStuff(){
     document.querySelector("button.remove-after-ability").remove()
 }
 
+//This needs to be transferred to a server command.
 function clientUseAbility(username, target){
     let player = board.players.find(player => player.username === username),
         targetArray = findDieObject(target)
@@ -523,6 +531,8 @@ function clientUseAbility(username, target){
 
     console.log(player, targetArray)
     player.playstyle.ability(targetArray)
+    player.abilityCounter -= 1
+    //Insert a emit refresh command here
     refreshDice()
     refreshAttackHand()
     refreshDMGValues()

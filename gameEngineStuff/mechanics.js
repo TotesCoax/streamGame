@@ -782,9 +782,6 @@ function stageHPchecker(currentScenario){
 
 }
 
-function scenarioAllStagesDefeated(currentScenario){
-
-}
 
 function isAnyoneDead(players){
     let inv = []
@@ -892,7 +889,9 @@ function unexhaustAllPlayers(players){
 
 function refreshAbilities(players) {
     players.forEach(player => {
+        console.log("Refreshing abilities",player, player.abilityCounter, " => ", player.abilityScenarioMax)
         player.abilityCounter = player.abilityScenarioMax
+        console.log("Ability Counter is now ", player.abilityCounter)
     })
 }
 
@@ -928,6 +927,10 @@ function refreshAbilities(players) {
     function NewScenarioSetup() {
         //Prepare the Scenario for the level
         setupScenario(scenarios, board.level)
+        if (board.level <= 1){
+            console.log("Start of game ability refresh engaged!")
+            refreshAbilities(board.players)
+        }
         console.log("NewScenarioSetup has finished")
         refreshScenario()
         NewStageSetup()
@@ -1071,6 +1074,7 @@ function refreshAbilities(players) {
                 //draw item from deck
                 draw(activePlayer, board.itemDeck)
                   //add item to Player inventory ~ this seems to work
+                  refreshItems() //CHANGE TO SOCKET EMIT
                   console.log("Item has been drawn and given to:", activePlayer)
                     //Give item to new player if desired
             //Level Up

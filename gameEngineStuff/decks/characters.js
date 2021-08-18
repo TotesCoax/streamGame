@@ -1,3 +1,7 @@
+module.exports = {
+    Playstyle
+}
+
 //Playstyle object holds the mechanics for each character class the players will use. Each mechanic is it's own object as well.
 
 //I still need to add in the more specific mechanics to each character attack but this will do for now just to get some core programming setup.

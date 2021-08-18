@@ -1,13 +1,29 @@
-// const io = require("socket.io-client")
-// const socket = io("http://localhost:3000")
+const socket = io("http://localhost:3000")
 
-// socket.on("init", handleInit)
+socket.on("init", handleInit)
+socket.on("gamestate", handleGamestate)
+socket.on("requestRecd", handleRequest)
 
-// function handleInit(msg) {
-//     console.log(msg)
-// }
+function handleInit(msg) {
+    console.log(msg)
+}
 
-let gameboard = boardExport
+function handleGamestate(gameState){
+    let gameboard = gameState.board
+
+    console.log(gameboard)
+}
+
+function handleRequest(msg){
+    console.log(msg)
+}
+
+function requestBoardExport() {
+    socket.emit("requestBoardState", "test")
+}
+
+
+// let gameboard = boardExport
 
 
 //GENERATE HTML ELEMENT FUNCTIONS
@@ -108,7 +124,7 @@ function fillUpPlayers(){
             newAttack.querySelector(".attack-damage").innerText = attackImport[a].dmg
             newAttack.querySelector(".attack-button").dataset.attackNameTrim = attackImport[a].name.split(" ").join("")
         }
-        fillUpPlayerInventory(gameboard.players)
+        refreshItems()
     }
 }
 
@@ -169,10 +185,10 @@ function fillUpAttackHand(){
         }
     }
 
-function fillUpPlayerInventory(players) {
+function fillUpPlayerInventory() {
     let template = document.getElementById("playerItemTemplate")
 
-    players.forEach(player => {
+    gameboard.players.forEach(player => {
         if (player.inventory.length > 0){
             player.inventory.forEach(item => {
                 let destination = document.querySelector(`#${player.username.toLowerCase()} .inventory`)
@@ -389,7 +405,7 @@ function refreshDMGValues(){
 
 function refreshItems() {
     let inventories = document.querySelectorAll(".inventory")
-    console.log(inventories);
+    console.log(inventories)
     inventories.forEach(player => {
         while (player.firstChild){
             player.removeChild(player.firstChild)

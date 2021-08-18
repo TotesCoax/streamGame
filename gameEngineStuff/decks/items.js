@@ -6,6 +6,10 @@ attack -> when player deals damage
 counterAttack -> when the player receives damage
 playerDeath -> when a player damage counter equals or exceeds their HPmax
 */
+module.exports = {
+    lootDeck
+}
+
 
 let lootDeck = [
     /*{

@@ -1,3 +1,11 @@
+module.exports = {
+    exportGamestate
+}
+
+function exportGamestate() {
+    return boardExport
+}
+
 //Object Factories
 
 // Die Object

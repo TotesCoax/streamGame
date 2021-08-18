@@ -1,3 +1,7 @@
+module.exports = {
+    Boons
+}
+
 let Boons = [
     {name:"CounterCounterAttack",
     type:"boon",

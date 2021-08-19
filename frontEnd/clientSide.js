@@ -2,29 +2,24 @@ const socket = io("http://localhost:3000")
 
 socket.on("init", handleInit)
 socket.on("gamestate", handleGamestate)
-socket.on("requestRecd", handleRequest)
 
 function handleInit(msg) {
     console.log(msg)
 }
 
-function handleGamestate(gameState){
-    let gameboard = gameState.board
+function handleGamestate(msg){
+    let gameboard = msg
 
-    console.log(gameboard)
-}
-
-function handleRequest(msg){
-    console.log(msg)
+    console.log("New gamestate arrived!", gameboard)
 }
 
 function requestBoardExport() {
     socket.emit("requestBoardState", "test")
 }
 
-
-// let gameboard = boardExport
-
+function startNewGame() {
+    socket.emit('newGame', { data: ["Me", "You"] })
+}
 
 //GENERATE HTML ELEMENT FUNCTIONS
 

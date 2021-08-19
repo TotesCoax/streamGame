@@ -1,8 +1,19 @@
-module.exports = {
-    exportGamestate
-}
 
-function exportGamestate() {
+//This function is used to send the gamestate info to the front end on request.
+exports.gamestate = function exportGamestate() {
+    //Gameboard object to export - use this to hide game information from the front end
+    let boardExport = {
+        players: board.players,
+        level: board.level,
+        scenarios: board.scenarios,
+        dicePool: {
+            active: board.dicePool.active,
+            support: board.dicePool.support
+        },
+        attackHand: board.attackHand,
+        boon: board.boon.drawn,
+        gameState: gameState
+    }
     return boardExport
 }
 
@@ -153,23 +164,6 @@ let gameState = {
     noAbilities: false,
     itemPhase: false
 }
-
-
-
-//Gameboard object to export - use this to hide game information from the front end
-let boardExport = {
-    players: board.players,
-    level: board.level,
-    scenarios: board.scenarios,
-    dicePool: {
-        active: board.dicePool.active,
-        support: board.dicePool.support
-    },
-    attackHand: board.attackHand,
-    boon: board.boon.drawn,
-    gameState: gameState
-}
-
 //Dev object - I created this to make some coding shorthands for testing - set after Rolling phase.
 let dev = {}
 function setDev(){

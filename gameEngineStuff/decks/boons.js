@@ -1,6 +1,3 @@
-module.exports = {
-    Boons
-}
 
 let Boons = [
     {name:"CounterCounterAttack",
@@ -12,3 +9,7 @@ let Boons = [
         alert(this.name + "boon has been used!")
     }}
 ]
+
+module.exports = {
+    Boons
+}

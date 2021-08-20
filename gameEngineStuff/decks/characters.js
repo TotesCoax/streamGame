@@ -1,6 +1,3 @@
-module.exports = {
-    Playstyle
-}
 
 //Playstyle object holds the mechanics for each character class the players will use. Each mechanic is it's own object as well.
 
@@ -289,4 +286,8 @@ let Playstyle = {
         }
     }
     */
+}
+
+module.exports = {
+    Playstyle
 }

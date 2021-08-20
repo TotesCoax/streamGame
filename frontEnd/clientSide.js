@@ -1,16 +1,31 @@
 const socket = io("http://localhost:3000")
 
-socket.on("init", handleInit)
-socket.on("gamestate", handleGamestate)
+let gameboard = {}
+
+socket.on('init', handleInit)
+socket.on('gamestate', handleGamestate)
+socket.on('prompt', handlePrompt)
 
 function handleInit(msg) {
     console.log(msg)
 }
 
 function handleGamestate(msg){
-    let gameboard = msg
+    gameboard = msg
 
     console.log("New gamestate arrived!", gameboard)
+    refreshScenario()
+    refreshPlayers()
+    refreshDice()
+    refreshAttackHand()
+    refreshDMGValues()
+    refreshItems()
+    return "Refreshed!"
+}
+
+function handlePrompt(dataFromServer){
+    console.log(dataFromServer);
+    promptPlayerSelection(dataFromServer)
 }
 
 function requestBoardExport() {
@@ -101,13 +116,13 @@ function fillUpPlayers(){
             newAttack.querySelector(".attack-req-dice").innerText = attackImport[a].diceReq
             console.log(attackImport[a].threshold)
             if (!isNaN(attackImport[a].threshold)) {
-                console.log("Threshold detected, Activating switch.", playerStats.playstyle.mechanic.name);
-                switch (playerStats.playstyle.mechanic.name) {
-                    case "staunch":
+                console.log("Threshold detected, Activating switch.", playerStats.playstyle.title);
+                switch (playerStats.playstyle.title) {
+                    case "the staunch":
                         console.log("Staunch detected")
                         playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerText = "sum of dice values \&geq; " + attackImport[a].threshold
                         break;
-                    case "sly":
+                    case "the sly":
                         console.log("Sly detected")
                         playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerText = "sum of dice values \&leq; " + attackImport[a].threshold
                         break;
@@ -243,12 +258,14 @@ function clearPrompt(){
     overlay.classList.toggle("hidden")
     }
 
-function promptPlayerSelection(validChoices, status){
-    console.log("Building request for: ", status)
+function promptPlayerSelection(data){
     let overlay = document.querySelector("#overlay"),
         alertContainer = document.querySelector("#overlay .alert"),
         newForm = document.createElement("form"),
-        newNotice = document.createElement("div")
+        newNotice = document.createElement("div"),
+        validChoices = data.choices,
+        status = data.status
+    console.log("Building request for: ", status)
     alertContainer.appendChild(newForm)
     switch (status) {
         case "active":
@@ -306,7 +323,7 @@ function sendPlayerChoice(choice, status){
         status: status
     }
     console.log(choiceObject)
-    setPlayerStatus(choiceObject)
+    socket.emit('sendPlayerStatus', choiceObject)
 }
 
 function activateItem(e){
@@ -453,10 +470,10 @@ function sendKeepDie(e) {
 
     let foundDie
 
-    if (board.dicePool.active.find(die => die.id === Number(e.target.previousElementSibling.id))) {
-        foundDie = board.dicePool.active.find(die => die.id === Number(e.target.previousElementSibling.id))
-    } else if (board.dicePool.support.find(die => die.id === Number(e.target.previousElementSibling.id))){
-        foundDie = board.dicePool.support.find(die => die.id === Number(e.target.previousElementSibling.id))
+    if (gameboard.dicePool.active.find(die => die.id === Number(e.target.previousElementSibling.id))) {
+        foundDie = gameboard.dicePool.active.find(die => die.id === Number(e.target.previousElementSibling.id))
+    } else if (gameboard.dicePool.support.find(die => die.id === Number(e.target.previousElementSibling.id))){
+        foundDie = gameboard.dicePool.support.find(die => die.id === Number(e.target.previousElementSibling.id))
     } else if (!foundDie){
         console.log("No die found")
     }
@@ -468,7 +485,7 @@ function sendKeepDie(e) {
 function sendSubmitDie(e){
     console.log(e.target.previousElementSibling.id)
 
-    let foundDie = board.attackHand.find(die => die.id === Number(e.target.previousElementSibling.id))
+    let foundDie = gameboard.attackHand.find(die => die.id === Number(e.target.previousElementSibling.id))
 
     foundDie.toggleSubmit()
     e.target.previousElementSibling.classList.toggle("submit")

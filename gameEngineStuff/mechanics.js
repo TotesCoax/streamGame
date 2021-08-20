@@ -1,3 +1,14 @@
+//Class imports
+const {Die} = require("../gameEngineStuff/classIndex")
+const {Player} = require("../gameEngineStuff/classIndex")
+const {Scenario} = require("../gameEngineStuff/classIndex")
+//Card Data import
+const {Boons} = require("../gameEngineStuff/decks/boons")
+const {Playstyle} = require("../gameEngineStuff/decks/characters")
+const {lootDeck} = require("../gameEngineStuff/decks/items")
+const {scenarios} = require("../gameEngineStuff/decks/scenarioDecks")
+
+//YOU SHOULD CONVERT PLAYSTYLE AND CARDS INTO CLASSES SOONtm
 
 //This function is used to send the gamestate info to the front end on request.
 exports.gamestate = function exportGamestate() {
@@ -15,94 +26,6 @@ exports.gamestate = function exportGamestate() {
         gameState: gameState
     }
     return boardExport
-}
-
-//Object Factories
-
-// Die Object
-
-class Die {
-    constructor(id) {
-        this.id = id
-        this.value = 0
-        this.keep = false
-        this.submitted = false
-    }
-//This function rolls values 1-6
-    rollDie()  {
-        if (this.keep === false){
-            this.value = Math.floor(Math.random() * 6) + 1
-        }
-    }
-//This is used in the rolling phase
-    toggleKeep() {
-        switch (this.keep) {
-            case true:
-                this.keep = false
-                break;
-            case false:
-                this.keep = true
-                break;
-        }
-    }
-//This is used in the attack phase, attack function looks for submitted dice.
-    toggleSubmit() {
-        switch (this.submitted) {
-            case true:
-                this.submitted = false
-                break;
-        
-            case false:
-                this.submitted = true
-                break;
-        }
-    }
-//I don't think I need this anymore.
-    reset() {
-        this.keep = false
-        this.redeemed = false
-        this.submitted = false
-    }
-}
-
-
-
-//Player object
-class Player {
-    constructor(username, playstyle) {
-        this.username = username.toLowerCase()
-        //this.profilePic = profilePic
-        this.playstyle = Playstyle[playstyle.toLowerCase()]
-        //Inventory is where loot items are held
-        this.inventory = []
-        //These are counters for each Scenario. Scen can modify them.
-        this.currentRerollsMax = 2
-        this.currentRerolls = 0
-        this.abilityScenarioMax = 0
-        this.abilityCounter = 0
-        this.dmgCounter = 0
-        //There can be three status: active, support, and inactive - this is for rolling and CSS positioning
-        this.status = "inactive"
-        //Exhausted is for selecting supports
-        this.exhausted = false
-        //Section for debuffs
-        //A player is poisoned when this is >0, and takes poison damage each turn, is not mitigated by effects or items.
-        this.poison = 0
-    }
-}
-
-//Scenario object
-class Scenario {
-    constructor(scenarioCard) {
-        //This is used to pull stats from the card file
-        this.card = scenarioCard
-        //This is used to track dmg between stages
-        this.dmgCounter = 0
-        //This can be used to generate CSS formatting
-        this.defeated = false
-        //This tracks which stage the players are on for each scenario.
-        this.stageCounter = 0
-    }
 }
 
 //Global functions
@@ -127,13 +50,6 @@ function shuffle(array) {
 function rollHand(hand) {
     for (let i = 0; i < hand.length; i++) {
         hand[i].rollDie()
-    }
-    console.log(hand)
-}
-
-function resetHand(hand) {
-    for (let i = 0; i < hand.length; i++) {
-        hand[i].reset()
     }
     console.log(hand)
 }
@@ -356,7 +272,7 @@ function cyclePlayerStatus(players){
 }
 
 //This takes the response from the client to set the player status.
-function setPlayerStatus(choiceObject){
+exports.setPlayerStatus = function setPlayerStatus(choiceObject){
     let chosenPlayer = board.players.find(player =>
         player.username === choiceObject.username)
     chosenPlayer.status = choiceObject.status
@@ -365,10 +281,9 @@ function setPlayerStatus(choiceObject){
     }
     console.log(chosenPlayer)
     if (choiceObject.status === "active"){
-        startOfTurnItemsPhase()
+        return startOfTurnItemsPhase()
     } else {
-        refreshPlayers()
-        RollingPhase()
+        return RollingPhase()
     }
 }
 
@@ -376,14 +291,19 @@ function requestPlayerStatusChoice(status){
     console.log("Game is saying I need to know who is: ", status)
     let validChoices = []
     for (let i = 0; i < board.players.length; i++){
-        console.log(board.players[i].username)
+        // console.log(board.players[i].username)
         if ((board.players[i].exhausted === false) && (board.players[i].status !== "active")){
             validChoices.push(board.players[i].username)
-            console.log(validChoices)
+            //console.log(validChoices)
         }
     }
-    //This will become a socket emit.
-    promptPlayerSelection(validChoices, status)
+    console.log(validChoices)
+    //Send this to server
+    return {
+        type: "playerRequest",
+        choices: validChoices,
+        status: status
+    }
 }
 
 //All Exhausted and refresh check
@@ -910,7 +830,7 @@ function refreshAbilities(players) {
 
 
 //Pre-game Setup
-    function NewGameSetup(playersArrayFromServer) {
+    exports.NewGameSetup = function NewGameSetup(playersArrayFromServer) {
         //Populate the players
         //populatePlayers(playersArrayFromServer)
         TESTFILLpopulatePlayers()
@@ -921,7 +841,7 @@ function refreshAbilities(players) {
         //Setup the boon deck
         prepareBoonDeck()
         console.log("Start of game Setup function has finished")
-        NewScenarioSetup()
+        return NewScenarioSetup()
     }
 
 // Turn system
@@ -934,8 +854,7 @@ function refreshAbilities(players) {
             refreshAbilities(board.players)
         }
         console.log("NewScenarioSetup has finished")
-        refreshScenario()
-        NewStageSetup()
+        return NewStageSetup()
     }
     //Setup for each new stage reveal (once per stage)
     function NewStageSetup() {
@@ -946,8 +865,7 @@ function refreshAbilities(players) {
         console.log("Stage affect has been applied")
         console.log("Stage level item effects have been applied")
         console.log("NewStageSetup has finished")
-        fillUpDevStats()
-        NewPlayerTurnSetup()
+        return NewPlayerTurnSetup()
     }
     //Setup for each Player's turn
     function NewPlayerTurnSetup() {
@@ -960,9 +878,9 @@ function refreshAbilities(players) {
         //If all others are exhausted, unexhaust all
         console.log("NewPlayerTurnSetup has completed.")
         if (isAnyoneActive() === undefined){
-            requestPlayerStatusChoice("active")
+            return requestPlayerStatusChoice("active")
         } else {
-            startOfTurnItemsPhase()
+             return startOfTurnItemsPhase()
         }
     }
     function startOfTurnItemsPhase(){
@@ -973,16 +891,19 @@ function refreshAbilities(players) {
         //Sends an alert that they can use items if they want.
         if(playersWithConsumables.length > 0){
             console.log(playersWithConsumables)
-            transmitItemPhase(playersWithConsumables)
+            return {
+                type: "itemsUpdate",
+                itemHolders: playersWithConsumables
+            }
         } else {
-            selectSupportPhase()
+            return selectSupportPhase()
         }
     }
 
     function selectSupportPhase(){
         //Select a support
         //verify the support is not exhausted
-        requestPlayerStatusChoice("support")
+        return requestPlayerStatusChoice("support")
     }
 
 
@@ -1002,7 +923,9 @@ function refreshAbilities(players) {
         rollHand(board.dicePool.active)
         rollHand(board.dicePool.support)
         setDev()
-        refreshDice()
+        return {
+            type: "gameRefresh"
+        }
         //Declare any die rerolls (assign keep:true)
             //This will be done with client side code sending keep command back to server
         //Roll all dice where keep is false and reroll counter is greater than zero for respective player
@@ -1020,27 +943,27 @@ function refreshAbilities(players) {
         //Move to attack Phase
         //Confirm player wants to move to attack phase
     }
-        //Attack phase
-        function AttackPhase() {
-            //Clone attack hand
-            createAttackHand()
-            //Execute an attack, only the active player can submit attacks
-                //Assign dice to attack(s)
-                //check if assignment is valid
-                //if they are, the used dice are discarded
-                //if not return dice to pool
-            //Submit attack(s)
-            //Check for any Event defense augments --> need to do
-            //Check for any Player attack augments --> need to do
-            //Calculate DMG result
-            //Modified DMG is submitted to Event stage counter
-            //endAttackPhase(board.attackHand) function
-                //Count number of remaining dice
-                //if greater than 0 await end turn confirmation
-                //if zero, engage skip counter attack phase
+    //Attack phase
+    exports.AttackPhase = function AttackPhase() {
+        //Clone attack hand
+        createAttackHand()
+        //Execute an attack, only the active player can submit attacks
+            //Assign dice to attack(s)
+            //check if assignment is valid
+            //if they are, the used dice are discarded
+            //if not return dice to pool
+        //Submit attack(s)
+        //Check for any Event defense augments --> need to do
+        //Check for any Player attack augments --> need to do
+        //Calculate DMG result
+        //Modified DMG is submitted to Event stage counter
+        //endAttackPhase(board.attackHand) function
+            //Count number of remaining dice
+            //if greater than 0 await end turn confirmation
+            //if zero, engage skip counter attack phase
         }
         //Counter Attack Phase
-        function CounterAttackPhase() {
+        exports.CounterAttackPhase = function CounterAttackPhase() {
             console.log("Start of counterattack")
             let activePlayer = board.players.find(player => player.status === "active")
             console.log(activePlayer)
@@ -1056,21 +979,21 @@ function refreshAbilities(players) {
             }
         }
         //Turn End Phase
-            function EndPhase(){
-                console.log("Start of End phase")
-            //Check if phase has more dmg than current HP
-            stageHPchecker(board.scenarios[board.level])
-            board.attackHand = []
-                //If so, clear DMG and move to next phase
-                //If no next phase, scenario cleared
-            //Check if any PLAYER has more dmg than their current HP max
-                    //if yes, game over
-                console.log("End phase has completed")
+        exports.EndPhase = function EndPhase(){
+            console.log("Start of End phase")
+        //Check if phase has more dmg than current HP
+        stageHPchecker(board.scenarios[board.level])
+        board.attackHand = []
+            //If so, clear DMG and move to next phase
+            //If no next phase, scenario cleared
+        //Check if any PLAYER has more dmg than their current HP max
+                //if yes, game over
+            console.log("End phase has completed")
 
-            }
+        }
     
         //Scenarion Cleared
-            function ScenarioCleared(){
+            exports.ScenarioCleared = function ScenarioCleared(){
             //Loot Phase -- active Player gets to loot as "last hit" bonus
             let activePlayer = board.players.find(player => player.status === "active")
                 //draw item from deck

@@ -1,3 +1,4 @@
+//Game engine import
 const Game = require("../gameEngineStuff/mechanics")
 
 const httpServer = require("http").createServer()
@@ -27,10 +28,31 @@ io.on('connection', client => {
     client.on('newGame', handleNewGame)
 
     function handleNewGame() {
-      console.log(client)
-      Game.NewGame()
-      client.emit('gamestate', Game.gamestate())
+      theMasterController(Game.NewGameSetup())
     }
+
+    client.on('sendPlayerStatus', handlePlayerChoice)
+
+    function handlePlayerChoice(choiceObject){
+      theMasterController(Game.setPlayerStatus(choiceObject))
+    }
+
+    function theMasterController(data){
+      console.log(data)
+      switch (data.type) {
+        case "playerRequest":
+          console.log("Sending a prompt request!")
+          client.emit('prompt', data)
+          break;
+      
+        default:
+          console.log("Sending new gamestate!")
+          client.emit('gamestate', Game.gamestate())
+          break;
+      }
+
+    }
+
 
     client.on('disconnect', () => console.log("Client disconnected"))
 

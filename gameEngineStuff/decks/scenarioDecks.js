@@ -1,6 +1,3 @@
-module.exports = {
-    scenarios
-}
 
 //Eventually, use a class to make all of these so it will be easier to add new events
 //maybe link it to an outside spreadsheet.
@@ -351,3 +348,7 @@ let bossDeck = [
     ]}
     */
 ]
+
+module.exports = {
+    scenarios
+}

@@ -153,7 +153,7 @@
             <div class="stage-progress">
                 Stage counter: <span class="stage-counter">X</span>
             </div>
-            <button id="newGameButton" type="button" onclick="NewGameSetup()">Start a new game with test data.</button>
+            <button id="newGameButton" type="button" onclick="startNewGame()">Start a new game with test data.</button>
         </div>
         <div id="scenarioContainer">
 
@@ -166,7 +166,7 @@
                 </div>
                 <div id="activeRolls" class="roll-dash hidden">
                     <div class="rollHUD">
-                        <button id="rollButton" type="button" onclick="sendRoll('active')">Roll</button>
+                        <button class="rollButton activeRoll" type="button" onclick="sendRoll(event)">Roll</button>
                         <button id="moveToAttack" type="button" onclick="sendAttackPhase()">Go To Attack Phase</button>
                         <p>Rerolls left:<span class="roll-counter">0</span></p>
                     </div>
@@ -190,7 +190,7 @@
             <div id="supportPlayerPosition" class="position">
                 <div id="supportRolls" class="roll-dash hidden">
                     <div class="rollHUD">
-                        <button id="rollButton" type="button" onclick="sendRoll('support')">Roll</button>
+                        <button class="rollButton supportRoll" type="button" onclick="sendRoll(event)">Roll</button>
                         <p>Rerolls left:<span class="roll-counter">0</span></p>
                     </div>
                     <div id="supportPlayerHand" class="player-hand">

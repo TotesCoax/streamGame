@@ -3,35 +3,43 @@ const socket = io("http://localhost:3000")
 let gameboard = {}
 
 socket.on('init', handleInit)
-socket.on('gamestate', handleGamestate)
-socket.on('prompt', handlePrompt)
 
 function handleInit(msg) {
     console.log(msg)
 }
 
+socket.on('gamestate', handleGamestate)
+
 function handleGamestate(msg){
     gameboard = msg
 
     console.log("New gamestate arrived!", gameboard)
-    refreshScenario()
-    refreshPlayers()
-    refreshDice()
-    refreshAttackHand()
-    refreshDMGValues()
-    refreshItems()
-    return "Refreshed!"
+    try {
+        refreshScenario()
+        refreshPlayers()
+        refreshDice()
+        refreshAttackHand()
+        refreshDMGValues()
+        refreshItems()
+    } catch (error) {
+        console.log("No game state to be fetched")
+    }
+    console.log("All refreshed!")
 }
+
+socket.on('prompt', handlePrompt)
 
 function handlePrompt(dataFromServer){
     console.log(dataFromServer);
     promptPlayerSelection(dataFromServer)
 }
 
+//This gets back a gamestate refresh
 function requestBoardExport() {
-    socket.emit("requestBoardState", "test")
+    socket.emit("requestBoardState")
 }
 
+//This gets back a gamestate refresh
 function startNewGame() {
     socket.emit('newGame', { data: ["Me", "You"] })
 }
@@ -467,19 +475,8 @@ function settingStatusHTML() {
 //Send keep die command
 function sendKeepDie(e) {
     console.log(e.target.previousElementSibling.id)
-
-    let foundDie
-
-    if (gameboard.dicePool.active.find(die => die.id === Number(e.target.previousElementSibling.id))) {
-        foundDie = gameboard.dicePool.active.find(die => die.id === Number(e.target.previousElementSibling.id))
-    } else if (gameboard.dicePool.support.find(die => die.id === Number(e.target.previousElementSibling.id))){
-        foundDie = gameboard.dicePool.support.find(die => die.id === Number(e.target.previousElementSibling.id))
-    } else if (!foundDie){
-        console.log("No die found")
-    }
-    foundDie.toggleKeep()
-    e.target.previousElementSibling.classList.toggle("keep")
-    console.log(foundDie)
+    let foundDie = Number(e.target.previousElementSibling.id)
+    socket.emit('keepDie', foundDie)
 }
 
 function sendSubmitDie(e){
@@ -493,10 +490,12 @@ function sendSubmitDie(e){
 }
 
 function sendAttackPhase() {
-    moveToAttackPhase()
-    fillUpAttackHand()
-    document.querySelector(".attack-hand").classList.toggle("hidden")
-    toggleRollHUDdisplay()
+    let choice = confirm("Are you sure you want to move to attack phase?")
+    if (choice){
+        socket.emit('toAttackPhase')
+        document.querySelector(".attack-hand").classList.toggle("hidden")
+        toggleRollHUDdisplay()
+    }
 }
 
 function sendAttack(e){
@@ -508,11 +507,13 @@ function sendAttack(e){
 
 function activateAbility(e){
     console.log(e.target)
-    let player = board.players.find(entry => entry.username === e.target.dataset.username)
+    let player = gameboard.players.find(entry => entry.username === e.target.dataset.username)
     if(player.abilityCounter > 0){
         
-        let newBtn = document.createElement("button")
+        let newBtn = document.createElement("button"),
+            oldBtn = document.querySelector("ability-button")
         
+        oldBtn.classList.toggle("hidden")
         newBtn.innerText = "Confirm"
         newBtn.dataset.username = e.target.dataset.username
         newBtn.addEventListener("click", sendAbility)
@@ -543,7 +544,11 @@ function sendAbility(e) {
     for(let i = 0; i < chosenDice.length; i++){
         chosenDiceIDs[i] = Number(chosenDice[i].id)
     }
-    clientUseAbility(submitter, chosenDiceIDs)
+    let useAbilityObject = {
+        username: submitter,
+        target: chosenDiceIDs
+    }
+    socket.emit('useAbility', useAbilityObject)
     removeAbilityStuff()
 }
 
@@ -612,21 +617,21 @@ function endAttackHand() {
     document.querySelector(".attack-hand").classList.toggle("hidden")
 }
 
-function sendRoll(playerStatus){
-    let player = gameboard.players.find(player => player.status === playerStatus)
-    switch (playerStatus) {
-        case "active":
-            rollActive(player)
-            refreshDice(gameboard.dicePool)
-            break;
-        case "support":
-            rollSupport(player)
-            refreshDice(gameboard.dicePool)
-            break;
-        default:
-            console.log("Something went wrong")
-            break;
+function sendRoll(e){
+    e.target.classList.toggle("wantsReroll")
+    let rollButtons = document.querySelectorAll(".rollButton"),
+        wantsRerolls = document.querySelectorAll(".wantsReroll")
+
+    console.log(e)
+    console.log(rollButtons, wantsRerolls)
+
+    if (rollButtons.length === wantsRerolls.length){
+        socket.emit('roll')
+        wantsRerolls.forEach(player => {
+            player.classList.remove("wantsReroll")
+        })
     }
+    
 }
 
 function updateRerollCount(){

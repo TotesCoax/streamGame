@@ -423,12 +423,53 @@ function hasRerollsremaining(player){
     }
 }
 
-function rollBoth() {
+function findDie(dieID){
+    if (board.dicePool.active.find(die => die.id === dieID)) {
+        console.log("Found in active pool!")
+        return board.dicePool.active.find(die => die.id === dieID)
+    } else if (board.dicePool.support.find(die => die.id === dieID)){
+        console.log("Found in support pool!")
+        return board.dicePool.support.find(die => die.id === dieID)
+    } else if (board.attackHand.find(die => die.id === dieID)){
+        console.log("Found in attack pool!")
+        return board.attackHand.find(die => die.id === dieID)
+    } else if (!foundDie){
+        return {
+            type: "noDice",
+            message: "That die was not found. We're gonna try a gamestate refresh to get your client up to date!"
+        }
+    }
+
+}
+
+exports.keepDie = function keepDie(dieID){
+    let die = findDie(dieID)
+    if (die.type === "noDice"){
+        return die
+    } else {
+        die.toggleKeep()
+        return {
+            type: "diceChange"
+        }
+    }
+}
+
+exports.rollBoth = function rollBoth() {
     let active = board.players.find(player => player.status === "active"),
         support = board.players.find(player => player.status === "support")
 
-    rollActive(active)
-    rollSupport(support)
+    let activeCheck = rollActive(active),
+        suppCheck = rollSupport(support)
+
+    if (!activeCheck && !suppCheck){
+        return {
+            type: "alert",
+            message: "Both players have no rerolls remaining."
+        }
+    }
+    return {
+        type: "diceChange"
+    }
 }
 
 function rollActive(player) {
@@ -437,10 +478,10 @@ function rollActive(player) {
         console.log("Active pool has been rerolled: ", board.dicePool.active)
         player.currentRerolls--
         console.log("Reroll deducted, now checking both rerolls:")
-        moveToAttackPhaseCheck()
+        return moveToAttackPhaseCheck()
     } else {
         console.log(player.status, player.currentRerolls)
-        alert("You cannot roll this hand.")
+        return false
     }
 }
 
@@ -450,10 +491,10 @@ function rollSupport(player){
         console.log("Support pool has been rerolled: ", board.dicePool.support)
         player.currentRerolls--
         console.log("Reroll deducted, now checking both rerolls:")
-        moveToAttackPhaseCheck()
+        return moveToAttackPhaseCheck()
     } else {
         console.log(player.status, player.currentRerolls)
-        alert("You cannot roll this hand.")
+        return false
     }
 }
 
@@ -465,21 +506,16 @@ function moveToAttackPhaseCheck(){
     console.log("Checking rerolls", "Active:", activePlayer.currentRerolls, " Support:", supportPlayer.currentRerolls)
     if (!hasRerollsremaining(activePlayer) && !hasRerollsremaining(supportPlayer)){
         console.log("Move to attack phase initiated.")
-        alert("No more rerolls remain. It is time to move to attack phase.")
-        return true
+        return {
+            type: "alert",
+            message: "You have run out of rerolls! Time to move to attack phase."
+        }
     }
     console.log("There are rerolls remaining.")
-    return false
+    return true
 }
 
 
-//Move to attack phase
-function moveToAttackPhase(){
-    let choice = confirm("Are you ready to move to attack phase?")
-    if (choice){
-        AttackPhase()
-    }
-}
 
 //--------------------//
 //End Rolling Phase Functions
@@ -548,6 +584,26 @@ function moveToAttackPhase(){
         console.log(calcDmg, " has been applied to the scenario")
     }
 
+//Find and initiate player ability based on client info
+exports.useAbility = function useAbility(abilityObject){
+    let player = board.players.find(player => player.username === abilityObject.username),
+        targetArray = []
+
+    if (player.abilityCounter = 0){
+        return {
+            type: "alert",
+            message: "You don't have any ability uses left!"
+        }
+    } else {
+        abilityObject.target.forEach(dieID => {
+            targetArray.push(findDie(dieID))
+        })    
+        //Each ability returns either a "diceChange" object or an "alert" object
+        return player.playstyle.ability(targetArray)
+    }
+
+}
+
 //If the # of dice is met, and the attack fits the style, dmg is issued
 function attack(attackNameNoSpaces) {
     let player = board.players.find(player => player.status === "active"),
@@ -604,9 +660,12 @@ function endAttackPhase() {
         CounterAttackPhase()
     } else {
         console.log("Switch triggered!")
-        alert("Switch triggered!!")
         gameState.switchCounter += 1
         EndPhase()
+        return {
+            type: "alert",
+            message: "Switch triggered!"
+        }
     }
 }
 
@@ -947,6 +1006,9 @@ function refreshAbilities(players) {
     exports.AttackPhase = function AttackPhase() {
         //Clone attack hand
         createAttackHand()
+        return {
+            type: "diceChange"
+        }
         //Execute an attack, only the active player can submit attacks
             //Assign dice to attack(s)
             //check if assignment is valid
@@ -963,7 +1025,7 @@ function refreshAbilities(players) {
             //if zero, engage skip counter attack phase
         }
         //Counter Attack Phase
-        exports.CounterAttackPhase = function CounterAttackPhase() {
+        function CounterAttackPhase() {
             console.log("Start of counterattack")
             let activePlayer = board.players.find(player => player.status === "active")
             console.log(activePlayer)
@@ -979,7 +1041,7 @@ function refreshAbilities(players) {
             }
         }
         //Turn End Phase
-        exports.EndPhase = function EndPhase(){
+        function EndPhase(){
             console.log("Start of End phase")
         //Check if phase has more dmg than current HP
         stageHPchecker(board.scenarios[board.level])

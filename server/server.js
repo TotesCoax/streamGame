@@ -13,7 +13,7 @@ const io = require('socket.io')(httpServer, {
 console.log("Server is on!")
 
 io.on('connection', client => {
-    client.emit('init', { data: "Connection established!"})
+    client.emit('init', { data: "Connection established!" })
     console.log("Client connected!")
 
     client.on('requestBoardState', handleRequestEvent)
@@ -32,14 +32,26 @@ io.on('connection', client => {
 
     client.on('sendPlayerStatus', handlePlayerStatus)
 
-    function handlePlayerStatus(choiceObject){
-      theMasterController(Game.setPlayerStatus(choiceObject))
+    function handlePlayerStatus(choiceObjectFromClient){
+      theMasterController(Game.setPlayerStatus(choiceObjectFromClient))
+    }
+
+    client.on('startTurn', handleStartTurn)
+
+    function handleStartTurn(){
+      theMasterController(Game.RollingPhase())
     }
 
     client.on('keepDie', handleKeepDie)
 
-    function handleKeepDie(dieID){
-      theMasterController(Game.keepDie(dieID))
+    function handleKeepDie(dieIDFromClient){
+      theMasterController(Game.keepDie(dieIDFromClient))
+    }
+
+    client.on('submitDie', handleSubmitDie)
+
+    function handleSubmitDie(dieIDFromClient){
+      theMasterController(Game.submitDie(dieIDFromClient))
     }
 
     client.on('roll', handleRoll)
@@ -50,14 +62,26 @@ io.on('connection', client => {
 
     client.on('useAbility', handleAbility)
 
-    function handleAbility(abilityObject){
-      theMasterController(Game.useAbility(abilityObject))
+    function handleAbility(abilityObjectFromClient){
+      theMasterController(Game.useAbility(abilityObjectFromClient))
     }
 
     client.on('toAttackPhase', handleAttackPhase)
 
     function handleAttackPhase(){
       theMasterController(Game.AttackPhase())
+    }
+
+    client.on('useAttack', handleAttack)
+
+    function handleAttack(attackObjFromClient){
+      theMasterController(Game.attack(attackObjFromClient))
+    }
+
+    client.on('endAttack', handleEndAttackPhase)
+
+    function handleEndAttackPhase() {
+      theMasterController(Game.endAttackPhase())
     }
 
     //This function dictates the type of communications the client will get, so it can respond accordingly.
@@ -72,6 +96,9 @@ io.on('connection', client => {
           console.log("Sending an alert!")
           client.emit('alert', data)
           break;
+        case "itemUsed":
+          console.log("Sending an item used notice!")
+          client.emit('itemUsed', data)
         default:
           console.log("Sending new gamestate!")
           client.emit('gamestate', Game.gamestate())

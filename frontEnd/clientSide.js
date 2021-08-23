@@ -17,8 +17,11 @@ function handleGamestate(msg){
     try {
         refreshScenario()
         refreshPlayers()
-        refreshDice()
-        refreshAttackHand()
+        if (gameboard.attackHand.length > 0){
+            refreshAttackHand()
+        } else if (gameboard.dicePool.active.length > 0) {
+            refreshDice()
+        }
         refreshDMGValues()
         refreshItems()
     } catch (error) {
@@ -30,8 +33,27 @@ function handleGamestate(msg){
 socket.on('prompt', handlePrompt)
 
 function handlePrompt(dataFromServer){
+    console.log("Prompt arrived!")
     console.log(dataFromServer);
     promptPlayerSelection(dataFromServer)
+}
+
+socket.on('alert', handleAlert)
+
+function handleAlert(data) {
+    console.log("Alert arrived!")
+    console.log(data)
+    if (data.switch){
+        alert("Switch triggered!")
+    }
+    alert(data.message)
+    requestBoardExport()
+}
+
+socket.on('itemUsed', handleItemUsed)
+
+function handleItemUsed(data) {
+    console.log(data)
 }
 
 //This gets back a gamestate refresh
@@ -42,6 +64,11 @@ function requestBoardExport() {
 //This gets back a gamestate refresh
 function startNewGame() {
     socket.emit('newGame', { data: ["Me", "You"] })
+}
+
+function sendStartTurn(e){
+    e.target.remove()
+    socket.emit('startTurn')
 }
 
 //GENERATE HTML ELEMENT FUNCTIONS
@@ -143,6 +170,12 @@ function fillUpPlayers(){
             newAttack.querySelector(".attack-button").dataset.attackNameTrim = attackImport[a].name.split(" ").join("")
         }
         refreshItems()
+        if (playerStats.status === "active" && gameboard.dicePool.active.length === 0){
+            let startTurnBtn = document.createElement("button")
+            startTurnBtn.innerText = "Start my turn!"
+            startTurnBtn.addEventListener("click", sendStartTurn)
+            playerInsert.appendChild(startTurnBtn)
+        }
     }
 }
 
@@ -184,6 +217,7 @@ function fillUpDiceRollingPhase() {
     document.querySelectorAll(".roll-dash").forEach(element => {
         element.classList.remove("hidden")
     })
+    document.querySelector(".attack-hand").classList.add("hidden")
 
 }
 
@@ -196,12 +230,20 @@ function fillUpAttackHand(){
             attackHandContainer.appendChild(dieTemplate.content.cloneNode(true))
             let newDie = attackHandContainer.lastElementChild,
                 dieVal = gameboard.attackHand[d].value,
-                dieID = gameboard.attackHand[d].id
+                dieID = gameboard.attackHand[d].id,
+                dieSubmit = gameboard.attackHand[d].submitted
             console.log(dieVal, dieID)
             newDie.querySelector(".die").innerText = dieVal
             newDie.querySelector(".die").id = dieID
+            if (dieSubmit){
+                newDie.querySelector(".die").classList.add("submitted")
+            }
         }
-    }
+        document.querySelector(".attack-hand").classList.remove("hidden")
+        document.querySelectorAll(".roll-dash").forEach(element => {
+            element.classList.add("hidden")
+        })
+        }
 
 function fillUpPlayerInventory() {
     let template = document.getElementById("playerItemTemplate")
@@ -481,12 +523,8 @@ function sendKeepDie(e) {
 
 function sendSubmitDie(e){
     console.log(e.target.previousElementSibling.id)
-
-    let foundDie = gameboard.attackHand.find(die => die.id === Number(e.target.previousElementSibling.id))
-
-    foundDie.toggleSubmit()
-    e.target.previousElementSibling.classList.toggle("submit")
-    console.log(foundDie)
+    let foundDie = Number(e.target.previousElementSibling.id)
+    socket.emit('submitDie', foundDie)
 }
 
 function sendAttackPhase() {
@@ -499,10 +537,11 @@ function sendAttackPhase() {
 }
 
 function sendAttack(e){
-    console.log(e.target.dataset.attackNameTrim)
-    attack(e.target.dataset.attackNameTrim)
-    refreshAttackHand()
-    refreshDMGValues()
+    //console.log(e.target.dataset.attackNameTrim)
+    let attackSendObj = {
+        attackName: e.target.dataset.attackNameTrim
+    }
+    socket.emit('useAttack', attackSendObj)
 }
 
 function activateAbility(e){
@@ -511,7 +550,7 @@ function activateAbility(e){
     if(player.abilityCounter > 0){
         
         let newBtn = document.createElement("button"),
-            oldBtn = document.querySelector("ability-button")
+            oldBtn = document.querySelector(".ability-button")
         
         oldBtn.classList.toggle("hidden")
         newBtn.innerText = "Confirm"
@@ -647,14 +686,8 @@ function updateRerollCount(){
 
 //This needs to be updated with server code
 function sendEndAttackPhase(){
-    endAttackPhase()
-    refreshScenario()
-    boardExport = board
-    gameboard = boardExport
-    refreshAttackHand()
-    document.querySelector(".attack-hand").classList.toggle("hidden")
-    refreshDMGValues()
-    toggleRollHUDdisplay()
+    socket.emit('endAttack')
+    document.querySelector(".attack-hand").classList.add("hidden")
 }
 
 

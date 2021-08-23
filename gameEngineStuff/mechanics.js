@@ -78,7 +78,7 @@ let gameState = {
     switchCounter: 0,
     noConsumables: false,
     noAbilities: false,
-    itemPhase: false
+    itemPhase: false,
 }
 //Dev object - I created this to make some coding shorthands for testing - set after Rolling phase.
 let dev = {}
@@ -283,7 +283,11 @@ exports.setPlayerStatus = function setPlayerStatus(choiceObject){
     if (choiceObject.status === "active"){
         return startOfTurnItemsPhase()
     } else {
-        return RollingPhase()
+        let username = board.players.find(player => player.status === "active").username
+        return {
+            type: "alert",
+            message: `It is now ${username}'s turn!`
+        }
     }
 }
 
@@ -353,9 +357,11 @@ function checkConsumables(){
 //Use consumable
 function useConsumable(itemChoiceObject){
     if (gameState.itemPhase === false){
-        alert("You can only use consumables at the start of the turn! ")
-        console.log("not in phase");
-        return
+        console.log("not in phase")
+        return {
+            type: "alert",
+            message: "You can only use consumables at the start of the turn!"
+        }
     }
     let item = board.players.find(player => player.username === itemChoiceObject.username).inventory.find(item => item.name),
         target = board.players.find(player => player.usernameitem.split(" ").join("").toLowerCase() = itemChoiceObject.target.split(" ").join("").toLowerCase())
@@ -366,11 +372,18 @@ function useConsumable(itemChoiceObject){
             item.ability(target)
             item.consumed = true
         } else {
-            alert("This item has already been used!")
             console.log("Item was previously consumed", item)
+            return {
+                type: "alert",
+                message: "This item has already been used!"
+            }
         }
     } else {
-        alert("An effect is preventing you from using items!")
+        return {
+            type: "alert",
+            message: "An effect is preventing you from using items!"
+        }
+
     }
 }
 
@@ -396,8 +409,6 @@ function damageOverTimeEffect(){
         board.scenarios[board.level].dmgCounter += board.scenarios[board.level].poison
     }
     })
-    //Check to see if this kills anyone
-    isAnyoneDead(board.players)
 }
 
 function cleansePoison(players){
@@ -423,19 +434,29 @@ function hasRerollsremaining(player){
     }
 }
 
+//This function will look for a die ID in all the pools in the game and return it's location and die object in a response object.
 function findDie(dieID){
     if (board.dicePool.active.find(die => die.id === dieID)) {
         console.log("Found in active pool!")
-        return board.dicePool.active.find(die => die.id === dieID)
+        return {
+            loc: "active",
+            die: board.dicePool.active.find(die => die.id === dieID)
+        }
     } else if (board.dicePool.support.find(die => die.id === dieID)){
         console.log("Found in support pool!")
-        return board.dicePool.support.find(die => die.id === dieID)
+        return {
+            loc: "supp",
+            die: board.dicePool.support.find(die => die.id === dieID)
+        }
     } else if (board.attackHand.find(die => die.id === dieID)){
         console.log("Found in attack pool!")
-        return board.attackHand.find(die => die.id === dieID)
+        return {
+            loc: "attack",
+            die: board.attackHand.find(die => die.id === dieID)
+        }
     } else if (!foundDie){
         return {
-            type: "noDice",
+            type: "alert",
             message: "That die was not found. We're gonna try a gamestate refresh to get your client up to date!"
         }
     }
@@ -443,15 +464,28 @@ function findDie(dieID){
 }
 
 exports.keepDie = function keepDie(dieID){
-    let die = findDie(dieID)
-    if (die.type === "noDice"){
-        return die
-    } else {
-        die.toggleKeep()
+    let foundDie = findDie(dieID)
+    if (foundDie.type === "noDice"){
+        return foundDie
+    } else if (foundDie.loc !== "attack") {
+        foundDie.die.toggleKeep()
         return {
             type: "diceChange"
         }
     }
+}
+
+exports.submitDie = function submitDie(dieID) {
+    let foundDie = findDie(dieID)
+    if (foundDie.type === "noDice"){
+        return foundDie
+    } else if (foundDie.loc === "attack") {
+        foundDie.die.toggleSubmit()
+        return {
+            type: "diceChange"
+        }
+    }
+
 }
 
 exports.rollBoth = function rollBoth() {
@@ -546,6 +580,8 @@ function moveToAttackPhaseCheck(){
             return a.value - b.value
         })
         console.log(board.attackHand)
+        board.dicePool.active = []
+        board.dicePool.support = []
     }
 
     //Generate an attack submisison
@@ -596,7 +632,7 @@ exports.useAbility = function useAbility(abilityObject){
         }
     } else {
         abilityObject.target.forEach(dieID => {
-            targetArray.push(findDie(dieID))
+            targetArray.push(findDie(dieID).die)
         })    
         //Each ability returns either a "diceChange" object or an "alert" object
         return player.playstyle.ability(targetArray)
@@ -605,20 +641,21 @@ exports.useAbility = function useAbility(abilityObject){
 }
 
 //If the # of dice is met, and the attack fits the style, dmg is issued
-function attack(attackNameNoSpaces) {
+exports.attack = function attack(attackObjFromServer) {
     let player = board.players.find(player => player.status === "active"),
         attackSubmission = createAttackSubmission(board.attackHand),
-        chosenAttack = player.playstyle.attack.find(attack => attack.name.split(" ").join("").toLowerCase() === attackNameNoSpaces.toLowerCase()),
+        chosenAttack = player.playstyle.attack.find(attack => attack.name.split(" ").join("").toLowerCase() === attackObjFromServer.attackName.toLowerCase()),
         diceReq = chosenAttack.diceReq,
         dmg = chosenAttack.dmg,
         style = player.playstyle.mechanic
     //Checking for basic attack submission - because they have their own special rules for each character
-    if (player.playstyle.attack.findIndex(attack => attack.name.split(" ").join("").toLowerCase() === attackNameNoSpaces.toLowerCase()) === 0){
+    if (player.playstyle.attack.findIndex(attack => attack.name.split(" ").join("").toLowerCase() === attackObjFromServer.attackName.toLowerCase()) === 0){
         console.log("Basic attack detected")
         if (player.playstyle.basicAttack(attackSubmission, chosenAttack)){
             applyDMGtoScenario(player, dmg, board.level)
+            return { type: "dmgIssued" }
         } else {
-            returnDiceToAttackHand(attackSubmission)
+            return returnDiceToAttackHand(attackSubmission)
         }
         //If the number of dice required is met AND the character mechanic is met, assign dmg
     } else if (diceReq > 1 && numDiceCheck(diceReq, attackSubmission) && style(attackSubmission, chosenAttack)){
@@ -626,8 +663,9 @@ function attack(attackNameNoSpaces) {
         applyDMGtoScenario(player, dmg, board.level)
         //The used dice should automatically be deleted/discarded one the function ends
         console.log(board.attackHand)
+        return { type: "dmgIssued" }
     } else {
-        returnDiceToAttackHand(attackSubmission)
+        return returnDiceToAttackHand(attackSubmission)
     }
 
 }
@@ -643,7 +681,10 @@ function returnDiceToAttackHand(dice){
         return a.value - b.value
     })
     console.log(board.attackHand)
-    return false
+    return {
+        type: "alert",
+        message: "The attack did not succeed. Returning dice to attack pool."
+    }
 
 }
 
@@ -655,18 +696,24 @@ function numDiceCheck(diceReq, attackSubmission){
 }
 
 
-function endAttackPhase() {
+exports.endAttackPhase = function endAttackPhase() {
     if (board.attackHand.length > 0){
         CounterAttackPhase()
+        clearAttackHand()
     } else {
         console.log("Switch triggered!")
         gameState.switchCounter += 1
-        EndPhase()
-        return {
-            type: "alert",
-            message: "Switch triggered!"
-        }
+        clearAttackHand()
+        return new Array(
+            {type: "alert",
+            message: "Switch triggered!"},
+            EndPhase()
+        )
     }
+}
+
+function clearAttackHand(){
+    board.attackHand = []
 }
 
 //--------------------//
@@ -740,60 +787,79 @@ function stageHPchecker(currentScenario){
     if (currentScenario.dmgCounter >= currentStage.hp){
         currentScenario.stageCounter++
         currentScenario.dmgCounter = 0
-        alert("Stage defeated!")
         gameState.noAbilities = false
         gameState.noConsumables = false
         if (currentScenario.stageCounter > (currentScenario.card.stage.length - 1)){
-            alert("Scenario Cleared!")
             console.log("achieved switch rate of: ", ((gameState.switchCounter / gameState.turnCounter) * 100),"%")
             gameState.turnCounter = 0
             gameState.switchCounter = 0
-            ScenarioCleared()
-            return
+            return ScenarioCleared()
         } else {
             console.log("New Stage being setup!")
-            NewStageSetup()
-            return
+            return NewStageSetup()
+
         }
     } else {
         console.log("New player turn being setup!")
-        NewPlayerTurnSetup()
-        return
+        return NewPlayerTurnSetup()
     }
 
 }
 
+function doesGameContinue(){
+    let deadPlayers = whoIsDead(),
+        savingItems = preventDeathItemCheck()
 
-function isAnyoneDead(players){
-    let inv = []
-    //Searching the inventories for any items to save the day
-    //Generating a sub-inventory of items we could use
-    for (let p = 0; p < players.length; p++){
-        if (players[p].inventory.find(item => item.timing === "playerDeath")){
-            inv.push(players[p].inventory.find(item => item.timing === "playerDeath"))
-        }
-    }
-    console.log(inv, inv.length)
-    //Searching for any dead players loops
-    for (let i = 0; i < players.length; i++){
-        //If any player is found to be dead, check for any saving items
-        if (players[i].dmgCounter >= players[i].playstyle.hpMax[board.level]){
-            console.log(players[i].username, " was calculated to be dead, but there might be more.")
-            //If those items are found, start using them!
-            if (inv.length > 0) {
-                let itemToUse = inv.find(item => item.consumed === false)
-                if (itemToUse){
-                    useConsumable(itemToUse, players[i])
-                    console.log("DIVING INTERVENTION!")
-                }
-                continue
-            } else {
-                alert("GAME OVER")
-                return true
+    //If this is false game continues
+    if (deadPlayers.length > 0){
+        //If there are no items, game is over.
+        if (savingItems.length > 0){
+            return {
+                type: "itemUsed",
+                data: lifeSavingItemUse()
             }
+        } else {
+            return false
+        }
+    } else {
+        //Game continues
+        return true
+    }
+}
+
+//Searches for dead players
+function whoIsDead(){
+    let deadPlayers = []
+
+    board.players.forEach(player => {
+        if (player.dmgCounter >= player.playstyle.hpMax[board.level]){
+            deadPlayers.push(player)
+        }
+    })
+    return deadPlayers
+}
+
+function preventDeathItemCheck(){
+    let savingItems = []
+    //Searching the inventories for any items to save the day
+    board.players.forEach(player => {
+        player.inventory.forEach(item => {
+            if (player.inventory.find(item => item.timing === "playerDeath" && item.consumed === false)){
+                savingItems.push(item)
+            }
+        })
+    })
+    return savingItems
+}
+
+function lifeSavingItemUse(players, items){
+    if(items.length > players.length){
+        items[0].ability(players[0])
+        return {
+            player: player[0],
+            item: item[0],
         }
     }
-    return false
 }
 
 
@@ -922,7 +988,7 @@ function refreshAbilities(players) {
         //Apply the Stage effect
         currentStage.effect(board.players)
         console.log("Stage affect has been applied")
-        console.log("Stage level item effects have been applied")
+        //console.log("Stage level item effects have been applied")
         console.log("NewStageSetup has finished")
         return NewPlayerTurnSetup()
     }
@@ -930,16 +996,25 @@ function refreshAbilities(players) {
     function NewPlayerTurnSetup() {
         gameState.turnCounter += 1
         console.log("It is now turn: ", gameState.turnCounter)
+        //I moved DOT to here for a consistent trigger and to give players plenty of time to try to respond to it.
+        damageOverTimeEffect()
         //Active Player is declared
         cyclePlayerStatus(board.players)
         //Check if all other players are exhausted
         allExhaustedRefresh(board.players)
         //If all others are exhausted, unexhaust all
         console.log("NewPlayerTurnSetup has completed.")
-        if (isAnyoneActive() === undefined){
-            return requestPlayerStatusChoice("active")
+        if (doesGameContinue()){
+            if (isAnyoneActive() === undefined){
+                return requestPlayerStatusChoice("active")
+            } else {
+                return startOfTurnItemsPhase()
+            }
         } else {
-             return startOfTurnItemsPhase()
+            return {
+                type: "alert",
+                message: "Game over! :("
+            }
         }
     }
     function startOfTurnItemsPhase(){
@@ -968,10 +1043,8 @@ function refreshAbilities(players) {
 
 
     //Rolling phase
-    function RollingPhase(){
+    exports.RollingPhase = function RollingPhase(){
         gameState.itemPhase = false
-        //I moved DOT to here for a consistent trigger and to give players plenty of time to try to respond to it.
-        damageOverTimeEffect()
         //Check for any reroll modifiers (event or items)
         //Apply any reroll modifiers to respective party
         setRerolls()
@@ -1019,7 +1092,6 @@ function refreshAbilities(players) {
         //Check for any Player attack augments --> need to do
         //Calculate DMG result
         //Modified DMG is submitted to Event stage counter
-        //endAttackPhase(board.attackHand) function
             //Count number of remaining dice
             //if greater than 0 await end turn confirmation
             //if zero, engage skip counter attack phase
@@ -1035,57 +1107,64 @@ function refreshAbilities(players) {
                 //Check for any attack modifiers
                 //Assign DMG to target(s)
             console.log("Stage has counterattacked")
-            if(!isAnyoneDead(board.players)) {
+            if(doesGameContinue()) {
                 console.log("Nobody seems to be dead. Continuing...");
-                EndPhase()
+                return EndPhase()
+            } else {
+                return {
+                    type: "alert",
+                    message: "Game over! :("
+                }
             }
         }
         //Turn End Phase
         function EndPhase(){
             console.log("Start of End phase")
         //Check if phase has more dmg than current HP
-        stageHPchecker(board.scenarios[board.level])
-        board.attackHand = []
-            //If so, clear DMG and move to next phase
-            //If no next phase, scenario cleared
+        //If so, clear DMG and move to next phase
+        //If no next phase, scenario cleared
         //Check if any PLAYER has more dmg than their current HP max
-                //if yes, game over
-            console.log("End phase has completed")
-
+        //if yes, game over
+            return stageHPchecker(board.scenarios[board.level])
         }
     
         //Scenarion Cleared
-            exports.ScenarioCleared = function ScenarioCleared(){
+        function ScenarioCleared(){
             //Loot Phase -- active Player gets to loot as "last hit" bonus
             let activePlayer = board.players.find(player => player.status === "active")
                 //draw item from deck
-                draw(activePlayer, board.itemDeck)
-                  //add item to Player inventory ~ this seems to work
-                  refreshItems() //CHANGE TO SOCKET EMIT
-                  console.log("Item has been drawn and given to:", activePlayer)
-                    //Give item to new player if desired
+            draw(activePlayer, board.itemDeck)
+                //add item to Player inventory ~ this seems to work
+                refreshItems() //CHANGE TO SOCKET EMIT
+                console.log("Item has been drawn and given to:", activePlayer)
+                //Give item to new player if desired
             //Level Up
             //Level up function ~ works
             LevelUp()
-                //First level up (to level 2)
-                    //Unlock tier 2 attack for all players
-                //Second Level up (to level 3)
-                    //Unlock tier 3 attack for all players
-                    //Grant a boon to the party
-
-                    
+            //First level up (to level 2)
+                //Unlock tier 2 attack for all players
+            //Second Level up (to level 3)
+                //Unlock tier 3 attack for all players
+                //Grant a boon to the party
             //Healing
-                //DMG counters removed
-                HealAllPlayers(board.players)
-                //Characters cleared of exhausted status
-                unexhaustAllPlayers(board.players)
-                //Ability points refreshed to max
-                refreshAbilities(board.players)
-                //Any lingering augment effects are cleared
-                cleansePoison(board.players)
-                if (board.level < scenarios.length - 1){
-                    NewScenarioSetup()
-                } else {
-                    alert("It seems you have won the game. Congratulations are in order.")
+            //DMG counters removed
+            HealAllPlayers(board.players)
+            //Characters cleared of exhausted status
+            unexhaustAllPlayers(board.players)
+            //Ability points refreshed to max
+            refreshAbilities(board.players)
+            //Any lingering augment effects are cleared
+            cleansePoison(board.players)
+            if (board.level < scenarios.length - 1){
+                return {
+                    type: "alert",
+                    message: "Scenario defeated!!"
+                }
+            } else {
+                return {
+                    type: "alert",
+                    message: "It seems you have won the game. Congratulations are in order."
                 }
             }
+        }
+

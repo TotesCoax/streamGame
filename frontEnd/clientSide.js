@@ -11,22 +11,18 @@ function handleInit(msg) {
 socket.on('gamestate', handleGamestate)
 
 function handleGamestate(msg){
-    gameboard = msg
+    gameboard = msg.boardExport 
 
     console.log("New gamestate arrived!", gameboard)
-    try {
-        refreshScenario()
-        refreshPlayers()
-        if (gameboard.attackHand.length > 0){
-            refreshAttackHand()
-        } else if (gameboard.dicePool.active.length > 0) {
-            refreshDice()
-        }
-        refreshDMGValues()
-        refreshItems()
-    } catch (error) {
-        console.log("No game state to be fetched")
+    refreshScenario()
+    refreshPlayers()
+    if (gameboard.attackHand.length > 0){
+        refreshAttackHand()
+    } else if (gameboard.dicePool.active.length > 0) {
+        refreshDice()
     }
+    refreshDMGValues()
+    refreshItems()
     console.log("All refreshed!")
 }
 
@@ -35,7 +31,7 @@ socket.on('prompt', handlePrompt)
 function handlePrompt(dataFromServer){
     console.log("Prompt arrived!")
     console.log(dataFromServer);
-    promptPlayerSelection(dataFromServer)
+    promptPlayer(dataFromServer)
 }
 
 socket.on('alert', handleAlert)
@@ -76,6 +72,7 @@ function sendStartTurn(e){
 function fillUpDevStats() {
     document.querySelector(".gameboard-level-counter").innerText = gameboard.level
     document.querySelector(".stage-counter").innerText = gameboard.scenarios[gameboard.level].stageCounter
+    console.log("Dev stats refreshed!")
 }
 
 //Populates the UI with the current scenario.
@@ -108,6 +105,7 @@ function fillUpScenario(){
         newStage.querySelector(".stage-dmg-stat").innerText = stageImport[s].dmg
         newStage.querySelector(".stage-name").innerText = stageImport[s].name
     }
+    console.log("Scenario(s) refreshed!")
 }
 
 //This function takes the player array from gameboard object and populates HTML elements based on how pany players there are and what style they are playing.
@@ -135,7 +133,7 @@ function fillUpPlayers(){
         playerInsert.querySelector(".ability-text").innerText = playerStats.playstyle.abilityText
         let targetData = playerInsert.querySelector(".target")
         targetData.dataset.username = playerStats.username.toLowerCase().split(" ").join("")
-        console.log("Easy  stuff filled, moving to attack array")
+        // console.log("Easy  stuff filled, moving to attack array")
         //Populating the attack array for new player
         let attackHTML = playerInsert.querySelector(".attack-box"),
             attackImport = playerStats.playstyle.attack,
@@ -143,22 +141,22 @@ function fillUpPlayers(){
 
         // console.log(attackHTML, attackImport, attackTemp)
         for (let a = 0; a < attackImport.length; a++){
-            console.log(`Inserting attack: ${attackImport[a].name}`)
+            // console.log(`Inserting attack: ${attackImport[a].name}`)
             attackHTML.appendChild(attackTemp.content.cloneNode(true))
             let newAttack = attackHTML.lastElementChild
 
             newAttack.id = `${attackImport[a].name.split(" ").join("")}`
             newAttack.querySelector(".attack-req-dice").innerText = attackImport[a].diceReq
-            console.log(attackImport[a].threshold)
+            // console.log(attackImport[a].threshold)
             if (!isNaN(attackImport[a].threshold)) {
-                console.log("Threshold detected, Activating switch.", playerStats.playstyle.title);
+                // console.log("Threshold detected, Activating switch.", playerStats.playstyle.title);
                 switch (playerStats.playstyle.title) {
                     case "the staunch":
-                        console.log("Staunch detected")
+                        // console.log("Staunch detected")
                         playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerText = "sum of dice values \&geq; " + attackImport[a].threshold
                         break;
                     case "the sly":
-                        console.log("Sly detected")
+                        // console.log("Sly detected")
                         playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerText = "sum of dice values \&leq; " + attackImport[a].threshold
                         break;
                     default:
@@ -170,7 +168,7 @@ function fillUpPlayers(){
             newAttack.querySelector(".attack-button").dataset.attackNameTrim = attackImport[a].name.split(" ").join("")
         }
         refreshItems()
-        if (playerStats.status === "active" && gameboard.dicePool.active.length === 0){
+        if (playerStats.status === "active" && gameboard.dicePool.active.length === 0 && gameboard.attackHand.length === 0){
             let startTurnBtn = document.createElement("button")
             startTurnBtn.innerText = "Start my turn!"
             startTurnBtn.addEventListener("click", sendStartTurn)
@@ -218,7 +216,7 @@ function fillUpDiceRollingPhase() {
         element.classList.remove("hidden")
     })
     document.querySelector(".attack-hand").classList.add("hidden")
-
+    console.log("Rolling hands filled up!")
 }
 
 function fillUpAttackHand(){
@@ -243,7 +241,8 @@ function fillUpAttackHand(){
         document.querySelectorAll(".roll-dash").forEach(element => {
             element.classList.add("hidden")
         })
-        }
+        console.log("Attack hand refreshed!")
+    }
 
 function fillUpPlayerInventory() {
     let template = document.getElementById("playerItemTemplate")
@@ -308,41 +307,38 @@ function clearPrompt(){
     overlay.classList.toggle("hidden")
     }
 
-function promptPlayerSelection(data){
+function promptPlayer(data){
     let overlay = document.querySelector("#overlay"),
         alertContainer = document.querySelector("#overlay .alert"),
         newForm = document.createElement("form"),
         newNotice = document.createElement("div"),
         validChoices = data.choices,
-        status = data.status
-    console.log("Building request for: ", status)
-    alertContainer.appendChild(newForm)
-    switch (status) {
-        case "active":
-            newNotice.innerText = "Please select an active player:"
-            break;
-    
-        default:
-            newNotice.innerText = "Please select your support:"
-            break;
+        requestCode = data.request
+    console.log("Building request for: ", requestCode)
+    if (data.switchTriggered === true){
+        switchDiv = document.createElement("div")
+        switchDiv.innerText = "Switch Triggered!!"
+        alertContainer.appendChild(switchDiv)
     }
+    alertContainer.appendChild(newForm)
+    newNotice.innerText = data.message
     newForm.appendChild(newNotice)
-    validChoices.forEach(player => {
+    validChoices.forEach(choice => {
         let newDiv = document.createElement("div")
             newBtn = document.createElement("input")
         newBtn.setAttribute("type", "radio")
-        newBtn.value = player
+        newBtn.value = choice
         newBtn.name = "playerSelect"
         newDiv.appendChild(newBtn)
         let newLbl = document.createElement("label")
-        newLbl.setAttribute("for", player)
-        newLbl.innerText = player
+        newLbl.setAttribute("for", choice)
+        newLbl.innerText = choice
         newDiv.appendChild(newLbl)
         newForm.appendChild(newDiv)
     })
     let newSubmit = document.createElement("button")
     newSubmit.type = "button"
-    newSubmit.dataset.status = status
+    newSubmit.dataset.requestCode = requestCode
     newSubmit.addEventListener("click", checkPlayerChoice)
     newSubmit.innerText = "Submit!"
     newForm.appendChild(newSubmit)
@@ -352,7 +348,7 @@ function promptPlayerSelection(data){
 function checkPlayerChoice(e) {
     let form = document.querySelector("#overlay .alert form"),
         choice,
-        status = e.target.dataset.status
+        requestCode = e.target.dataset.requestCode
 
     for (let i = 0; i < form.length; i++){
         if (form[i].checked === true){
@@ -363,17 +359,17 @@ function checkPlayerChoice(e) {
         alert("Please select an option then hit submit.")
     } else {
         clearPrompt()
-        sendPlayerChoice(choice.value, status)
+        sendPlayerChoice(choice.value, requestCode)
     }
 }
 
-function sendPlayerChoice(choice, status){
+function sendPlayerChoice(choice, requestCode){
     let choiceObject = {
-        username: choice,
-        status: status
+        choice: choice,
+        requestCode: requestCode
     }
     console.log(choiceObject)
-    socket.emit('sendPlayerStatus', choiceObject)
+    socket.emit('sendChoice', choiceObject)
 }
 
 function activateItem(e){
@@ -467,7 +463,7 @@ function refreshDMGValues(){
 
 function refreshItems() {
     let inventories = document.querySelectorAll(".inventory")
-    console.log(inventories)
+    // console.log(inventories)
     inventories.forEach(player => {
         while (player.firstChild){
             player.removeChild(player.firstChild)
@@ -593,49 +589,6 @@ function sendAbility(e) {
 
 function removeAbilityStuff(){
     document.querySelector("button.remove-after-ability").remove()
-}
-
-//This needs to be transferred to a server command.
-function clientUseAbility(username, target){
-    let player = board.players.find(player => player.username === username),
-        targetArray = findDieObject(target)
-
-
-    console.log(player, targetArray)
-    player.playstyle.ability(targetArray)
-    player.abilityCounter -= 1
-    //Insert a emit refresh command here
-    refreshDice()
-    refreshAttackHand()
-    refreshDMGValues()
-}
-
-//This will eventually be a server command.
-function findDieObject(arrayOfIDs){
-    console.log("Finding dice Function")
-    let foundDice = []
-    console.log(arrayOfIDs)
-    for(let i = 0; i < arrayOfIDs.length; i++){
-        console.log(arrayOfIDs[i])
-        console.log("Searching Attack hand")
-        if (board.attackHand.find(die => arrayOfIDs[i] === die.id)){
-            console.log("Found in attack hand")
-            foundDice.push(board.attackHand.find(die => arrayOfIDs[i] === die.id))
-        }
-        console.log("Searching Active pool")
-        if (board.dicePool.active.find(die => arrayOfIDs[i] === die.id)){
-            console.log("Found in active pool")
-            foundDice.push(board.dicePool.active.find(die => arrayOfIDs[i] === die.id))
-        }
-        console.log("Searching Support pool")
-        if (board.dicePool.support.find(die => arrayOfIDs[i] === die.id)){
-            console.log("Found in support pool")
-            foundDice.push(board.dicePool.support.find(die => arrayOfIDs[i] === die.id))
-        }
-    }
-    console.log(foundDice)
-    return foundDice
-
 }
 
 function refreshAttackHand(){

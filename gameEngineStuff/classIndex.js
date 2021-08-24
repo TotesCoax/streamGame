@@ -83,6 +83,48 @@ class Scenario {
     }
 }
 
+class EngineOutput {
+    constructor(){
+        this.switchTriggered = false
+        this.gameOver = false
+    }
+}
+
+class Alert extends EngineOutput{
+    constructor(message){
+        super()
+        this.type = "alert"
+        this.message = message
+    }
+}
+
+class Prompt extends EngineOutput {
+    constructor(request, message, choices){
+        super()
+        this.type = "prompt"
+        this.request = request
+        this.message = message
+        this.choices = choices
+    }
+}
+
+class ItemsNotice extends EngineOutput {
+    constructor(players){
+        super()
+        this.type = "itemsNotice"
+        this.playerWithConsumables = players
+    }
+}
+
+class Refresh extends EngineOutput {
+    constructor(code, gamestate){
+        super()
+        this.type = code
+        this.boardExport = gamestate
+    }
+}
+
+
 module.exports = {
-    Die, Player, Scenario
+    Die, Player, Scenario, EngineOutput, Alert, Prompt, ItemsNotice, Refresh
 }

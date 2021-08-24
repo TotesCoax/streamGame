@@ -20,7 +20,7 @@ io.on('connection', client => {
 
     function handleRequestEvent(){
       console.log("Gamestate has been requested.")
-      client.emit('gamestate' , Game.gamestate())
+      client.emit('gamestate' , Game.newGameState())
       console.log("Gamestate sent out")
     }
 
@@ -30,9 +30,9 @@ io.on('connection', client => {
       theMasterController(Game.NewGameSetup())
     }
 
-    client.on('sendPlayerStatus', handlePlayerStatus)
+    client.on('sendChoice', handleChoice)
 
-    function handlePlayerStatus(choiceObjectFromClient){
+    function handleChoice(choiceObjectFromClient){
       theMasterController(Game.setPlayerStatus(choiceObjectFromClient))
     }
 
@@ -87,8 +87,9 @@ io.on('connection', client => {
     //This function dictates the type of communications the client will get, so it can respond accordingly.
     function theMasterController(data){
       console.log(data)
+      console.log(data.type)
       switch (data.type) {
-        case "playerRequest":
+        case "prompt":
           console.log("Sending a prompt request!")
           client.emit('prompt', data)
           break;
@@ -101,7 +102,7 @@ io.on('connection', client => {
           client.emit('itemUsed', data)
         default:
           console.log("Sending new gamestate!")
-          client.emit('gamestate', Game.gamestate())
+          client.emit('gamestate', data)
           break;
       }
 

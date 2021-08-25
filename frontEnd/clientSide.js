@@ -80,31 +80,43 @@ function fillUpDevStats() {
 function fillUpScenario(){
     let scenTemplate = document.getElementById("scenarioCardTemplate"),
         scenContainer = document.getElementById("scenarioContainer")
-
-    scenContainer.appendChild(scenTemplate.content.cloneNode(true))
-
-    let newScen = scenContainer.lastElementChild,
-        currScen = gameboard.scenarios[gameboard.level].card
-
-    newScen.id = `scenario${gameboard.level}`
-    //newScen.children[0] = Image
-    newScen.querySelector(".active-player-rolls").innerText = currScen.activeDice
-    newScen.querySelector(".support-player-rolls").innerText = currScen.suppDice
-    newScen.querySelector(".scenario-title").innerText = currScen.name
-    //Populating the stage array
-    let stageHTML = newScen.querySelector(".scenario-stage-hook"),
-        stageImport = currScen.stage,
-        stageTemplate = document.getElementById("scenarioStageTemplate")
-
-    for (let s = 0; s < stageImport.length; s++){
-        stageHTML.appendChild(stageTemplate.content.cloneNode(true))
-        let newStage = stageHTML.lastElementChild
-
-        newStage.id = `scenario${gameboard.level}stage${s}`
-        newStage.querySelector(".stage-hp-stat").innerText = stageImport[s].hp
-        newStage.querySelector(".stage-dmg-stat").innerText = stageImport[s].dmg
-        newStage.querySelector(".stage-name").innerText = stageImport[s].name
-    }
+    gameboard.scenarios.forEach(scenario =>{
+        console.log(scenario)
+        scenContainer.appendChild(scenTemplate.content.cloneNode(true))
+    
+        let newScen = scenContainer.lastElementChild,
+            currScen = scenario.card
+    
+        newScen.id = `scenario${gameboard.level}`
+        if (scenario.defeated === true){
+            newScen.classList.add("defeated")
+        }
+        //newScen.children[0] = Image
+        newScen.querySelector(".active-player-rolls").innerText = currScen.activeDice
+        newScen.querySelector(".support-player-rolls").innerText = currScen.suppDice
+        newScen.querySelector(".scenario-title").innerText = currScen.name
+        //Populating the stage array
+        let stageHTML = newScen.querySelector(".scenario-stage-hook"),
+            stageImport = currScen.stage,
+            stageTemplate = document.getElementById("scenarioStageTemplate")
+    
+        for (let s = 0; s < stageImport.length; s++){
+            stageHTML.appendChild(stageTemplate.content.cloneNode(true))
+            let newStage = stageHTML.lastElementChild
+    
+            newStage.id = `scenario${gameboard.level}stage${s}`
+            newStage.querySelector(".stage-hp-stat").innerText = stageImport[s].hp
+            newStage.querySelector(".stage-dmg-stat").innerText = stageImport[s].dmg
+            if (stageImport[s].def > 0){
+                newStage.querySelector(".stage-def-stat").innerText = stageImport[s].def
+                newStage.querySelector(".stage-def").classList.remove("hidden")
+            }
+            if (stageImport[s].aoe === true){
+                newStage.querySelector(".stage-aoe").classList.remove("hidden")
+            }
+            newStage.querySelector(".stage-name").innerText = stageImport[s].name
+        }
+    })
     console.log("Scenario(s) refreshed!")
 }
 
@@ -385,7 +397,7 @@ function activateItem(e){
 function sendUseItem(e){
     console.log(e)
     let useItemObject = {
-        player: e.target.dataset.holder,
+        holder: e.target.dataset.holder,
         item: e.target.dataset.itemname,
         target: e.target.dataset.username
     }
@@ -396,6 +408,7 @@ function sendUseItem(e){
         player.removeEventListener("click", sendUseItem)
     })
     toggleItemButtonVisibility()
+    socket.emit("useItem", useItemObject)
 }
 
 function moveToSupportPhase(){
@@ -500,6 +513,7 @@ function settingStatusHTML() {
        playerHTML.classList.add(`${player.status}`)
     })
     document.querySelectorAll(".scenario-stage").forEach(stage => stage.classList.remove("currScen"))
+    console.log("check for stage",gameboard)
     document.querySelector(`#scenario${gameboard.level}stage${gameboard.scenarios[gameboard.level].stageCounter}`).classList.add("currScen")
 }
 
@@ -555,11 +569,11 @@ function activateAbility(e){
         newBtn.classList.add("remove-after-ability")
         e.target.after(newBtn)
         
-        let diceOptions = document.querySelectorAll(".die")
-        diceOptions.forEach(die =>{
+        let targets = document.querySelectorAll(".die")
+        targets.forEach(die =>{
             die.addEventListener("click", toggleChoice)
         })
-        console.log(diceOptions)
+        console.log(targets)
     } else {
         alert("You have no ability points left!")
     }
@@ -572,7 +586,7 @@ function toggleChoice(e){
 function sendAbility(e) {
     console.log(e.target.dataset.username)
     let submitter = e.target.dataset.username,
-        chosenDice = document.querySelectorAll(".die.choice")
+        chosenDice = document.querySelectorAll(".choice")
     console.log(chosenDice)
 
     let chosenDiceIDs = []
@@ -581,7 +595,7 @@ function sendAbility(e) {
     }
     let useAbilityObject = {
         username: submitter,
-        target: chosenDiceIDs
+        target: chosenDiceIDs,
     }
     socket.emit('useAbility', useAbilityObject)
     removeAbilityStuff()

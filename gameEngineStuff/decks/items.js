@@ -38,6 +38,7 @@ let lootDeck = [
         newRerolls = player.currentRerolls + 1
         console.log(this.name + " effect has been applied. ", player.currentRerollsMax, " -> ", newRerolls)
         player.currentRerolls = newRerolls
+        return true
     }},
 
     {name:"Sword",
@@ -59,11 +60,12 @@ let lootDeck = [
     ability: function(player) {
         let newAbil = player.abilityCounter + 1
         if (newAbil > player.abilityScenarioMax){
-            alert("This would push abilities past your current max allowed.")
+            return "This would push abilities past your current max allowed."
         } else {
             console.log(this.name + " effect has been applied. ",player.abilityCounter," -> ",newAbil)
             player.abilityCounter = newAbil
         }
+        return true
     }},
 
     {name:"Ability Potion",
@@ -74,11 +76,12 @@ let lootDeck = [
     ability: function(player) {
         let newAbil = player.abilityCounter + 1
         if (newAbil > player.abilityScenarioMax){
-            alert("This would push abilities past your current max allowed.")
+            return "This would push abilities past your current max allowed."
         } else {
             console.log(this.name + " effect has been applied. ",player.abilityCounter," -> ",newAbil)
             player.abilityCounter = newAbil
         }
+        return true
     }},
 
     {name:"Healing Potion",
@@ -89,6 +92,7 @@ let lootDeck = [
     ability: function(player) {
         player.dmgCounter = 0
         console.log(this.name + " effect has been applied.", player.dmgCounter,)
+        return true
     }},
 
     {name:"Healing Potion",
@@ -99,6 +103,7 @@ let lootDeck = [
     ability: function(player) {
         player.dmgCounter = 0
         console.log(this.name + " effect has been applied.", player.dmgCounter,)
+        return true
     }},
 
     {name:"Sacred Relic",
@@ -111,6 +116,7 @@ let lootDeck = [
         console.log("Current dmg coutner: ", player.dmgCounter)
         player.dmgCounter = currentMax - 1
         console.log(this.name + " effect has been applied. New dmg counter: ", player.dmgCounter)
+        return true
     }}
 ]
 

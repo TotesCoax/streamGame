@@ -19,22 +19,14 @@ let Playstyle = {
         ability: function(diceArray) {
             console.log(diceArray)
             if (diceArray.length > 1){
-                return {
-                    type: "alert",
-                    message: "Too many dice submitted!"
-                }
+                return "Too many dice submitted!"
             }
             let newValue = 6
             if (newValue === 1 || newValue === 6 ) {
             diceArray[0].value = newValue
-            return {
-                type: "diceChange"
-            }
+            return true
             } else {
-                return {
-                    type: "alert",
-                    message: "Incorrect value given"
-                }
+                return "Incorrect value given"
             }
         },
         mechanicExplain: "A brash fighter requires all dice values for non-basic attacks to be identical.",
@@ -78,40 +70,33 @@ let Playstyle = {
             {tier: 2, diceReq: 8, dmg:24, name: "Magnum Opus", desc: "Dear god, it's beautiful."}
         ],
         ability: function(diceArray) {
-            let allGood = { type: "diceChange" }
             if (diceArray.length < 2){
                 diceArray.forEach(die =>{
                     switch (die.value) {
                         case 1:
                             die.value = 6
-                            return allGood;
+                            return true
                         case 2:
                             die.value = 5
-                            return allGood;
+                            return true
                         case 3:
                             die.value = 4
-                            return allGood;
+                            return true
                         case 4:
                             die.value = 3
-                            return allGood;
+                            return true
                         case 5:
                             die.value = 2
-                            return allGood;
+                            return true
                         case 6:
                             die.value = 1
-                            return allGood;
+                            return true
                         default:
-                            return {
-                                type: "alert",
-                                message: "Something went wrong!"
-                            }
+                            return "Something went wrong!"
                     }
                 })
             } else {
-                return {
-                    type: "alert",
-                    message: "Too many dice submitted!"
-                }
+                return "Too many dice submitted!"
             }
         },
         mechanicExplain: "An elegant fighter requires dice values for non-basic attacks to be sequentially ascending.",
@@ -159,15 +144,12 @@ let Playstyle = {
         ],
         ability: function(targetArray) {
             if (targetArray.length > 2){
-                return {
-                    type: "alert",
-                    message: "Too many dice submitted!"
-                }
+                return "Too many dice submitted!"
             } else {
                 targetArray.forEach(die =>{
                     die.value = 5
                 })
-                return { type: "diceChange" }
+                return true
             }
         },
         mechanicExplain: "A staunch fighter requires the sum of dice values for non-basic attacks to be OVER an amount specified for that attack.",
@@ -215,16 +197,12 @@ let Playstyle = {
         ],
         ability: function(targetArray) {
             if (targetArray.length > 2){
-                alert("Too many dice submitted")
-                return {
-                    type: "alert",
-                    message: "Too many dice submitted!"
-                }
+                return "Too many dice submitted!"
             }
             targetArray.forEach(die => {
                 die.value = 2
             })
-            return { type: "diceChange" }
+            return true
         },
         mechanicExplain: "A sly fighter requires the sum of dice values for non-basic attacks to be UNDER an amount specified for that attack.",
         mechanic: function sly(attackSubmission, chosenAttack){

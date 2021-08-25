@@ -36,6 +36,12 @@ io.on('connection', client => {
       theMasterController(Game.setPlayerStatus(choiceObjectFromClient))
     }
 
+    client.on("useItem", handleItem)
+
+    function handleItem(data){
+      theMasterController(Game.useConsumable(data))
+    }
+
     client.on('startTurn', handleStartTurn)
 
     function handleStartTurn(){

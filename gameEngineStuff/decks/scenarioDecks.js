@@ -323,7 +323,7 @@ let scenario3Deck = [
     ]}
 ]
 
-let scenarios = [scenario1Deck, scenario2Deck, scenario3Deck]
+let Adventure = [scenario1Deck, scenario2Deck, scenario3Deck]
 
 
 let bossDeck = [
@@ -350,5 +350,5 @@ let bossDeck = [
 ]
 
 module.exports = {
-    scenarios
+    Adventure
 }

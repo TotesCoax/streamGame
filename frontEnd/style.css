@@ -194,7 +194,8 @@ html {
     background: lightskyblue;
 }
 
-.die.choice {
+/* This is to indicate target choice */
+.choice {
     background: yellow
 }
 

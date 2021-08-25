@@ -4,26 +4,13 @@ const {Die, Player, Scenario, EngineOutput, Alert, Prompt, ItemsNotice, Refresh}
 const {Boons} = require("../gameEngineStuff/decks/boons")
 const {Playstyle} = require("../gameEngineStuff/decks/characters")
 const {lootDeck} = require("../gameEngineStuff/decks/items")
-const {scenarios} = require("../gameEngineStuff/decks/scenarioDecks")
+const {Adventure} = require("../gameEngineStuff/decks/scenarioDecks")
 
 //YOU SHOULD CONVERT PLAYSTYLE AND CARDS INTO CLASSES SOONtm
 
 //This function is used to send the gamestate info to the front end on request.
 exports.newGameState = function newExport() {
-    //Gameboard object to export - use this to hide game information from the front end
-    let boardExport = {
-        players: board.players,
-        level: board.level,
-        scenarios: board.scenarios,
-        dicePool: {
-            active: board.dicePool.active,
-            support: board.dicePool.support
-        },
-        attackHand: board.attackHand,
-        boon: board.boon.drawn,
-        gameState: gameState
-    }
-    return new Refresh('raw', exportGamestate())
+        return new Refresh('raw', exportGamestate())
 }
 //Global Object reservations
 let board, gameState
@@ -382,19 +369,20 @@ function checkConsumables(){
 }
 
 //Use consumable
-function useConsumable(itemChoiceObject){
+exports.useConsumable = function useConsumable(itemChoiceObject){
     if (gameState.itemPhase === false){
         console.log("not in phase")
         return new Alert("You can only use consumables at the start of the turn!")
     }
-    let item = board.players.find(player => player.username === itemChoiceObject.username).inventory.find(item => item.name),
-        target = board.players.find(player => player.usernameitem.split(" ").join("").toLowerCase() = itemChoiceObject.target.split(" ").join("").toLowerCase())
+    let item = board.players.find(player => player.username === itemChoiceObject.holder).inventory.find(item => item.name === itemChoiceObject.item),
+        target = board.players.find(player => player.username.split(" ").join("").toLowerCase() = itemChoiceObject.target.split(" ").join("").toLowerCase())
     //Checking to see if game state allows consumables
     if (gameState.noConsumables === false){
         //Checking if item is consumed
         if (!item.consumed){
             item.ability(target)
             item.consumed = true
+            return new Refresh("itemUsed", exportGamestate())
         } else {
             console.log("Item was previously consumed", item)
             return new Alert("This item has already been used!")
@@ -627,16 +615,24 @@ function moveToAttackPhaseCheck(){
 //Find and initiate player ability based on client info
 exports.useAbility = function useAbility(abilityObject){
     let player = board.players.find(player => player.username === abilityObject.username),
-        targetArray = []
-
-    if (player.abilityCounter = 0){
+        diceArray = []
+    console.log("Starting ability:", abilityObject)
+    if (player.abilityCounter === 0){
         return new Alert("You don't have any ability uses left!")
     } else {
-        abilityObject.target.forEach(dieID => {
-            targetArray.push(findDie(dieID).die)
-        })    
-        //Each ability returns either a "diceChange" object or an "alert" object
-        return player.playstyle.ability(targetArray)
+        console.log("Target array:", abilityObject.target)
+        abilityObject.target.forEach(dieID =>{
+            diceArray.push(findDie(dieID).die)
+        })
+        //Each ability returns nothing, a string (for failure), or a prompt-style response object
+        console.log(typeof(player.playstyle.ability(diceArray)))
+        switch (typeof(player.playstyle.ability(diceArray))) {
+            case "string":
+                return new Alert(player.playstyle.ability(diceArray))
+            default:
+                player.abilityCounter--
+                return new Refresh("abilityUsed", exportGamestate())
+        }
     }
 
 }
@@ -790,10 +786,14 @@ function stageHPchecker(){
             console.log("achieved switch rate of: ", ((gameState.switchCounter / gameState.turnCounter) * 100),"%")
             gameState.turnCounter = 0
             gameState.switchCounter = 0
-            return ScenarioCleared()
+            let scenWin = ScenarioCleared()
+            scenWin.scenarioDefeated = true
+            return scenWin
         } else {
             console.log("New Stage being setup!")
-            return NewStageSetup()
+            let stageWin = NewStageSetup()
+            stageWin.stageDefeated = true
+            return stageWin
 
         }
     } else {
@@ -971,7 +971,7 @@ function refreshAbilities(players) {
     function NewScenarioSetup() {
         isGameOver()
         //Prepare the Scenario for the level
-        setupScenario(scenarios, board.level)
+        setupScenario(Adventure, board.level)
         if (board.level <= 1){
             console.log("Start of game ability refresh engaged!")
             refreshAbilities(board.players)
@@ -1122,8 +1122,7 @@ function refreshAbilities(players) {
                 //draw item from deck
             draw(activePlayer, board.itemDeck)
                 //add item to Player inventory ~ this seems to work
-                refreshItems() //CHANGE TO SOCKET EMIT
-                console.log("Item has been drawn and given to:", activePlayer)
+                console.log("Item has been drawn and given to:", activePlayer.username)
                 //Give item to new player if desired
             //Level Up
             //Level up function ~ works
@@ -1142,7 +1141,7 @@ function refreshAbilities(players) {
             refreshAbilities(board.players)
             //Any lingering augment effects are cleared
             cleansePoison(board.players)
-            if (board.level < scenarios.length - 1){
+            if (board.level < Adventure.length - 1){
                 return new Alert("Scenario defeated!")
             } else {
                 return new Alert("It seems you have won the game. Congratulations are in order.")

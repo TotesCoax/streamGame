@@ -8,7 +8,7 @@ let Playstyle = {
         title: "the brash",
         hpMax:[10,15,20],
         abilityMax: [[1,1,1],[2,1,1],[3,2,1]],
-        abilityText: "Change one dice value into a 1 or 6",
+        abilityText: "Change one dice value into a 6"/*Supposed to be 1 or 6*/,
         attack:[
             {tier: 0, diceReq: 1, dmg:1, name: "Basic Attack", desc: "Give the enemy a bonk"},
             {tier: 0, diceReq: 2, dmg:4, name: "Punch", desc: "A simple punch"},

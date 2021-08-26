@@ -86,8 +86,11 @@ class Scenario {
 class EngineOutput {
     constructor(){
         this.switchTriggered = false
+        this.switchMessage = "Switch triggered!"
         this.stageDefeated = false
+        this.stageMessage = "Stage defeated!"
         this.scenarioDefeated = false
+        this.scenarioMessage = "Scenario defeated!"
         this.gameOver = false
     }
 }

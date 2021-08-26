@@ -20,8 +20,7 @@ io.on('connection', client => {
 
     function handleRequestEvent(){
       console.log("Gamestate has been requested.")
-      client.emit('gamestate' , Game.newGameState())
-      console.log("Gamestate sent out")
+      theMasterController(Game.newGameState())
     }
 
     client.on('newGame', handleNewGame)
@@ -46,6 +45,12 @@ io.on('connection', client => {
 
     function handleStartTurn(){
       theMasterController(Game.RollingPhase())
+    }
+
+    client.on('startScenario', handleNewScneario)
+
+    function handleNewScneario(){
+      theMasterController(Game.startNewScenario())
     }
 
     client.on('keepDie', handleKeepDie)
@@ -103,9 +108,15 @@ io.on('connection', client => {
           console.log("Sending an alert!")
           client.emit('alert', data)
           break;
+        case "itemsNotice":
+          console.log("Sending an items notice!")
+          client.emit('itemNotice', data)
         case "itemUsed":
           console.log("Sending an item used notice!")
           client.emit('itemUsed', data)
+        case "scenarioDefeated":
+          console.log("Sending a scenario defeated notice")
+          client.emit('scenarioDefeated', data)
         default:
           console.log("Sending new gamestate!")
           client.emit('gamestate', data)

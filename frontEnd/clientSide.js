@@ -10,16 +10,31 @@ function handleInit(msg) {
 
 socket.on('gamestate', handleGamestate)
 
-function handleGamestate(msg){
-    gameboard = msg.boardExport 
+function handleGamestate(data){
+    console.log("Gamestate refresh object:", data)
+    gameboard = data.boardExport 
 
     console.log("New gamestate arrived!", gameboard)
     refreshScenario()
     refreshPlayers()
-    if (gameboard.attackHand.length > 0){
-        refreshAttackHand()
-    } else if (gameboard.dicePool.active.length > 0) {
-        refreshDice()
+    //Dice Controller
+    switch (data.type) {
+        case "startWait":
+            insertStartTurnButton()
+            break;
+        case "rollPhase":
+            refreshDice()
+            break;
+        case "attackPhase":
+            refreshAttackHand()
+            break;
+        default:
+            if (gameboard.attackHand.length > 0){
+                refreshAttackHand()
+            } else {
+                refreshDice()
+            }
+            break;
     }
     refreshDMGValues()
     refreshItems()
@@ -39,9 +54,6 @@ socket.on('alert', handleAlert)
 function handleAlert(data) {
     console.log("Alert arrived!")
     console.log(data)
-    if (data.switch){
-        alert("Switch triggered!")
-    }
     alert(data.message)
     requestBoardExport()
 }
@@ -52,9 +64,21 @@ function handleItemUsed(data) {
     console.log(data)
 }
 
+socket.on("itemNotice", handleItemNotice)
+
+function handleItemNotice(data){
+    console.log(data)
+}
+
 //This gets back a gamestate refresh
 function requestBoardExport() {
     socket.emit("requestBoardState")
+}
+
+socket.on("scenarioDefeated", handleScenarioDefeated)
+
+function handleScenarioDefeated(data){
+    console.log(data)
 }
 
 //This gets back a gamestate refresh
@@ -178,16 +202,35 @@ function fillUpPlayers(){
             newAttack.querySelector(".attack-name").innerText = attackImport[a].name
             newAttack.querySelector(".attack-damage").innerText = attackImport[a].dmg
             newAttack.querySelector(".attack-button").dataset.attackNameTrim = attackImport[a].name.split(" ").join("")
+            newAttack.querySelector(".attack-button").dataset.username = playerStats.username
         }
         refreshItems()
-        if (playerStats.status === "active" && gameboard.dicePool.active.length === 0 && gameboard.attackHand.length === 0){
-            let startTurnBtn = document.createElement("button")
-            startTurnBtn.innerText = "Start my turn!"
-            startTurnBtn.addEventListener("click", sendStartTurn)
-            playerInsert.appendChild(startTurnBtn)
-        }
     }
 }
+
+function insertStartTurnButton(){
+    let activePlayer = gameboard.players.find(player => player.status === "active"),
+    infopanel = document.querySelector("#infopanel")
+    console.log("Insert attack button for: ". activePlayer)
+    if (gameboard.dicePool.active.length === 0 && gameboard.attackHand.length === 0){
+        let startTurnBtn = document.createElement("button")
+        startTurnBtn.innerText = `Start ${activePlayer.username}'s turn!`
+        startTurnBtn.addEventListener("click", sendStartTurn)
+        infopanel.appendChild(startTurnBtn)
+    }
+}
+
+function insertStartScenarioButton(){
+    let infopanel = document.querySelector("#infopanel")
+    console.log("Insert attack button for new scenario!")
+    if (gameboard.dicePool.active.length === 0 && gameboard.attackHand.length === 0){
+        let startNewScenario = document.createElement("button")
+        startNewScenario.innerText = "Ready to move on to the next scenario!"
+        startNewScenario.addEventListener("click", sendStartTurn)
+        infopanel.appendChild(startNewScenario)
+    }
+}
+
 
 //This function sets the initial die objects
 function fillUpDiceRollingPhase() {
@@ -328,9 +371,19 @@ function promptPlayer(data){
         requestCode = data.request
     console.log("Building request for: ", requestCode)
     if (data.switchTriggered === true){
-        switchDiv = document.createElement("div")
-        switchDiv.innerText = "Switch Triggered!!"
+        let switchDiv = document.createElement("div")
+        switchDiv.innerText = data.switchMessage
         alertContainer.appendChild(switchDiv)
+    }
+    if (data.stageDefeated === true){
+        let stageDiv = document.createElement("div")
+        stageDiv.innerText = data.stageMessage
+        alertContainer.appendChild(stageDiv)
+    }
+    if (data.scenarioDefeated === true){
+        let scenDiv = document.createElement("div")
+        scenDiv.innerText = data.scenarioMessage
+        alertContainer.appendChild(scenDiv)
     }
     alertContainer.appendChild(newForm)
     newNotice.innerText = data.message
@@ -513,7 +566,6 @@ function settingStatusHTML() {
        playerHTML.classList.add(`${player.status}`)
     })
     document.querySelectorAll(".scenario-stage").forEach(stage => stage.classList.remove("currScen"))
-    console.log("check for stage",gameboard)
     document.querySelector(`#scenario${gameboard.level}stage${gameboard.scenarios[gameboard.level].stageCounter}`).classList.add("currScen")
 }
 
@@ -549,6 +601,7 @@ function sendAttackPhase() {
 function sendAttack(e){
     //console.log(e.target.dataset.attackNameTrim)
     let attackSendObj = {
+        username: e.target.dataset.username,
         attackName: e.target.dataset.attackNameTrim
     }
     socket.emit('useAttack', attackSendObj)

@@ -26,7 +26,7 @@ let scenario1Deck = [
     */
 
     {name:"Fight the goon squad",
-    tier:1,
+    tier:0,
     description:"itemDescription",
     activeDice:3,
     suppDice:3,
@@ -37,7 +37,7 @@ let scenario1Deck = [
             dmg:3,
             def:0,
             aoe:false,
-            effect:function(){
+            effect:function(board, gameState){
                 console.log("This stage has no effect")
             }
         },
@@ -47,7 +47,7 @@ let scenario1Deck = [
             dmg:3,
             def:0,
             aoe:false,
-            effect:function(){
+            effect:function(board, gameState){
                 console.log("This stage has no effect")
             }
         },
@@ -57,7 +57,7 @@ let scenario1Deck = [
             dmg:3,
             def:0,
             aoe:false,
-            effect:function(){
+            effect:function(board, gameState){
                 console.log("This stage has no effect")
             }
         },
@@ -67,7 +67,7 @@ let scenario1Deck = [
             dmg:5,
             def:0,
             aoe:false,
-            effect:function(){
+            effect:function(board, gameState){
                 console.log("This stage has no effect")
             }
         }]
@@ -75,7 +75,7 @@ let scenario1Deck = [
 
     {
     name:"Got Ambushed",
-    tier:1,
+    tier:0,
     description:"itemDescription",
     activeDice:3,
     suppDice:3,
@@ -86,7 +86,7 @@ let scenario1Deck = [
             dmg:3,
             def:0,
             aoe:true,
-            effect:function(){
+            effect:function(board, gameState){
                 console.log("This stage has no effect")
             }
         },
@@ -96,7 +96,7 @@ let scenario1Deck = [
             dmg:5,
             def:0,
             aoe:false,
-            effect:function(){
+            effect:function(board, gameState){
                 console.log("This stage has no effect")
             }
         }
@@ -104,7 +104,7 @@ let scenario1Deck = [
     ]},
 
     {name:"Trap room",
-    tier:1,
+    tier:0,
     description:"itemDescription",
     activeDice:3,
     suppDice:3,
@@ -115,8 +115,9 @@ let scenario1Deck = [
             dmg:2,
             def:0,
             aoe:true,
-            effect:function panic(players){
+            effect:function panic(board, gameState){
                 //Rerolls -1
+                let players = board.players
                 players.forEach(player => {
                     console.log(player.username, "rerolls: ", player.currentRerollsMax)
                     player.currentRerollsMax -= 1
@@ -133,7 +134,7 @@ let scenario1Deck = [
 let scenario2Deck = [
 
     {name:"Poisoned",
-    tier:2,
+    tier:1,
     description:"itemDescription",
     activeDice:4,
     suppDice:3,
@@ -144,7 +145,8 @@ let scenario2Deck = [
             dmg:1,
             def:0,
             aoe:false,
-            effect:function poisoned(players){
+            effect:function poisoned(board, gameState){
+                let players = board.players
                 //No Consumables
                 gameState.noConsumables = true
                 //At the start of each player's turn POISONED PLAYER (randomly chosen) suffers X (4 is default for game) dmg
@@ -157,7 +159,7 @@ let scenario2Deck = [
     ]},
 
     {name:"The Dragon fight",
-    tier:2,
+    tier:1,
     description:"itemDescription",
     activeDice:4,
     suppDice:3,
@@ -168,7 +170,7 @@ let scenario2Deck = [
             dmg:3,
             def:0,
             aoe:true,
-            effect:function(){
+            effect:function(board, gameState){
                 console.log("This stage has no effect")
             }
         },
@@ -178,7 +180,7 @@ let scenario2Deck = [
             dmg:5,
             def:0,
             aoe:false,
-            effect:function(){
+            effect:function(board, gameState){
                 //No Abilities
                 gameState.noAbilities = true
                 console.log("No abilities may be used")
@@ -190,7 +192,7 @@ let scenario2Deck = [
             dmg:5,
             def:5,
             aoe:false,
-            effect:function(){
+            effect:function(board, gameState){
                 console.log("This stage has no effect")
             }
         }
@@ -198,7 +200,7 @@ let scenario2Deck = [
     ]},
 
     {name:"Fight the big boi",
-    tier:2,
+    tier:1,
     description:"itemDescription",
     activeDice:4,
     suppDice:3,
@@ -209,7 +211,7 @@ let scenario2Deck = [
             dmg:6,
             def:3,
             aoe:false,
-            effect:function(){
+            effect:function(board, gameState){
                 console.log("This stage has no effect")
             }
         }
@@ -219,7 +221,7 @@ let scenario2Deck = [
 
 let scenario3Deck = [
     {name:"This one has a temper",
-    tier:3,
+    tier:2,
     description:"itemDescription",
     activeDice:4,
     suppDice:4,
@@ -230,7 +232,7 @@ let scenario3Deck = [
             dmg:5,
             def:0,
             aoe:true,
-            effect:function(){
+            effect:function(board, gameState){
                 console.log("This stage has no effect")
             }
         },
@@ -240,7 +242,7 @@ let scenario3Deck = [
             dmg:15,
             def:0,
             aoe:false,
-            effect:function(){
+            effect:function(board, gameState){
                 console.log("This stage has no effect")
             }
         }
@@ -248,7 +250,7 @@ let scenario3Deck = [
     ]},
 
     {name:"Just Survive",
-    tier:3,
+    tier:2,
     description:"itemDescription",
     activeDice:4,
     suppDice:4,
@@ -259,7 +261,7 @@ let scenario3Deck = [
             dmg:99,
             def:96,
             aoe:false,
-            effect:function countdown(){
+            effect:function countdown(board, gameState){
                 //At the start of each players turn, this enemy suffers 1 dmg, ignoring defense
                 board.scenarios[board.level].poison = 1
             }
@@ -267,7 +269,7 @@ let scenario3Deck = [
     ]},
 
     {name:"Survive on skill alone",
-    tier:3,
+    tier:2,
     description:"itemDescription",
     activeDice:4,
     suppDice:4,
@@ -278,7 +280,7 @@ let scenario3Deck = [
             dmg:8,
             def:3,
             aoe:false,
-            effect:function(){
+            effect:function(board, gameState){
                 //No Consumables
                 gameState.noConsumables = true
                 console.log("No consumables active")
@@ -290,7 +292,7 @@ let scenario3Deck = [
             dmg:5,
             def:3,
             aoe:true,
-            effect:function(){
+            effect:function(board, gameState){
                 //No Consumables
                 gameState.noConsumables = true
                 console.log("No consumables active")
@@ -302,7 +304,7 @@ let scenario3Deck = [
             dmg:12,
             def:3,
             aoe:false,
-            effect:function(){
+            effect:function(board, gameState){
                 //No Consumables
                 gameState.noConsumables = true
                 console.log("No consumables active")
@@ -314,7 +316,7 @@ let scenario3Deck = [
             dmg:8,
             def:3,
             aoe:true,
-            effect:function(){
+            effect:function(board, gameState){
                 //No Consumables
                 gameState.noConsumables = true
                 console.log("No consumables active")

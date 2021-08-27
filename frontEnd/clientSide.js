@@ -31,13 +31,16 @@ function handleGamestate(data){
         default:
             if (gameboard.attackHand.length > 0){
                 refreshAttackHand()
-            } else {
+            } else if (gameboard.dicePool.active.length > 0){
                 refreshDice()
+            } else if (gameboard.gameState.turnCounter > 0){
+                insertStartTurnButton()
+            } else if (gameboard.scenarios.length > 0) {
+                insertStartScenarioButton()
             }
             break;
     }
     refreshDMGValues()
-    refreshItems()
     console.log("All refreshed!")
 }
 
@@ -91,6 +94,11 @@ function sendStartTurn(e){
     socket.emit('startTurn')
 }
 
+function sendStartScenario(e){
+    e.target.remove()
+    socket.emit('startScenario')
+}
+
 //GENERATE HTML ELEMENT FUNCTIONS
 
 function fillUpDevStats() {
@@ -105,13 +113,12 @@ function fillUpScenario(){
     let scenTemplate = document.getElementById("scenarioCardTemplate"),
         scenContainer = document.getElementById("scenarioContainer")
     gameboard.scenarios.forEach(scenario =>{
-        console.log(scenario)
         scenContainer.appendChild(scenTemplate.content.cloneNode(true))
     
         let newScen = scenContainer.lastElementChild,
             currScen = scenario.card
     
-        newScen.id = `scenario${gameboard.level}`
+        newScen.id = `scenario${scenario.card.tier}`
         if (scenario.defeated === true){
             newScen.classList.add("defeated")
         }
@@ -161,7 +168,7 @@ function fillUpPlayers(){
         playerInsert.id = playerStats.username.toLowerCase().split(" ").join("")
         playerInsert.classList.add(playerStats.status)
         playerInsert.querySelector(".player-name").innerText = playerStats.username.toUpperCase()
-        playerInsert.querySelector(".player-class").innerText = playerStats.playstyle.title
+        playerInsert.querySelector(".player-class").innerText = "the " + playerStats.playstyle.title
         playerInsert.querySelector(".player-hp-counter").innerText = playerStats.playstyle.hpMax[gameboard.level]
         playerInsert.querySelector(".ability-use-counter").innerText = playerStats.playstyle.abilityMax[gameboard.level][gameboard.players.length - 2]
         playerInsert.querySelector(".ability-button").dataset.username = playerStats.username.toLowerCase()
@@ -177,7 +184,8 @@ function fillUpPlayers(){
 
         // console.log(attackHTML, attackImport, attackTemp)
         for (let a = 0; a < attackImport.length; a++){
-            // console.log(`Inserting attack: ${attackImport[a].name}`)
+            //console.log(attackImport[a]);
+            //console.log(`Inserting attack: ${attackImport[a].name}`)
             attackHTML.appendChild(attackTemp.content.cloneNode(true))
             let newAttack = attackHTML.lastElementChild
 
@@ -186,17 +194,22 @@ function fillUpPlayers(){
             // console.log(attackImport[a].threshold)
             if (!isNaN(attackImport[a].threshold)) {
                 // console.log("Threshold detected, Activating switch.", playerStats.playstyle.title);
-                switch (playerStats.playstyle.title) {
-                    case "the staunch":
-                        // console.log("Staunch detected")
-                        playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerText = "sum of dice values \&geq; " + attackImport[a].threshold
-                        break;
-                    case "the sly":
-                        // console.log("Sly detected")
-                        playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerText = "sum of dice values \&leq; " + attackImport[a].threshold
-                        break;
-                    default:
-                        break;
+                if (a === 0 && playerStats.playstyle.title !== "elegant"){
+                    playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerHTML = "die with value of " + attackImport[a].threshold
+                } else {
+                    switch (playerStats.playstyle.title) {
+                        case "staunch":
+                            // console.log("Staunch detected")
+                            playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerHTML = "dice, sum of dice values \&geq; " + attackImport[a].threshold
+                            break;
+                        case "sly":
+                            // console.log("Sly detected")
+                            playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerHTML = "dice, sum of dice values \&leq; " + attackImport[a].threshold
+                            break;
+                        default:
+                            playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerHTML = playerStats.playstyle.title + " dice"
+                            break;
+                    }
                 }
             }
             newAttack.querySelector(".attack-name").innerText = attackImport[a].name
@@ -204,14 +217,17 @@ function fillUpPlayers(){
             newAttack.querySelector(".attack-button").dataset.attackNameTrim = attackImport[a].name.split(" ").join("")
             newAttack.querySelector(".attack-button").dataset.username = playerStats.username
         }
-        refreshItems()
+        refreshItems(playerStats)
     }
 }
 
 function insertStartTurnButton(){
     let activePlayer = gameboard.players.find(player => player.status === "active"),
     infopanel = document.querySelector("#infopanel")
-    console.log("Insert attack button for: ". activePlayer)
+    if(infopanel.firstChild){
+        infopanel.firstChild.remove()
+    }
+    console.log("Insert attack button for: ", activePlayer.username)
     if (gameboard.dicePool.active.length === 0 && gameboard.attackHand.length === 0){
         let startTurnBtn = document.createElement("button")
         startTurnBtn.innerText = `Start ${activePlayer.username}'s turn!`
@@ -222,11 +238,14 @@ function insertStartTurnButton(){
 
 function insertStartScenarioButton(){
     let infopanel = document.querySelector("#infopanel")
+    if(infopanel.firstChild){
+        infopanel.firstChild.remove()
+    }
     console.log("Insert attack button for new scenario!")
     if (gameboard.dicePool.active.length === 0 && gameboard.attackHand.length === 0){
         let startNewScenario = document.createElement("button")
         startNewScenario.innerText = "Ready to move on to the next scenario!"
-        startNewScenario.addEventListener("click", sendStartTurn)
+        startNewScenario.addEventListener("click", sendStartScenario)
         infopanel.appendChild(startNewScenario)
     }
 }
@@ -237,7 +256,7 @@ function fillUpDiceRollingPhase() {
     let dieTemplate = document.getElementById("dieTemplateRoll"),
         activeContainer = document.getElementById("activePlayerHand"),
         suppContainer = document.getElementById("supportPlayerHand")
-    console.log(dieTemplate, activeContainer, suppContainer)
+    //console.log(dieTemplate, activeContainer, suppContainer)
 //Active player dice
     for (let d = 0; d < gameboard.dicePool.active.length; d++){
         activeContainer.appendChild(dieTemplate.content.cloneNode(true))
@@ -299,27 +318,24 @@ function fillUpAttackHand(){
         console.log("Attack hand refreshed!")
     }
 
-function fillUpPlayerInventory() {
+function fillUpPlayerInventory(player) {
     let template = document.getElementById("playerItemTemplate")
-
-    gameboard.players.forEach(player => {
-        if (player.inventory.length > 0){
-            player.inventory.forEach(item => {
-                let destination = document.querySelector(`#${player.username.toLowerCase()} .inventory`)
-                destination.appendChild(template.content.cloneNode(true))
-                let newItem = destination.lastElementChild
-                newItem.classList.add(item.name.split(" ").join("").toLowerCase())
-                if (item.consumed === true){
-                    newItem.classList.add("consumed")
-                }
-                newItem.querySelector(".player-item-name").innerText = item.name
-                newItem.querySelector(".player-item-description").innerText = item.description
-                newItem.querySelector("button").dataset.holder = player.username.split(" ").join("").toLowerCase()
-                newItem.querySelector('button').dataset.itemname = item.name.split(" ").join("").toLowerCase()
-            })
-        }
-    })
-
+    console.log(player)
+    if (player.inventory.length > 0){
+        player.inventory.forEach(item => {
+            let destination = document.querySelector(`#${player.username.toLowerCase()} .inventory`)
+            destination.appendChild(template.content.cloneNode(true))
+            let newItem = destination.lastElementChild
+            newItem.classList.add(item.name.split(" ").join("").toLowerCase())
+            if (item.consumed === true){
+                newItem.classList.add("consumed")
+            }
+            newItem.querySelector(".player-item-name").innerText = item.name
+            newItem.querySelector(".player-item-description").innerText = item.description
+            newItem.querySelector("button").dataset.holder = player.username.split(" ").join("").toLowerCase()
+            newItem.querySelector('button').dataset.itemname = item.name.split(" ").join("").toLowerCase()
+        })
+    }
 }
 // {username: board.players[i].username, itemname: board.players[i].inventory[j].name, consumed: board.players[i].inventory[j].consumed}
 function transmitItemPhase(playersWithConsumables) {
@@ -516,26 +532,26 @@ function refreshDMGValues(){
     let scenDMGCounterHTML = document.querySelector(`#scenario${gameboard.level} .scenario-dmg-counter`),
         boardLevelCounterHTML = document.querySelector("#devTracker .gameboard-level-counter"),
         stageCounterHTML = document.querySelector("#devTracker .stage-counter")
-    scenDMGCounterHTML.innerText = gameboard.scenarios[gameboard.level].dmgCounter 
     boardLevelCounterHTML.innerText = gameboard.level
-    stageCounterHTML.innerText = gameboard.scenarios[gameboard.level].stageCounter
     gameboard.players.forEach(player => {
         document.querySelector(`#${player.username} .player-dmg-counter`).innerText = player.dmgCounter
         document.querySelector(`#${player.username} .player-hp-counter`).innerText = player.playstyle.hpMax[gameboard.level]
         document.querySelector(`#${player.username} .ability-use-counter`).innerText = player.abilityCounter
     })
+    if (typeof(gameboard.scenarios[gameboard.level]) !== "undefined"){
+        scenDMGCounterHTML.innerText = gameboard.scenarios[gameboard.level].dmgCounter 
+        stageCounterHTML.innerText = gameboard.scenarios[gameboard.level].stageCounter
+    }
     console.log("Values have been refreshed")
 }
 
-function refreshItems() {
-    let inventories = document.querySelectorAll(".inventory")
+function refreshItems(player) {
+    let inventory = document.querySelectorAll(`#${player.username} .inventory`)
     // console.log(inventories)
-    inventories.forEach(player => {
-        while (player.firstChild){
-            player.removeChild(player.firstChild)
-        }
-    })
-    fillUpPlayerInventory(gameboard.players)
+    while (inventory.firstChild){
+        inventory.removeChild(inventory.firstChild)
+    }
+    fillUpPlayerInventory(player)
 }
 
 
@@ -566,7 +582,11 @@ function settingStatusHTML() {
        playerHTML.classList.add(`${player.status}`)
     })
     document.querySelectorAll(".scenario-stage").forEach(stage => stage.classList.remove("currScen"))
-    document.querySelector(`#scenario${gameboard.level}stage${gameboard.scenarios[gameboard.level].stageCounter}`).classList.add("currScen")
+    try {
+        document.querySelector(`#scenario${gameboard.level}stage${gameboard.scenarios[gameboard.level].stageCounter}`).classList.add("currScen")
+    } catch (error) {
+        console.log("There's no current scenario to mark.");
+    }
 }
 
 

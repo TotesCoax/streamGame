@@ -50,7 +50,7 @@ class Player {
     constructor(username, playstyle) {
         this.username = username.toLowerCase()
         //this.profilePic = profilePic
-        this.playstyle = Playstyle[playstyle.toLowerCase()]
+        this.playstyle = Playstyle.find(style => style.title === playstyle.toLowerCase())
         //Inventory is where loot items are held
         this.inventory = []
         //These are counters for each Scenario. Scen can modify them.

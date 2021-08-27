@@ -214,7 +214,7 @@ function prepareScenario(deck, level){
     let clone = shuffle(deck[level])
     board.scenarios.push(new Scenario(clone[0]))
     console.log("The scenario card has been pulled")
-    console.log(board.scenarios)
+    console.log(board.scenarios[level])
 }
 
 
@@ -254,12 +254,6 @@ function setRerolls() {
     })
     console.log("Rerolls have been set")
 }
-
-//Applying the effect of the current stage
-function applyStageEffect(currentStage){
-    currentStage.effect(board.players)
-}
-
 //--------------------//
 //End of Scenario setup
 //--------------------//
@@ -420,6 +414,14 @@ function cleansePoison(players){
     players.forEach(player => player.poison = 0)
 }
 
+function cleanseRerollPenalty(players){
+    players.forEach(player => player.currentRerollsMax = 2)
+}
+
+function clearOldStageEffects(){
+    cleansePoison(board.players)
+    cleanseRerollPenalty(board.players)
+}
 
 //--------------------//
 //End of Player Turn Setup Functions
@@ -934,9 +936,9 @@ function unexhaustAllPlayers(players){
 
 function refreshAbilities(players) {
     players.forEach(player => {
-        console.log("Refreshing abilities",player, player.abilityCounter, " => ", player.abilityScenarioMax)
+        //console.log("Refreshing abilities",player, player.abilityCounter, " => ", player.abilityScenarioMax)
         player.abilityCounter = player.abilityScenarioMax
-        console.log("Ability Counter is now ", player.abilityCounter)
+        //console.log("Ability Counter is now ", player.abilityCounter)
     })
 }
 
@@ -988,11 +990,12 @@ exports.startNewScenario = function (){
     }
     //Setup for each new stage reveal (once per stage)
     function NewStageSetup() {
+        clearOldStageEffects()
         currentStage = board.scenarios[board.level].card.stage[board.scenarios[board.level].stageCounter]
         console.log("Current stage: ", currentStage)
         //Check for any Event Stage effects
         //Apply the Stage effect
-        currentStage.effect(board.players)
+        currentStage.effect(board, gameState)
         console.log("Stage affect has been applied")
         //console.log("Stage level item effects have been applied")
         console.log("NewStageSetup has finished")
@@ -1050,6 +1053,7 @@ exports.startNewScenario = function (){
         //Apply any reroll modifiers to respective party
         setRerolls()
         //Create player "hands" based on the scenario's restrictions
+        console.log(board.scenarios)
         setHands(board.scenarios[board.level])
         //Initial Rolls for scenario
         console.log("Initial Rolls for the scenario")

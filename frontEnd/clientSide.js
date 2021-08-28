@@ -67,10 +67,10 @@ function handleItemUsed(data) {
     console.log(data)
 }
 
-socket.on("itemNotice", handleItemNotice)
+socket.on("itemsNotice", handleItemNotice)
 
 function handleItemNotice(data){
-    console.log(data)
+    console.log("Item notice!:", data)
 }
 
 //This gets back a gamestate refresh

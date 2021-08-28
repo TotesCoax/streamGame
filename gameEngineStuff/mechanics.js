@@ -791,9 +791,7 @@ function stageHPchecker(){
             console.log("achieved switch rate of: ", ((gameState.switchCounter / gameState.turnCounter) * 100),"%")
             gameState.turnCounter = 0
             gameState.switchCounter = 0
-            let scenWin = ScenarioCleared()
-            scenWin.scenarioDefeated = true
-            return scenWin
+            return ScenarioCleared()
         } else {
             console.log("New Stage being setup!")
             let stageWin = NewStageSetup()
@@ -1032,7 +1030,7 @@ exports.startNewScenario = function (){
         //Sends an alert that they can use items if they want.
         if(playersWithConsumables.length > 0){
             //console.log(playersWithConsumables)
-            return new ItemsNotice(playersWithConsumables)
+            return new ItemsNotice(playersWithConsumables, exportGamestate())
         } else {
             return selectSupportPhase()
         }

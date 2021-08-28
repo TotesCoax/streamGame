@@ -113,10 +113,9 @@ class Prompt extends EngineOutput {
     }
 }
 
-class ItemsNotice extends EngineOutput {
-    constructor(players){
-        super()
-        this.type = "itemsNotice"
+class ItemsNotice extends Refresh {
+    constructor(players, board){
+        super('itemsNotice', board)
         this.playerWithConsumables = players
     }
 }

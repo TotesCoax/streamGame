@@ -58,6 +58,13 @@ io.on('connection', client => {
       theMasterController(Game.startNewScenario())
     }
 
+    client.on('itemOver', handleItemOver)
+
+    function handleItemOver(){
+      console.log("Item phase is over.")
+      theMasterController(Game.ItemPhaseDone())
+    }
+
     client.on('keepDie', handleKeepDie)
 
     function handleKeepDie(dieIDFromClient){
@@ -121,12 +128,15 @@ io.on('connection', client => {
         case "itemsNotice":
           console.log("Sending an items notice!")
           client.emit('itemsNotice', data)
+          break;
         case "itemUsed":
           console.log("Sending an item used notice!")
           client.emit('itemUsed', data)
+          break;
         case "scenarioDefeated":
           console.log("Sending a scenario defeated notice")
           client.emit('scenarioDefeated', data)
+          break;
         default:
           console.log("Sending new gamestate!")
           client.emit('gamestate', data)

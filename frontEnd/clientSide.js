@@ -29,12 +29,19 @@ function handleGamestate(data){
             refreshAttackHand()
             break;
         default:
+            if (gameboard.gameState === true){
+                break;
+            }
             if (gameboard.attackHand.length > 0){
                 refreshAttackHand()
-            } else if (gameboard.dicePool.active.length > 0){
+            }
+            if (gameboard.dicePool.active.length > 0){
                 refreshDice()
-            } else if (gameboard.gameState.turnCounter > 0){
+            }
+            if (gameboard.gameState.turnCounter > 0 && gameboard.players.findIndex(player => player.status === "support") >= 0){
                 insertStartTurnButton()
+            } else if (gameboard.players.findIndex(player => player.status === "active") >= 0 && !(gameboard.players.findIndex(player => player.status === "support") >= 0)){
+                insertItemPhaseOverButton()
             } else if (gameboard.scenarios.length > 0) {
                 insertStartScenarioButton()
             }
@@ -64,13 +71,15 @@ function handleAlert(data) {
 socket.on('itemUsed', handleItemUsed)
 
 function handleItemUsed(data) {
-    console.log(data)
+    console.log("item used rec'd", data)
+    requestBoardExport()
 }
 
 socket.on("itemsNotice", handleItemNotice)
 
 function handleItemNotice(data){
     console.log("Item notice!:", data)
+    insertItemPhaseOverButton()
 }
 
 //This gets back a gamestate refresh
@@ -81,7 +90,9 @@ function requestBoardExport() {
 socket.on("scenarioDefeated", handleScenarioDefeated)
 
 function handleScenarioDefeated(data){
-    console.log(data)
+    alert(data.scenarioMessage)
+    refreshPlayers()
+    insertStartScenarioButton()
 }
 
 //This gets back a gamestate refresh
@@ -97,6 +108,17 @@ function sendStartTurn(e){
 function sendStartScenario(e){
     e.target.remove()
     socket.emit('startScenario')
+}
+
+function sendItemsDone(e){
+    e.target.remove()
+
+    let usableItems = document.querySelectorAll(".use-item-visibility")
+    usableItems.forEach(item => {
+        item.classList.add("hidden")
+    })
+
+    socket.emit('itemOver')
 }
 
 //GENERATE HTML ELEMENT FUNCTIONS
@@ -135,7 +157,7 @@ function fillUpScenario(){
             stageHTML.appendChild(stageTemplate.content.cloneNode(true))
             let newStage = stageHTML.lastElementChild
     
-            newStage.id = `scenario${gameboard.level}stage${s}`
+            newStage.id = `scenario${scenario.card.tier}stage${s}`
             newStage.querySelector(".stage-hp-stat").innerText = stageImport[s].hp
             newStage.querySelector(".stage-dmg-stat").innerText = stageImport[s].dmg
             if (stageImport[s].def > 0){
@@ -191,9 +213,8 @@ function fillUpPlayers(){
 
             newAttack.id = `${attackImport[a].name.split(" ").join("")}`
             newAttack.querySelector(".attack-req-dice").innerText = attackImport[a].diceReq
-            // console.log(attackImport[a].threshold)
-            if (!isNaN(attackImport[a].threshold)) {
-                // console.log("Threshold detected, Activating switch.", playerStats.playstyle.title);
+            //console.log(attackImport[a].threshold)
+            if (!false) {
                 if (a === 0 && playerStats.playstyle.title !== "elegant"){
                     playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerHTML = "die with value of " + attackImport[a].threshold
                 } else {
@@ -210,6 +231,9 @@ function fillUpPlayers(){
                             playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerHTML = playerStats.playstyle.title + " dice"
                             break;
                     }
+                }
+                if (attackImport[a].threshold === "1,1,2,3,4,5,6,6"){
+                    playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerHTML = "dice with values of " + attackImport[a].threshold
                 }
             }
             newAttack.querySelector(".attack-name").innerText = attackImport[a].name
@@ -242,12 +266,27 @@ function insertStartScenarioButton(){
         infopanel.firstChild.remove()
     }
     console.log("Insert attack button for new scenario!")
-    if (gameboard.dicePool.active.length === 0 && gameboard.attackHand.length === 0){
-        let startNewScenario = document.createElement("button")
-        startNewScenario.innerText = "Ready to move on to the next scenario!"
-        startNewScenario.addEventListener("click", sendStartScenario)
-        infopanel.appendChild(startNewScenario)
+    let startNewScenario = document.createElement("button")
+    startNewScenario.innerText = "Ready to move on to the next scenario!"
+    startNewScenario.addEventListener("click", sendStartScenario)
+    infopanel.appendChild(startNewScenario)
+}
+
+function insertItemPhaseOverButton(){
+    let infopanel = document.querySelector("#infopanel")
+    if(infopanel.firstChild){
+        infopanel.firstChild.remove()
     }
+    console.log("Insert button for moves out of Item phase")
+    let startNewScenario = document.createElement("button")
+    startNewScenario.innerText = "Move out of items phase"
+    startNewScenario.addEventListener("click", sendItemsDone)
+    infopanel.appendChild(startNewScenario)
+    let usableItems = document.querySelectorAll(".use-item-visibility")
+    usableItems.forEach(item => {
+        item.classList.remove("hidden")
+    })
+
 }
 
 
@@ -458,7 +497,9 @@ function activateItem(e){
     //Generate Player Targetting
     let playerTargets = document.querySelectorAll(".player.target")
     playerTargets.forEach(player => {
-        player.classList.toggle("hidden")
+        player.classList.remove("hidden")
+        player.classList.dataset.holder = e.target.dataset.holder
+        player.classList.dataset.itemname = e.target.dataset.itemname
         player.addEventListener("click", sendUseItem)
     })
 }
@@ -473,7 +514,9 @@ function sendUseItem(e){
     console.log(useItemObject)
     let playerTargets = document.querySelectorAll(".player.target")
     playerTargets.forEach(player => {
-        player.classList.toggle("hidden")
+        player.classList.add("hidden")
+        delete e.target.dataset.holder
+        delete e.target.dataset.itemname
         player.removeEventListener("click", sendUseItem)
     })
     toggleItemButtonVisibility()
@@ -557,21 +600,44 @@ function refreshItems(player) {
 
 //Function to move player cards around based on status
 //This should be run at the start of each turn I think.
-function movingPlayerCards() {
+function moveActivePlayerCard() {
     settingStatusHTML()
     let activeDestination = document.getElementById("activePlayerCardHook"),
-        activePlayerToMove = document.querySelector(".active.player"),
-        supportDestination = document.getElementById("supportPlayerCardHook"),
-        supportPlayerToMove = document.querySelector(".support.player"),
-        inactiveDestination = document.getElementById("playerContainer"),
-        activeToInactivePlayer = document.querySelector("#activePlayerCardHook .inactive")
+        activePlayerToMove = document.querySelector(".active.player")
 
     activeDestination.appendChild(activePlayerToMove)
-    supportDestination.appendChild(supportPlayerToMove)
-    if (activeToInactivePlayer){
-        inactiveDestination.appendChild(activeToInactivePlayer)
-    }
 }
+
+function moveSupportPlayerCard() {
+    settingStatusHTML()
+    let supportDestination = document.getElementById("supportPlayerCardHook"),
+        supportPlayerToMove = document.querySelector(".support.player")
+
+    supportDestination.appendChild(supportPlayerToMove)
+}
+
+function moveInactivePlayerCards() {
+    settingStatusHTML()
+    let inactiveDestination = document.getElementById("playerContainer"),
+        inactivePlayers = document.querySelectorAll(".inactive.player")
+
+    inactivePlayers.forEach(player => {
+        inactiveDestination.appendChild(player)
+    })
+}
+
+function movingPlayerCards() {
+    if (gameboard.players.findIndex(player => player.status === "active") >= 0){
+        moveActivePlayerCard()
+    }
+    if (gameboard.players.findIndex(player => player.status === "support") >= 0){
+        moveSupportPlayerCard()
+    }
+    moveInactivePlayerCards()
+}
+
+
+
 
 function settingStatusHTML() {
     let playerStats = gameboard.players
@@ -583,6 +649,7 @@ function settingStatusHTML() {
     })
     document.querySelectorAll(".scenario-stage").forEach(stage => stage.classList.remove("currScen"))
     try {
+        // console.log(gameboard.scenarios[gameboard.level].stageCounter)
         document.querySelector(`#scenario${gameboard.level}stage${gameboard.scenarios[gameboard.level].stageCounter}`).classList.add("currScen")
     } catch (error) {
         console.log("There's no current scenario to mark.");
@@ -747,3 +814,4 @@ function toggleRollHUDdisplay(){
 
 }
 
+document.addEventListener("load", requestBoardExport())

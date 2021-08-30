@@ -350,7 +350,7 @@ function checkConsumables(){
         if (board.players[i].inventory.length > 0){
             //check each item in their inventory if they are a type:consumable
             for (let j = 0; j < board.players[i].inventory.length; j++){
-                if (board.players[i].inventory[j].type === "consumable" && board.players[i].inventory[j].consumed === false)
+                if (board.players[i].inventory[j].type === "consumable" && board.players[i].inventory[j].consumed === false && board.players[i].inventory[j].timing === "startTurn")
                 //add the username and item name to a list to export
                 playersWithItems.push({username: board.players[i].username, itemname: board.players[i].inventory[j].name, consumed: board.players[i].inventory[j].consumed})
             }
@@ -363,11 +363,13 @@ function checkConsumables(){
 
 //Use consumable
 exports.useConsumable = function useConsumable(itemChoiceObject){
+    console.log(itemChoiceObject)
     if (gameState.itemPhase === false){
         console.log("not in phase")
         return new Alert("You can only use consumables at the start of the turn!")
     }
-    let item = board.players.find(player => player.username === itemChoiceObject.holder).inventory.find(item => item.name === itemChoiceObject.item),
+    let holder = board.players.find(player => player.username === itemChoiceObject.holder),
+        item = holder.inventory.find(item => item.name === itemChoiceObject.item),
         target = board.players.find(player => player.username.split(" ").join("").toLowerCase() = itemChoiceObject.target.split(" ").join("").toLowerCase())
     //Checking to see if game state allows consumables
     if (gameState.noConsumables === false){
@@ -398,7 +400,7 @@ function damageOverTimeEffect(){
     //Checking for poison status on players
     board.players.forEach(player => {
         if (player.poison > 0){
-            console.log(player, " is poisoned and will take: ", player.poison, "damage")
+            console.log(player.username, " is poisoned and will take: ", player.poison, "damage")
             //console.log(player.dmgCounter, " -> ", player.dmgCounter += player.poison)
             player.dmgCounter += player.poison
         }
@@ -608,9 +610,10 @@ function moveToAttackPhaseCheck(){
                 console.log("New dmg: ", calcDmg)
             }
         }
-        
-        //Apply new damage amount to scenario
-        board.scenarios[board.level].dmgCounter+= (calcDmg - currentStageDef)
+        if ((calcDmg - currentStageDef) > 0){
+            //Apply new damage amount to scenario
+            board.scenarios[board.level].dmgCounter+= (calcDmg - currentStageDef)
+        }
         console.log(calcDmg, " has been applied to the scenario")
     }
 
@@ -791,6 +794,7 @@ function stageHPchecker(){
             console.log("achieved switch rate of: ", ((gameState.switchCounter / gameState.turnCounter) * 100),"%")
             gameState.turnCounter = 0
             gameState.switchCounter = 0
+            currentScenario.defeated === true
             return ScenarioCleared()
         } else {
             console.log("New Stage being setup!")
@@ -815,8 +819,10 @@ function doesGameContinue(){
         //If there are no items, game is over.
         if (savingItems.length > 0){
             lifeSavingItemUse(deadPlayers, savingItems)
-            return new Refresh("itemUsed", exportGamestate())
+            return true
         } else {
+            //Game Over
+            gameState.gameOver = true
             return false
         }
     } else {
@@ -1042,6 +1048,10 @@ exports.startNewScenario = function (){
         return requestPlayerStatusChoice("support")
     }
 
+    exports.ItemPhaseDone = function() {
+        return requestPlayerStatusChoice("support")
+    }
+
 
 
     //Rolling phase
@@ -1151,7 +1161,7 @@ exports.startNewScenario = function (){
             refreshAbilities(board.players)
             //Any lingering augment effects are cleared
             cleansePoison(board.players)
-            if (board.level < Adventure.length - 1){
+            if (board.level < Adventure.length){
                 let output = new Refresh('scenarioDefeated', exportGamestate())
                 output.scenarioDefeated = true
                 return output

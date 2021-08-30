@@ -113,12 +113,6 @@ class Prompt extends EngineOutput {
     }
 }
 
-class ItemsNotice extends Refresh {
-    constructor(players, board){
-        super('itemsNotice', board)
-        this.playerWithConsumables = players
-    }
-}
 
 class Refresh extends EngineOutput {
     constructor(code, gamestate){
@@ -128,6 +122,12 @@ class Refresh extends EngineOutput {
     }
 }
 
+class ItemsNotice extends Refresh {
+    constructor(players, board){
+        super('itemsNotice', board)
+        this.playerWithConsumables = players
+    }
+}
 
 module.exports = {
     Die, Player, Scenario, EngineOutput, Alert, Prompt, ItemsNotice, Refresh

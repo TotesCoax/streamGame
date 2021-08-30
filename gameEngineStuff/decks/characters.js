@@ -67,7 +67,7 @@ let Playstyle = [
             {tier: 0, diceReq: 4, dmg:5, threshold: false, name: "En Croix", desc: "A four step combo with a minor flourish"},
             {tier: 0, diceReq: 5, dmg:8, threshold: false, name: "Rond de jambe", desc: "A five step combo with a major flourish"},
             {tier: 1, diceReq: 6, dmg:12, threshold: false, name: "Port de bras", desc: "A six step combo with hits on the strike and return"},
-            {tier: 2, diceReq: 8, dmg:24, threshold: false, name: "Magnum Opus", desc: "Dear god, it's beautiful."}
+            {tier: 2, diceReq: 8, dmg:24, threshold: "1,1,2,3,4,5,6,6", name: "Magnum Opus", desc: "Dear god, it's beautiful."}
         ],
         ability: function(diceArray) {
             if (diceArray.length <= 2){
@@ -106,6 +106,15 @@ let Playstyle = [
                 return a.value - b.value
             })
             console.log(attackSubmission)
+            if (chosenAttack.diceReq === 8){
+                console.log("They're trying the complicated thing")
+                if (attackSubmission === [1,1,2,3,4,5,6,6,]){
+                    console.log("MAGNUM!")
+                    return true
+                } else {
+                    return false
+                }
+            }
             for (let i = 1; i < attackSubmission.length; i++){
                 console.log(attackSubmission[i-1].value, "->", attackSubmission[i].value);
                 if (attackSubmission[i].value !== attackSubmission[i-1].value + 1){

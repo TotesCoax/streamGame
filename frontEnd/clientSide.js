@@ -17,6 +17,7 @@ function handleGamestate(data){
     console.log("New gamestate arrived!", gameboard)
     refreshScenario()
     refreshPlayers()
+    refreshDMGValues()
     //Dice Controller
     switch (data.type) {
         case "startWait":
@@ -29,7 +30,7 @@ function handleGamestate(data){
             refreshAttackHand()
             break;
         default:
-            if (gameboard.gameState === true){
+            if (gameboard.gameState.gameOver === true){
                 break;
             }
             if (gameboard.attackHand.length > 0){
@@ -47,7 +48,6 @@ function handleGamestate(data){
             }
             break;
     }
-    refreshDMGValues()
     console.log("All refreshed!")
 }
 
@@ -65,7 +65,9 @@ function handleAlert(data) {
     console.log("Alert arrived!")
     console.log(data)
     alert(data.message)
-    requestBoardExport()
+    if (!data.gameOver){
+        requestBoardExport()
+    }
 }
 
 socket.on('itemUsed', handleItemUsed)
@@ -79,7 +81,14 @@ socket.on("itemsNotice", handleItemNotice)
 
 function handleItemNotice(data){
     console.log("Item notice!:", data)
+    gameboard = data.boardExport
+    refreshScenario()
+    refreshPlayers()
+    refreshDMGValues()
     insertItemPhaseOverButton()
+    if (data.switchTriggered){
+        alert(data.switchMessage)
+    }
 }
 
 //This gets back a gamestate refresh
@@ -90,6 +99,8 @@ function requestBoardExport() {
 socket.on("scenarioDefeated", handleScenarioDefeated)
 
 function handleScenarioDefeated(data){
+    console.log("Scenario defeated rec'd", data)
+    gameboard = data.boardExport
     alert(data.scenarioMessage)
     refreshPlayers()
     insertStartScenarioButton()
@@ -191,6 +202,7 @@ function fillUpPlayers(){
         playerInsert.classList.add(playerStats.status)
         playerInsert.querySelector(".player-name").innerText = playerStats.username.toUpperCase()
         playerInsert.querySelector(".player-class").innerText = "the " + playerStats.playstyle.title
+        playerInsert.querySelector(".player-mechanic-explain").innerText = playerStats.playstyle.mechanicExplain
         playerInsert.querySelector(".player-hp-counter").innerText = playerStats.playstyle.hpMax[gameboard.level]
         playerInsert.querySelector(".ability-use-counter").innerText = playerStats.playstyle.abilityMax[gameboard.level][gameboard.players.length - 2]
         playerInsert.querySelector(".ability-button").dataset.username = playerStats.username.toLowerCase()
@@ -254,7 +266,7 @@ function insertStartTurnButton(){
     console.log("Insert attack button for: ", activePlayer.username)
     if (gameboard.dicePool.active.length === 0 && gameboard.attackHand.length === 0){
         let startTurnBtn = document.createElement("button")
-        startTurnBtn.innerText = `Start ${activePlayer.username}'s turn!`
+        startTurnBtn.innerText = `Initial dice roll for ${activePlayer.username}'s turn!`
         startTurnBtn.addEventListener("click", sendStartTurn)
         infopanel.appendChild(startTurnBtn)
     }
@@ -447,11 +459,12 @@ function promptPlayer(data){
         let newDiv = document.createElement("div")
             newBtn = document.createElement("input")
         newBtn.setAttribute("type", "radio")
+        newBtn.id = `${choice}_choice`
         newBtn.value = choice
         newBtn.name = "playerSelect"
         newDiv.appendChild(newBtn)
         let newLbl = document.createElement("label")
-        newLbl.setAttribute("for", choice)
+        newLbl.setAttribute("for", `${choice}_choice`)
         newLbl.innerText = choice
         newDiv.appendChild(newLbl)
         newForm.appendChild(newDiv)
@@ -498,8 +511,8 @@ function activateItem(e){
     let playerTargets = document.querySelectorAll(".player.target")
     playerTargets.forEach(player => {
         player.classList.remove("hidden")
-        player.classList.dataset.holder = e.target.dataset.holder
-        player.classList.dataset.itemname = e.target.dataset.itemname
+        player.dataset.holder = e.target.dataset.holder
+        player.dataset.itemname = e.target.dataset.itemname
         player.addEventListener("click", sendUseItem)
     })
 }

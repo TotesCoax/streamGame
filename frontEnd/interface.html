@@ -63,6 +63,9 @@
             <div class="player-class">
                 Class
             </div>
+            <div class="player-mechanic-explain">
+                Explain
+            </div>
             <div class="hp-bar stat-box">
                 <div class="player-dmg">
                     DMG: <span class="player-dmg-counter">00</span>
@@ -143,21 +146,7 @@
             
         </div>
     </div>
-    <div id="infopanel">
-        
-    </div>
-
     <div id="gameboardContainer">
-        <div id="devTracker" class="stat-box">
-            Dev Tracker:
-            <div class="gameboard-level">
-                Board Level: <span class="gameboard-level-counter">X</span>
-            </div>
-            <div class="stage-progress">
-                Stage counter: <span class="stage-counter">X</span>
-            </div>
-            <button id="newGameButton" type="button" onclick="startNewGame()">Start a new game with test data.</button>
-        </div>
         <div id="scenarioContainer">
 
         </div>
@@ -178,7 +167,9 @@
                     </div>
                 </div>
             </div>
-            
+            <div id="infopanel">
+        
+            </div>
             <!-- Attack Hand Container -->
             <div class="attack-hand hidden">
                 <div>Attack hand dice:</div>
@@ -214,6 +205,46 @@
 
         <!-- Gameboard end div -->
     </div>
+    <div id="devTracker" class="stat-box">
+        Dev Tracker:
+        <div class="gameboard-level">
+            Board Level: <span class="gameboard-level-counter">X</span>
+        </div>
+        <div class="stage-progress">
+            Stage counter: <span class="stage-counter">X</span>
+        </div>
+        <button id="newGameButton" type="button" onclick="startNewGame()">Start a new game with test data.</button>
+        <div class="instructions">
+            <h1>Game Rules:</h1>
+            <p>There are 3 levels of scenarios to beat.</p>
+            <p>Each scenario dictates how many dice are rerolled.</p>
+            <p>Each scenario has a number of stages to beat in order to defeat the scenario.</p>
+            <p>Stage might have effects that impact certain game elements.</p>
+            <p>Each player turn is one active player and one support player rolling an amoutn of dice.</p>
+            <p>Only the active player issues attacks during their turn.</p>
+            <p>Only the active and support players can use abilities during the turn</p>
+            <p>Each support becomes the new active player.</p>
+            <p>Active only needs to be chose at the start of the game.</p>
+            <p>The cycle continues through scenarios.</p>
+            <p>The default amount of rerolls is two.</p>
+            <p>Both players must reroll their dice pools at the same time.</p>
+            <p>Dice can be marked as kept so they are not rerolled. A die can be unkept at anytime.</p>
+            <p>After rerolls are gone you move to attack phase.</p>
+            <p>In attack phase you mark dice to submit and then declare an attack using those dice.</p>
+            <p>Each playstyle has it's own criteria for what dice are valid for their attack.</p>
+            <p>If you use up all dice for attacks, you trigger a switch.</p>
+            <p>When a switch is triggered, the stage does not counterattack.</p>
+            <p>A stage counterattack applies it's damage to the active player</p>
+            <p>Unless the stage has the AOE tag and that applies damage to all players.</p>
+            <p>If a stage has defense of X (Def:X) then it blocks X damage before taking damage.</p>
+            <p>If one player dies, the game is over. It's all or nothing baby.</p>
+            <p>The player to land the last hit on any scenario is granted an item reward.</p>
+            <p>Some items have passive effects, some are consumables.</p>
+            <p>You can only use consumables after the Active player is declared but before they choose their support.</p>
+            <p>After beating Scenario 2 you are granted a Boon (similar to a party-wide item).</p>
+        </div>
+    </div>
+
     <script src="https://cdn.socket.io/4.1.2/socket.io.min.js" integrity="sha384-toS6mmwu70G0fw54EGlWWeA4z3dyJ+dlXBtSURSKN4vyRFOcxd3Bzjj/AoOwY+Rg" crossorigin="anonymous"></script>
     <script src="clientSide.js"></script>
 </body>

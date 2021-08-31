@@ -110,7 +110,7 @@ let scenario1Deck = [
     suppDice:3,
     stage:[
         {
-            name:"Escape the trap!",
+            name:"Panic consumes the party. Rerolls -1. Try to escape the trap!!",
             hp:30,
             dmg:2,
             def:0,
@@ -140,7 +140,7 @@ let scenario2Deck = [
     suppDice:3,
     stage:[
         {
-            name:"Poisoned!",
+            name:"A random player has been poisoned! They will take 4 damage at the start of each turn. Beat the stage to get them the antidote. Also you can't use consumables... have fun!",
             hp:30,
             dmg:1,
             def:0,
@@ -165,7 +165,7 @@ let scenario2Deck = [
     suppDice:3,
     stage:[
         {
-            name:"The Dragon Circles",
+            name:"The dragon circles overhead, blasting the party with breath attacks.",
             hp:20,
             dmg:3,
             def:0,
@@ -175,7 +175,7 @@ let scenario2Deck = [
             }
         },
         {
-            name:"The dragon lands",
+            name:"The dragon lands! The party trembles at it's fearsome presence. Abilities are disabled.",
             hp:20,
             dmg:5,
             def:0,
@@ -187,7 +187,7 @@ let scenario2Deck = [
             }
         },
         {
-            name:"We have it cornered!",
+            name:"We have it cornered! The dragon curls up in a defensive posture as the onslaught begins.",
             hp:20,
             dmg:5,
             def:5,
@@ -206,7 +206,7 @@ let scenario2Deck = [
     suppDice:3,
     stage:[
         {
-            name:"Oh, he big.",
+            name:"Oh lawd, he THICC.",
             hp:50,
             dmg:6,
             def:3,
@@ -220,14 +220,14 @@ let scenario2Deck = [
 ]
 
 let scenario3Deck = [
-    {name:"This one has a temper",
+    {name:"A giant beast",
     tier:2,
     description:"itemDescription",
     activeDice:4,
     suppDice:4,
     stage:[
         {
-            name:"Chill",
+            name:"Wild swings",
             hp:50,
             dmg:5,
             def:0,
@@ -249,17 +249,17 @@ let scenario3Deck = [
 
     ]},
 
-    {name:"Just Survive",
+    {name:"Impending DOOM",
     tier:2,
     description:"itemDescription",
     activeDice:4,
     suppDice:4,
     stage:[
         {
-            name:"The Sword of Damocles",
+            name:"Each turn this scenario deals one damage to itself. You just need to keep on fighting!",
             hp:6,
             dmg:99,
-            def:96,
+            def:99,
             aoe:false,
             effect:function countdown(board, gameState){
                 //At the start of each players turn, this enemy suffers 1 dmg, ignoring defense
@@ -268,14 +268,14 @@ let scenario3Deck = [
         }
     ]},
 
-    {name:"Survive on skill alone",
+    {name:"I hope this isn't your first rodeo.",
     tier:2,
     description:"itemDescription",
     activeDice:4,
     suppDice:4,
     stage:[
         {
-            name:"Start",
+            name:"Consumables are disabled.",
             hp:20,
             dmg:8,
             def:3,
@@ -287,7 +287,7 @@ let scenario3Deck = [
             }
         },
         {
-            name:"Brace",
+            name:"Consumables are still disabled.",
             hp:20,
             dmg:5,
             def:3,
@@ -299,7 +299,7 @@ let scenario3Deck = [
             }
         },
         {
-            name:"Withstand",
+            name:"Consumables are STILL disabled.",
             hp:25,
             dmg:12,
             def:3,
@@ -311,7 +311,7 @@ let scenario3Deck = [
             }
         },
         {
-            name:"Finale",
+            name:"Consumables are en-JUST KIDDING still disabled.",
             hp:25,
             dmg:8,
             def:3,

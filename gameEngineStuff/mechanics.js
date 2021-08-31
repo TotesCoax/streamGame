@@ -369,8 +369,8 @@ exports.useConsumable = function useConsumable(itemChoiceObject){
         return new Alert("You can only use consumables at the start of the turn!")
     }
     let holder = board.players.find(player => player.username === itemChoiceObject.holder),
-        item = holder.inventory.find(item => item.name === itemChoiceObject.item),
-        target = board.players.find(player => player.username.split(" ").join("").toLowerCase() = itemChoiceObject.target.split(" ").join("").toLowerCase())
+        item = holder.inventory.find(item => item.name.split(" ").join("").toLowerCase() === itemChoiceObject.item),
+        target = board.players.find(player => player.username.split(" ").join("").toLowerCase() === itemChoiceObject.target.split(" ").join("").toLowerCase())
     //Checking to see if game state allows consumables
     if (gameState.noConsumables === false){
         //Checking if item is consumed
@@ -891,7 +891,7 @@ function LevelUp() {
                 console.log("board is now level: ", board.level);
                 //Unlock tier 3 attack for all players
                 //Grant a boon to the party
-                boonDraw(board.boon.deck, Boons)
+                boonDraw()
                 console.log("Boon has been granted to the party: ", board.boon.drawn)    
                 break;
 
@@ -912,9 +912,8 @@ function draw(player, deck){
 }
 
 //This function is used to "grant" (draw) a boon for the party.
-function boonDraw(target, deck){
-    console.log(deck, target);
-    target.push(deck.shift())
+function boonDraw(){
+    board.boon.drawn.push(board.boon.deck.shift())
 }
 
 //Healing
@@ -1166,7 +1165,9 @@ exports.startNewScenario = function (){
                 output.scenarioDefeated = true
                 return output
             } else {
-                return new Alert("It seems you have won the game. Congratulations are in order.")
+                let victory = new Alert("It seems you have won the game. Congratulations are in order.")
+                victory.gameOver = true
+                return victory
             }
         }
 

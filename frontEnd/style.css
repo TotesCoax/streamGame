@@ -169,7 +169,9 @@ html {
 }
 
 .player-hand {
+    width: 250px;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;}
 
 .hand-slot {
@@ -203,6 +205,7 @@ html {
 
 .player-attack {
     display: flex;
+    background: rgba(119, 136, 153, 0.333);
 }
 
 .player-attack:nth-child(even) {
@@ -215,7 +218,6 @@ html {
 
 .attack-requirements {
     font-size: .75em;
-    background: rgba(119, 136, 153, 0.333);
 }
 
 .attack-name {
@@ -237,10 +239,15 @@ span.attack-damage {
 }
 
 .inactive {
-    height: 100px;
+    background-color: grey;
 }
 
 /* Items formatting */
+
+.inventory {
+    display: flex;
+    flex-wrap: wrap;
+}
 
 .player-item {
     width: 100px;

@@ -1,0 +1,19 @@
+{
+  "name": "streamgame",
+  "version": "1.0.0",
+  "description": "multiplayer dice and card game digital version",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TotesCoax/streamGame.git"
+  },
+  "author": "Chris K",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TotesCoax/streamGame/issues"
+  },
+  "homepage": "https://github.com/TotesCoax/streamGame#readme"
+}

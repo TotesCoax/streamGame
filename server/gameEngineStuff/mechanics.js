@@ -1,10 +1,10 @@
 //Class imports
-const {Die, Player, Scenario, EngineOutput, Alert, Prompt, ItemsNotice, Refresh} = require("../gameEngineStuff/classIndex")
+const {Die, Player, Scenario, EngineOutput, Alert, Prompt, ItemsNotice, Refresh} = require("./classIndex")
 //Card Data import
-const {Boons} = require("../gameEngineStuff/decks/boons")
-const {Playstyle} = require("../gameEngineStuff/decks/characters")
-const {lootDeck} = require("../gameEngineStuff/decks/items")
-const {Adventure} = require("../gameEngineStuff/decks/scenarioDecks")
+const {Boons} = require("./decks/boons")
+const {Playstyle} = require("./decks/characters")
+const {lootDeck} = require("./decks/items")
+const {Adventure} = require("./decks/scenarioDecks")
 
 //YOU SHOULD CONVERT PLAYSTYLE AND CARDS INTO CLASSES SOONtm
 

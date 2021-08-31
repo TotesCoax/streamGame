@@ -1,5 +1,5 @@
 //Game engine import
-const Game = require("../gameEngineStuff/mechanics")
+const Game = require("./gameEngineStuff/mechanics")
 
 const httpServer = require("http").createServer()
 const io = require('socket.io')(httpServer, {

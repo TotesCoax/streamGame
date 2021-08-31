@@ -1,4 +1,4 @@
-const {Playstyle} = require("../gameEngineStuff/decks/characters")
+const {Playstyle} = require("./decks/characters")
 
 //Object Factories
 

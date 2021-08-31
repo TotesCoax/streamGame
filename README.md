@@ -8,9 +8,9 @@ The original game is called Sword Art Online: Sword of Fellows.
 I really liked the mechanics of this game but what came in the box left me feeling like so much more could be done with the core mechanics.
 So I initially wanted to code the game engine, strip most of the branded flavor, and rework some of the sections of the game to be more open-ended.
 
-Current Phase (8/6/21): Phase 2
-  - Notes: The game *seems* to be fully playable and functioning with console commands, but you'd need to know how to navigate my maze of objects to do so.
-  - I've been the only one to test it so I'm sure there's still bugs floating out there so that is why I'm waiting foe the UI to be done so I can have friends QA it a bit.
+Current Phase (8/31/21): Phase 3
+  - I have a working prototype of the client and server code for single person testing. Just need to have some friends do a bit of QA for the engine.
+  - In the meantime, I get to research how I can turn it into a multiplayer game using socket.io
 
 Phase 1: Coding the game engine
   - Just translating the game rules into computer code to make the game engine

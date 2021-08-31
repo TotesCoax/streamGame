@@ -5,7 +5,7 @@ const httpServer = require("http").createServer()
 const io = require('socket.io')(httpServer, {
     cors: {
       //I don't like using *, but figuring out what the hell was going wrong was too much of a bother when I just want to code a prototype.
-      origin: "https://calm-plateau-34573.herokuapp.com/",
+      origin: "http://calm-plateau-34573.herokuapp.com/",
       methods: ["GET", "POST"]
     }
   });

@@ -1,4 +1,4 @@
-const socket = io("https://calm-plateau-34573.herokuapp.com/")
+const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket']})
 
 let gameboard = {}
 

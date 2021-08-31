@@ -1,4 +1,4 @@
-const socket = io("http://localhost:3000")
+const socket = io("https://calm-plateau-34573.herokuapp.com/")
 
 let gameboard = {}
 

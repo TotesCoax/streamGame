@@ -1,16 +1,19 @@
+'use strict';
+
+const express = require('express');
+const socketIO = require('socket.io');
+
+const PORT = process.env.PORT || 3000;
+const INDEX = '/index.html';
+
+const server = express()
+.use((req, res) => res.sendFile(INDEX, { root: __dirname }))
+.listen(PORT, () => console.log(`Listening on ${PORT}`));
+
 //Game engine import
 const Game = require("./gameEngineStuff/mechanics")
 
-const httpServer = require("http").createServer()
-const io = require('socket.io')(httpServer, {
-    cors: {
-      //I don't like using *, but figuring out what the hell was going wrong was too much of a bother when I just want to code a prototype.
-      origin: "https://calm-plateau-34573.herokuapp.com/",
-      methods: ["GET", "POST"],
-      credentials: true
-    }
-  });
-
+const io = socketIO(server);
 console.log("Server is on!")
 
 io.on('connection', client => {
@@ -150,9 +153,4 @@ io.on('connection', client => {
     client.on('disconnect', () => console.log("Client disconnected"))
 
 })
-
-
-
-httpServer.listen(process.env.PORT || 3000)
-
 

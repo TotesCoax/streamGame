@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/TotesCoax/streamGame/issues"
   },
-  "homepage": "https://github.com/TotesCoax/streamGame#readme"
+  "homepage": "https://github.com/TotesCoax/streamGame#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^4.2.0"
+  }
 }

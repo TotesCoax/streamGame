@@ -1,5 +1,5 @@
 const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket', 'polling', 'flashsocket']})
-
+// const socket = io("http://localhost:3000", {transports: ['websocket', 'polling', 'flashsocket']})
 let gameboard = {}
 
 socket.on('init', handleInit)

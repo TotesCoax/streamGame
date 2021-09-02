@@ -10,7 +10,15 @@ const {Adventure} = require("./decks/scenarioDecks")
 
 //This function is used to send the gamestate info to the front end on request.
 exports.newGameState = function newExport() {
+    if (board.players.length === 0){
+        if (board.players.findIndex(player => player.status === "active") > 0){
+            return new Refresh('raw', exportGamestate())
+        } else {
+            return requestPlayerStatusChoice("active")
+        }
+    } else {
         return new Refresh('raw', exportGamestate())
+    }
 }
 //Global Object reservations
 let board, gameState

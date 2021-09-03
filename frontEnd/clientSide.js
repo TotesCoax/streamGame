@@ -1,11 +1,72 @@
 const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket', 'polling', 'flashsocket']})
 // const socket = io("http://localhost:3000", {transports: ['websocket', 'polling', 'flashsocket']})
-let gameboard = {}
+
+const initialScreen = document.querySelector("#initialScreen")
+const newSessionBtn = document.querySelector("#newSessionButton")
+const joinSessionBtn = document.querySelector("#joinSessionButton")
+const sessionCodeInput = document.querySelector("#sessionCodeInput")
+const sessionCodeDisplay = document.querySelector("#sessionCodeDisplay")
+
+newSessionBtn.addEventListener('click', newSession)
+joinSessionBtn.addEventListener('click', joinSession)
+
+function newSession(){
+    socket.emit('newSession')
+    initialScreen.classList.add("hidden")
+}
+
+function joinSession(){
+    let code = sessionCodeInput.value
+    socket.emit('joinSession', code)
+}
+
+let gameboard = {},
+    playerNumber
 
 socket.on('init', handleInit)
 
 function handleInit(msg) {
     console.log(msg)
+}
+
+socket.on('sessionCreated', handleNewSession)
+
+function handleNewSession(number){
+    playerNumber = number
+}
+
+socket.on('sessionCode', handleSessionCode)
+
+function handleSessionCode(sessionCode){
+    sessionCodeDisplay.innerText = sessionCode
+}
+
+socket.on('noSession', handleNoSession)
+
+function handleNoSession(){
+    resetUI()
+    alert("Unknown game code")
+}
+
+socket.on('tooManyPlayers', handleTooManyPlayers)
+
+function handleTooManyPlayers(){
+    resetUI()
+    alert("Too many players are in that session")
+}
+
+function resetUI(){
+    playerNumber = null
+    sessionCodeInput.value = ""
+    sessionCodeDisplay.innerText = ""
+    initialScreen.classList.remove("hidden")
+}
+
+socket.on('playerJoined', handlePlayerJoined)
+
+function handlePlayerJoined(number){
+    playerNumber = number
+    initialScreen.classList.add("hidden")
 }
 
 socket.on('gamestate', handleGamestate)
@@ -826,5 +887,3 @@ function toggleRollHUDdisplay(){
     })
 
 }
-
-document.addEventListener("load", requestBoardExport())

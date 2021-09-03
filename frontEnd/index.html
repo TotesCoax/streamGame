@@ -141,12 +141,24 @@
 
 <!-- End Template section -->
 
-    <div id="overlay" class="hidden">
+    <div id="initialScreen" class="cover">
+        <div class="alert">
+            <h1>Coax's Game Prototype</h1>
+            <button type="button" id="newSessionButton">Create new session</button>
+            <div>OR</div>
+            <div>
+                <input type="text" placeholder="Enter Session Code" id="sessionCodeInput">
+            </div>
+            <button type="button" id="joinSessionButton">Join session</button>
+        </div>
+    </div>
+
+    <div id="overlay" class="cover hidden">
         <div class="alert">
             
         </div>
     </div>
-    <div id="gameboardContainer">
+    <div id="gameboardContainer" class="hidden">
         <div id="scenarioContainer">
 
         </div>
@@ -206,6 +218,7 @@
         <!-- Gameboard end div -->
     </div>
     <div id="devTracker" class="stat-box">
+        <h2>Your game code is: <span id="sessionCodeDisplay"></span></h2>
         Dev Tracker:
         <div class="gameboard-level">
             Board Level: <span class="gameboard-level-counter">X</span>

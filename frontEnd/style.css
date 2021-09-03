@@ -240,6 +240,7 @@ span.attack-damage {
 
 .inactive {
     background-color: grey;
+    height: max-content;
 }
 
 /* Items formatting */

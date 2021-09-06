@@ -1,5 +1,5 @@
-const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket', 'polling', 'flashsocket']})
-// const socket = io("http://localhost:3000", {transports: ['websocket', 'polling', 'flashsocket']})
+// const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket', 'polling', 'flashsocket']})
+const socket = io("http://localhost:3000", {transports: ['websocket', 'polling', 'flashsocket']})
 
 const initialScreen = document.querySelector("#initialScreen")
 const newSessionBtn = document.querySelector("#newSessionButton")
@@ -96,9 +96,11 @@ function handleGamestate(data){
             }
             if (gameboard.attackHand.length > 0){
                 refreshAttackHand()
+                console.log("Attack hand refreshed")
             }
             if (gameboard.dicePool.active.length > 0){
                 refreshDice()
+                console.log("Rolling hands refreshed")
             }
             if (gameboard.gameState.turnCounter > 0 && gameboard.players.findIndex(player => player.status === "support") >= 0){
                 insertStartTurnButton()
@@ -129,6 +131,12 @@ function handleAlert(data) {
     if (!data.gameOver){
         requestBoardExport()
     }
+}
+
+socket.on('abilityUsed', handleAbilityUsed)
+
+function handleAbilityUsed(data){
+    handleGamestate(data)
 }
 
 socket.on('itemUsed', handleItemUsed)
@@ -487,7 +495,7 @@ function clearPrompt(){
         while (alertContainer.firstChild) {
             alertContainer.removeChild(alertContainer.firstChild)
         }
-    overlay.classList.toggle("hidden")
+    overlay.classList.add("hidden")
     }
 
 function promptPlayer(data){
@@ -536,7 +544,7 @@ function promptPlayer(data){
     newSubmit.addEventListener("click", checkPlayerChoice)
     newSubmit.innerText = "Submit!"
     newForm.appendChild(newSubmit)
-    overlay.classList.toggle("hidden")
+    overlay.classList.remove("hidden")
 }
 
 function checkPlayerChoice(e) {
@@ -740,13 +748,13 @@ function settingStatusHTML() {
 //Send keep die command
 function sendKeepDie(e) {
     console.log(e.target.previousElementSibling.id)
-    let foundDie = Number(e.target.previousElementSibling.id)
+    let foundDie = e.target.previousElementSibling.id
     socket.emit('keepDie', foundDie)
 }
 
 function sendSubmitDie(e){
     console.log(e.target.previousElementSibling.id)
-    let foundDie = Number(e.target.previousElementSibling.id)
+    let foundDie = e.target.previousElementSibling.id
     socket.emit('submitDie', foundDie)
 }
 
@@ -754,7 +762,7 @@ function sendAttackPhase() {
     let choice = confirm("Are you sure you want to move to attack phase?")
     if (choice){
         socket.emit('toAttackPhase')
-        document.querySelector(".attack-hand").classList.toggle("hidden")
+        document.querySelector(".attack-hand").classList.remove("hidden")
         toggleRollHUDdisplay()
     }
 }
@@ -773,15 +781,18 @@ function activateAbility(e){
     let player = gameboard.players.find(entry => entry.username === e.target.dataset.username)
     if(player.abilityCounter > 0){
         
-        let newBtn = document.createElement("button"),
-            oldBtn = document.querySelector(".ability-button")
+        let confirmBtn = document.createElement("button"),
+            cxlBtn = document.createElement("button"),
+            oldBtn = document.querySelector(`#${e.target.dataset.username} .ability-button`)
         
-        oldBtn.classList.toggle("hidden")
-        newBtn.innerText = "Confirm"
-        newBtn.dataset.username = e.target.dataset.username
-        newBtn.addEventListener("click", sendAbility)
-        newBtn.classList.add("remove-after-ability")
-        e.target.after(newBtn)
+        oldBtn.classList.add("hidden")
+        confirmBtn.innerText = "Confirm"
+        confirmBtn.dataset.username = e.target.dataset.username
+        confirmBtn.addEventListener("click", sendAbility)
+        confirmBtn.classList.add("remove-after-ability")
+        e.target.after(confirmBtn)
+
+        
         
         let targets = document.querySelectorAll(".die")
         targets.forEach(die =>{
@@ -805,7 +816,7 @@ function sendAbility(e) {
 
     let chosenDiceIDs = []
     for(let i = 0; i < chosenDice.length; i++){
-        chosenDiceIDs[i] = Number(chosenDice[i].id)
+        chosenDiceIDs[i] = chosenDice[i].id
     }
     let useAbilityObject = {
         username: submitter,
@@ -834,7 +845,7 @@ function endAttackHand() {
     while (AH.firstChild) {
         AH.removeChild(AH.firstChild)
     }
-    document.querySelector(".attack-hand").classList.toggle("hidden")
+    document.querySelector(".attack-hand").classList.add("hidden")
 }
 
 function sendRoll(e){

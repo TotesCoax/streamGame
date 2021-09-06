@@ -47,14 +47,18 @@ io.on('connection', client => {
       console.log("A player is trying to connect to: ", sessionCode)
       // console.log(room)
       // console.log(room.size)
-      let numClients = room.size
-      if (numClients === 0){
-        // console.log("No session triggered")
+      if (room){
+        if (room.size === 0){
+          // console.log("No session triggered")
+          return
+        } else if (room.size > 5){
+          // console.log("Too many players triggered");
+          client.emit('tooManyPlayers')
+          return
+        }
+      }
+      else {
         client.emit('noSession')
-        return
-      } else if (numClients > 5){
-        // console.log("Too many players triggered");
-        client.emit('tooManyPlayers')
         return
       }
       clientRooms[client.id] = sessionCode
@@ -62,7 +66,7 @@ io.on('connection', client => {
       client.emit('sessionCode', sessionCode)
       // console.log("New player joined: ", sessionCode, "Size is now: ", room.size)
       client.number = room.size
-      client.emit('playerJoined', client.number)
+      client.emit('playerJoined', client.number)  
     }
 
     client.on('requestBoardState', handleRequestEvent)
@@ -110,7 +114,7 @@ io.on('connection', client => {
     function handleNewScneario(){
       console.log("Start scenario has been requested.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.startNewScenario(),roomName)
+      theMasterController(Game.startNewScenario(), roomName)
     }
 
     client.on('itemOver', handleItemOver)
@@ -148,7 +152,7 @@ io.on('connection', client => {
     function handleAbility(abilityObjectFromClient){
       console.log("Ability use has been received.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.useAbility(abilityObjectFromClient, roomName))
+      theMasterController(Game.useAbility(abilityObjectFromClient), roomName)
     }
 
     client.on('toAttackPhase', handleAttackPhase)
@@ -179,7 +183,7 @@ io.on('connection', client => {
     function theMasterController(data, roomName){
       state[roomName] = Game.serverGameState()
       // console.log("States:", state)
-      // console.log(data.type)
+      console.log(data.type)
       switch (data.type) {
         case "prompt":
           console.log("Sending a prompt request!")
@@ -210,9 +214,8 @@ io.on('connection', client => {
     }
 
     function emitGamestateRoom(code, roomName, data){
-      // console.log(roomName, data)
-      io.to(roomName)
-        .emit(code, data)
+      // console.log(roomName, code, data)
+      io.to(roomName).emit(code, data)
     }
 
     client.on('disconnect', () => console.log("Client disconnected"))

@@ -168,6 +168,10 @@ html {
     background: lightgreen;
 }
 
+.rollButton.wantsReroll {
+    background: purple;
+}
+
 .player-hand {
     width: 250px;
     display: flex;

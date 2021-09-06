@@ -5,6 +5,7 @@ const {Boons} = require("./decks/boons")
 const {Playstyle} = require("./decks/characters")
 const {lootDeck} = require("./decks/items")
 const {Adventure} = require("./decks/scenarioDecks")
+const {makeid} = require("../utils")
 
 //YOU SHOULD CONVERT PLAYSTYLE AND CARDS INTO CLASSES SOONtm
 
@@ -225,8 +226,8 @@ function prepareScenario(deck, level){
     console.log("Pulling the scenario card");
     let clone = shuffle(deck[level])
     board.scenarios.push(new Scenario(clone[0]))
-    console.log("The scenario card has been pulled")
-    console.log(board.scenarios[level])
+    console.log("The scenario card has been pulled: ", clone[0].name)
+    // console.log(board.scenarios)
 }
 
 
@@ -237,9 +238,9 @@ function setHands(scenario){
 
     function populateHand(hand, num){
         for (let i = 0; i < num; i++){
-        hand[i] = new Die(Math.round(Date.now() * Math.random()))
+        hand[i] = new Die(makeid(6))
         }
-        //console.log(hand)
+        // console.log(hand)
     }
     populateHand(board.dicePool.active, scenario.card.activeDice)
     populateHand(board.dicePool.support, scenario.card.suppDice)
@@ -306,7 +307,7 @@ exports.setPlayerStatus = function setPlayerStatus(choiceObject){
     if (choiceObject.requestCode === "support"){
         chosenPlayer.exhausted = true
     }
-    console.log(chosenPlayer)
+    console.log(chosenPlayer.username)
     if (choiceObject.requestCode === "active"){
         return startOfTurnItemsPhase()
     } else {
@@ -402,7 +403,6 @@ exports.useConsumable = function useConsumable(itemChoiceObject){
 
 function isAnyoneActive(){
     let foundPlayer = board.players.find(player => player.status === "active")
-    console.log("Active player?: ", foundPlayer)
     return foundPlayer
 }
 
@@ -483,7 +483,7 @@ function findDie(dieID){
 
 exports.keepDie = function keepDie(dieID){
     let foundDie = findDie(dieID)
-    if (foundDie.type === "noDice"){
+    if (foundDie.type === "alert"){
         return foundDie
     } else if (foundDie.loc !== "attack") {
         foundDie.die.toggleKeep()
@@ -493,7 +493,7 @@ exports.keepDie = function keepDie(dieID){
 
 exports.submitDie = function submitDie(dieID) {
     let foundDie = findDie(dieID)
-    if (foundDie.type === "noDice"){
+    if (foundDie.type === "alert"){
         return foundDie
     } else if (foundDie.loc === "attack") {
         foundDie.die.toggleSubmit()
@@ -572,13 +572,13 @@ function moveToAttackPhaseCheck(){
     function createAttackHand() {
         let counter = 0
         for (let i = 0; i < board.dicePool.active.length; i++){
-            board.attackHand[counter] = new Die(Math.round(Date.now() * Math.random()))
+            board.attackHand[counter] = new Die(makeid(6))
             board.attackHand[counter].value = board.dicePool.active[i].value
             board.attackHand[counter].keep = true
             counter++
         }
         for (let i = 0; i < board.dicePool.support.length; i++){
-            board.attackHand[counter] = new Die(Math.round(Date.now() * Math.random()))
+            board.attackHand[counter] = new Die(makeid(6))
             board.attackHand[counter].value = board.dicePool.support[i].value
             board.attackHand[counter].keep = true
             counter++
@@ -626,36 +626,39 @@ function moveToAttackPhaseCheck(){
             //Apply new damage amount to scenario
             board.scenarios[board.level].dmgCounter+= (calcDmg - currentStageDef)
         }
-        console.log(calcDmg, " has been applied to the scenario")
+        console.log(calcDmg, "dmg has been applied to the scenario")
     }
 
 //Find and initiate player ability based on client info
 exports.useAbility = function useAbility(abilityObject){
     let player = board.players.find(player => player.username === abilityObject.username),
         diceArray = []
-    //console.log("Starting ability:", abilityObject, player)
+    console.log("Starting ability:", abilityObject, player)
     if (player.status === "inactive"){
         return new Alert("Abilities can only be used by the active player or their support.")
     }
     if (player.abilityCounter === 0){
         return new Alert("You don't have any ability uses left!")
-    } else {
-        //console.log("Target array:", abilityObject.target)
-        abilityObject.target.forEach(dieID =>{
-            diceArray.push(findDie(dieID).die)
-        })
-        //Each ability returns nothing, a string (for failure), or a prompt-style response object
-        //console.log(typeof(player.playstyle.ability(diceArray)))
-        switch (typeof(player.playstyle.ability(diceArray))) {
-            case "string":
-                return new Alert(player.playstyle.ability(diceArray))
-            default:
-                player.abilityCounter--
-                return new Refresh("abilityUsed", exportGamestate())
+    }
+    if (gameState.noAbilities){
+        return new Alert("Something is preventing you from using abilities!")
+    }
+    
+    //console.log("Target array:", abilityObject.target)
+    abilityObject.target.forEach(dieID =>{
+        diceArray.push(findDie(dieID).die)
+        console.log(diceArray)
+    })
+    //Each ability returns nothing, a string (for failure), or a prompt-style response object
+    //console.log(typeof(player.playstyle.ability(diceArray)))
+    switch (typeof(player.playstyle.ability(diceArray))) {
+        case "string":
+            return new Alert(player.playstyle.ability(diceArray))
+        default:
+            player.abilityCounter--
+            return new Refresh("abilityUsed", exportGamestate())
         }
     }
-
-}
 
 //If the # of dice is met, and the attack fits the style, dmg is issued
 exports.attack = function attack(attackObjFromServer) {
@@ -919,7 +922,7 @@ function LevelUp() {
 
 //This function lets a player draw a card from a deck. Currently just used for the item deck
 function draw(player, deck){
-    console.log(deck, player);
+    // console.log(deck, player);
     player.inventory.push(deck.shift())
 }
 
@@ -1072,7 +1075,7 @@ exports.startNewScenario = function (){
         //Apply any reroll modifiers to respective party
         setRerolls()
         //Create player "hands" based on the scenario's restrictions
-        console.log(board.scenarios)
+        // console.log(board.scenarios)
         setHands(board.scenarios[board.level])
         //Initial Rolls for scenario
         console.log("Initial Rolls for the scenario")

@@ -15,7 +15,6 @@ class Die {
     rollDie()  {
         if (this.keep === false){
             this.value = Math.floor(Math.random() * 6) + 1
-            console.log(this.id, " was rolled!")
         }
     }
 //This is used in the rolling phase

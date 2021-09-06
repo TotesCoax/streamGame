@@ -220,14 +220,14 @@ let scenario2Deck = [
 ]
 
 let scenario3Deck = [
-    {name:"A giant beast",
+    {name:"A giant drunken giant",
     tier:2,
     description:"itemDescription",
     activeDice:4,
     suppDice:4,
     stage:[
         {
-            name:"Wild swings",
+            name:"I'm fine, the floor just needs to stop moving on me!",
             hp:50,
             dmg:5,
             def:0,
@@ -237,7 +237,7 @@ let scenario3Deck = [
             }
         },
         {
-            name:"Enraged",
+            name:"I'm not cut off! You're cut off! ...Said by your limbs! HAH!",
             hp:50,
             dmg:15,
             def:0,

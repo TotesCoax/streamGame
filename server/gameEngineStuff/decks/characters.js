@@ -10,11 +10,11 @@ let Playstyle = [
         abilityMax: [[1,1,1],[2,1,1],[3,2,1]],
         abilityText: "Change one dice value into a 6"/*Supposed to be 1 or 6*/,
         attack:[
-            {tier: 0, diceReq: 1, dmg:1, threshold: 6, name: "Basic Attack", desc: "Give the enemy a bonk"},
-            {tier: 0, diceReq: 2, dmg:4, threshold: false, name: "Punch", desc: "A simple punch"},
-            {tier: 0, diceReq: 4, dmg:10, threshold: false, name: "Kick", desc: "A simple kick"},
-            {tier: 1, diceReq: 6, dmg:16, threshold: false, name: "Combo", desc: "You swing wildly and somehow connect on a few occasions"},
-            {tier: 2, diceReq: 8, dmg:27, threshold: false, name: "Finisher", desc: "It's not pretty but it gets the job done"}
+            {tier: 0, diceReq: 1, dmg:1, threshold: 6, pierce: 0, name: "Basic Attack", desc: "Give the enemy a bonk"},
+            {tier: 0, diceReq: 2, dmg:4, threshold: false, pierce: 0, name: "Punch", desc: "A simple punch"},
+            {tier: 0, diceReq: 4, dmg:10, threshold: false, pierce: 0, name: "Kick", desc: "A simple kick"},
+            {tier: 1, diceReq: 6, dmg:16, threshold: false, pierce: 0, name: "Combo", desc: "You swing wildly and somehow connect on a few occasions"},
+            {tier: 2, diceReq: 8, dmg:27, threshold: false, pierce: 0, name: "Finisher", desc: "It's not pretty but it gets the job done"}
         ],
         ability: function(diceArray) {
             console.log(diceArray)
@@ -62,12 +62,12 @@ let Playstyle = [
         abilityText: "Flip up to two standard dice to their opposite sides.(Pairing 1:6 2:5 3:4)",
         attack:[
             //The default names are ballet terms.
-            {tier: 0, diceReq: 2, dmg:1, threshold: false, name: "Demi", desc: "Basic? My attacks? Perish the thought."},
-            {tier: 0, diceReq: 3, dmg:3, threshold: false, name: "Pique", desc: "A three step combo"},
-            {tier: 0, diceReq: 4, dmg:5, threshold: false, name: "En Croix", desc: "A four step combo with a minor flourish"},
-            {tier: 0, diceReq: 5, dmg:8, threshold: false, name: "Rond de jambe", desc: "A five step combo with a major flourish"},
-            {tier: 1, diceReq: 6, dmg:12, threshold: false, name: "Port de bras", desc: "A six step combo with hits on the strike and return"},
-            {tier: 2, diceReq: 8, dmg:24, threshold: "1,1,2,3,4,5,6,6", name: "Magnum Opus", desc: "Dear god, it's beautiful."}
+            {tier: 0, diceReq: 2, dmg:1, threshold: false, pierce: 0, name: "Demi", desc: "Basic? My attacks? Perish the thought."},
+            {tier: 0, diceReq: 3, dmg:3, threshold: false, pierce: 0, name: "Pique", desc: "A three step combo"},
+            {tier: 0, diceReq: 4, dmg:5, threshold: false, pierce: 0, name: "En Croix", desc: "A four step combo with a minor flourish"},
+            {tier: 0, diceReq: 5, dmg:8, threshold: false, pierce: 0, name: "Rond de jambe", desc: "A five step combo with a major flourish"},
+            {tier: 1, diceReq: 6, dmg:12, threshold: false, pierce: 0, name: "Port de bras", desc: "A six step combo with hits on the strike and return"},
+            {tier: 2, diceReq: 8, dmg:24, threshold: "1,1,2,3,4,5,6,6", pierce: 0, name: "Magnum Opus", desc: "Dear god, it's beautiful."}
         ],
         ability: function(diceArray) {
             if (diceArray.length <= 2){
@@ -145,11 +145,11 @@ let Playstyle = [
         abilityText: "Change up to two standard dice to a value of 5",
         attack:[
             //Attack names are boxing punch terms.
-            {tier: 0, diceReq: 1, dmg:1, threshold: 1, name: "Basic Attack", desc: "Give the enemy a bonk"},
-            {tier: 0, diceReq: 2, dmg:3, threshold:10, name: "Jab", desc: "An attack to keep the enemy at distance"},
-            {tier: 0, diceReq: 4, dmg:8, threshold:20, name: "Cross", desc: "An attack to counter enemy aggression"},
-            {tier: 1, diceReq: 6, dmg:15, threshold:32, name: "Hook", desc: "The enemy drops their guard and you take advantage"},
-            {tier: 2, diceReq: 8, dmg:25, threshold:45, name: "Uppercut", desc: "An all-in attack on the enemy"}
+            {tier: 0, diceReq: 1, dmg:1, threshold: 1, pierce: 0, name: "Basic Attack", desc: "Give the enemy a bonk"},
+            {tier: 0, diceReq: 2, dmg:3, threshold:10, pierce: 0, name: "Jab", desc: "An attack to keep the enemy at distance"},
+            {tier: 0, diceReq: 4, dmg:8, threshold:20, pierce: 0, name: "Cross", desc: "An attack to counter enemy aggression"},
+            {tier: 1, diceReq: 6, dmg:15, threshold:32, pierce: 0, name: "Hook", desc: "The enemy drops their guard and you take advantage"},
+            {tier: 2, diceReq: 8, dmg:25, threshold:45, pierce: 0, name: "Uppercut", desc: "An all-in attack on the enemy"}
         ],
         ability: function(targetArray) {
             if (targetArray.length > 2){
@@ -198,11 +198,11 @@ let Playstyle = [
         abilityMax: [[1,1,1],[2,1,1],[3,2,1]],
         abilityText: "Change up to two standard dice to a value of 2",
         attack:[
-            {tier: 0, diceReq: 1, dmg:1, threshold:6, name: "Basic Attack", desc: "Give the enemy a bonk"},//Original design calls for 5 or 6 to be valid
-            {tier: 0, diceReq: 2, dmg:3, threshold:4, name: "Sleight of hand", desc: "Distract the enemy so you can strike with your off-hand"},
-            {tier: 0, diceReq: 4, dmg:6, threshold:8, name: "Calculated strike", desc: "You find a weakness in their guard and exploit it"},
-            {tier: 1, diceReq: 6, dmg:12, threshold:10, name: "Backstab", desc: "Dash to the enemy's flank and strike"},
-            {tier: 2, diceReq: 8, dmg:20, threshold:12, name: "Pocket sand", desc: "GYAAAAHHH!!"}
+            {tier: 0, diceReq: 1, dmg:1, threshold:6, pierce: 0, name: "Basic Attack", desc: "Give the enemy a bonk"},//Original design calls for 5 or 6 to be valid
+            {tier: 0, diceReq: 2, dmg:3, threshold:4, pierce: 5, name: "Sleight of hand", desc: "Distract the enemy so you can strike with your off-hand"},
+            {tier: 0, diceReq: 4, dmg:6, threshold:8, pierce: 5, name: "Calculated strike", desc: "You find a weakness in their guard and exploit it"},
+            {tier: 1, diceReq: 6, dmg:12, threshold:10, pierce: 10, name: "Backstab", desc: "Dash to the enemy's flank and strike"},
+            {tier: 2, diceReq: 8, dmg:20, threshold:12, pierce: 10, name: "Pocket sand", desc: "GYAAAAHHH!!"}
         ],
         ability: function(targetArray) {
             if (targetArray.length > 2){

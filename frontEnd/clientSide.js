@@ -1,5 +1,5 @@
-const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket', 'polling', 'flashsocket']})
-// const socket = io("http://localhost:3000", {transports: ['websocket', 'polling', 'flashsocket']})
+// const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket', 'polling', 'flashsocket']})
+const socket = io("http://localhost:3000", {transports: ['websocket', 'polling', 'flashsocket']})
 
 const initialScreen = document.querySelector("#initialScreen")
 const newSessionBtn = document.querySelector("#newSessionButton")
@@ -319,6 +319,10 @@ function fillUpPlayers(){
             }
             newAttack.querySelector(".attack-name").innerText = attackImport[a].name
             newAttack.querySelector(".attack-damage").innerText = attackImport[a].dmg
+            if (attackImport[a].pierce > 0){
+                newAttack.querySelector(".attack-pierce").classList.remove("hidden")
+                newAttack.querySelector(".pierce-value").innerText = attackImport[a].pierce
+            }
             newAttack.querySelector(".attack-button").dataset.attackNameTrim = attackImport[a].name.split(" ").join("")
             newAttack.querySelector(".attack-button").dataset.username = playerStats.username
         }

@@ -608,10 +608,11 @@ function moveToAttackPhaseCheck(){
     }
 
     //Dmg calc for scenario
-    function applyDMGtoScenario(player, dmg) {
+    function applyDMGtoScenario(player, chosenAttack, dmg) {
         let calcDmg = dmg,
             inv = player.inventory.filter(item => item.timing === "attack"),
-            currentStageDef = board.scenarios[board.level].card.stage[board.scenarios[board.level].stageCounter].def
+            currentStageDef = board.scenarios[board.level].card.stage[board.scenarios[board.level].stageCounter].def,
+            pierceValue = chosenAttack.pierce
         //Search inventory for any damage buff items or ability tokens
         //console.log(inv)
         //If any buffs are found, for each buff invoke their ability to modify dmg
@@ -622,7 +623,11 @@ function moveToAttackPhaseCheck(){
                 console.log("New dmg: ", calcDmg)
             }
         }
-        if ((calcDmg - currentStageDef) > 0){
+        let mitigation = currentStageDef - pierceValue
+        if (mitigation > 0){
+            mitigation = 0
+        }
+        if (calcDmg - mitigation > 0){
             //Apply new damage amount to scenario
             board.scenarios[board.level].dmgCounter+= (calcDmg - currentStageDef)
         }
@@ -672,7 +677,7 @@ exports.attack = function attack(attackObjFromServer) {
     if (player.playstyle.attack.findIndex(attack => attack.name.split(" ").join("").toLowerCase() === attackObjFromServer.attackName.toLowerCase()) === 0){
         console.log("Basic attack detected")
         if (player.playstyle.basicAttack(attackSubmission, chosenAttack)){
-            applyDMGtoScenario(player, dmg)
+            applyDMGtoScenario(player, chosenAttack, dmg)
             return new Refresh("attackPhase", exportGamestate())
         } else {
             return returnDiceToAttackHand(attackSubmission)
@@ -680,7 +685,7 @@ exports.attack = function attack(attackObjFromServer) {
         //If the number of dice required is met AND the character mechanic is met, assign dmg
     } else if (diceReq > 1 && numDiceCheck(diceReq, attackSubmission) && style(attackSubmission, chosenAttack)){
         console.log("Attack succeeds. " + dmg + " damage has been submitted")
-        applyDMGtoScenario(player, dmg)
+        applyDMGtoScenario(player, chosenAttack, dmg)
         //The used dice should automatically be deleted/discarded one the function ends
         //console.log(board.attackHand)
         return new Refresh("attackPhase", exportGamestate())

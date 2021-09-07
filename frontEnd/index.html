@@ -94,7 +94,7 @@
     <template id="playerAttackTemplate">
         <div class="player-attack">
             <div class="attack-info">
-                <div class="attack-requirements">
+                <div class="attack-requirements em75">
                     <span class="attack-req-dice">X</span> <span class="attack-req-threshold"></span>
                 </div>
                 <div class="attack-details">
@@ -103,7 +103,7 @@
             </div>
             <div class="attack-output">
                 <span class="attack-damage">YY</span>
-                <span class="attack-augment"></span>
+                <span class="attack-pierce em75 hidden">Pierce: <span class="pierce-value">ZZ</span></span>
             </div>
             <button class="attack-button" onclick="sendAttack(event)">Attack</button>
         </div>

@@ -141,10 +141,10 @@ io.on('connection', client => {
 
     client.on('roll', handleRoll)
 
-    function handleRoll(){
+    function handleRoll(status){
       console.log("Roll has been requested.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.rollBoth(), roomName)
+      theMasterController(Game.wantsReroll(status), roomName)
     }
 
     client.on('useAbility', handleAbility)

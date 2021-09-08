@@ -103,7 +103,7 @@ function rollHand(hand) {
     for (let i = 0; i < hand.length; i++) {
         hand[i].rollDie()
     }
-    //console.log(hand)
+    console.log(hand)
 }
 
 //Game over check
@@ -502,16 +502,47 @@ exports.submitDie = function submitDie(dieID) {
 
 }
 
-exports.rollBoth = function rollBoth() {
+exports.wantsReroll = function wantsReroll(status){
+    let requester = board.players.find(player => player.status === status)
+
+    toggleWantsReroll(requester)
+
     let active = board.players.find(player => player.status === "active"),
         support = board.players.find(player => player.status === "support")
 
+    if (rollCheck(active, support)){
+        return rollBoth(active, support)
+    } else {
+        return new Refresh('rollPhase', exportGamestate())
+    }
+}
+
+function toggleWantsReroll(player){
+    console.log("Toggling wants reroll for: ", player.username)
+    switch (player.wantsReroll) {
+        case false:
+            player.wantsReroll = true
+            break;
+    
+        default:
+            player.wantsReroll = false
+            break;
+    }
+}
+
+function rollCheck(active, support){
+    return active.wantsReroll && support.wantsReroll
+}
+
+function rollBoth(active, support) {
     let activeCheck = rollActive(active),
         suppCheck = rollSupport(support)
 
     if (!activeCheck && !suppCheck){
         return new Alert("Both players have no rerolls remaining.")
     }
+    active.wantsReroll = false
+    support.wantsReroll = false
     return new Refresh("rollPhase", exportGamestate())
 }
 

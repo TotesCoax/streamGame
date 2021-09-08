@@ -170,7 +170,7 @@
                 </div>
                 <div id="activeRolls" class="roll-dash hidden">
                     <div class="rollHUD">
-                        <button class="rollButton activeRoll" type="button" onclick="sendRoll(event)">Roll</button>
+                        <button id="activeRoll" class="rollButton" type="button" onclick="sendRoll(event)" data-status="active">Roll</button>
                         <button id="moveToAttack" type="button" onclick="sendAttackPhase()">Go To Attack Phase</button>
                         <p>Rerolls left:<span class="roll-counter">0</span></p>
                     </div>
@@ -196,7 +196,7 @@
             <div id="supportPlayerPosition" class="position">
                 <div id="supportRolls" class="roll-dash hidden">
                     <div class="rollHUD">
-                        <button class="rollButton supportRoll" type="button" onclick="sendRoll(event)">Roll</button>
+                        <button id="supportRoll" class="rollButton" type="button" onclick="sendRoll(event)" data-status="support">Roll</button>
                         <p>Rerolls left:<span class="roll-counter">0</span></p>
                     </div>
                     <div id="supportPlayerHand" class="player-hand">

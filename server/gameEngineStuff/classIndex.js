@@ -60,6 +60,8 @@ class Player {
         this.dmgCounter = 0
         //There can be three status: active, support, and inactive - this is for rolling and CSS positioning
         this.status = "inactive"
+        //wantsReroll is for the rolling function on the client
+        this.wantsReroll = false
         //Exhausted is for selecting supports
         this.exhausted = false
         //Section for debuffs

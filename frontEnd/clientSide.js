@@ -86,6 +86,7 @@ function handleGamestate(data){
             break;
         case "rollPhase":
             refreshDice()
+            rollButtonStatus()
             break;
         case "attackPhase":
             refreshAttackHand()
@@ -853,20 +854,25 @@ function endAttackHand() {
 }
 
 function sendRoll(e){
-    e.target.classList.toggle("wantsReroll")
-    let rollButtons = document.querySelectorAll(".rollButton"),
-        wantsRerolls = document.querySelectorAll(".wantsReroll")
+    let status = e.target.dataset.status
 
     console.log(e)
-    console.log(rollButtons, wantsRerolls)
+    socket.emit('roll', status)
+}
 
-    if (rollButtons.length === wantsRerolls.length){
-        socket.emit('roll')
-        wantsRerolls.forEach(player => {
-            player.classList.remove("wantsReroll")
-        })
+function rollButtonStatus(){
+    let rollButtons = document.querySelectorAll(".rollButton"),
+        activePlayer = gameboard.players.find(player => player.status === "active"),
+        supportPlayer = gameboard.players.find(player => player.status === "support")
+
+    rollButtons.forEach(button => button.classList.remove("wantsReroll"))
+
+    if (activePlayer.wantsReroll){
+        document.querySelector("#activeRoll").classList.add("wantsReroll")
     }
-    
+    if (supportPlayer.wantsReroll){
+        document.querySelector("#supportRoll").classList.add("wantsReroll")
+    }
 }
 
 function updateRerollCount(){

@@ -67,7 +67,7 @@ let Playstyle = [
             {tier: 0, diceReq: 4, dmg:5, threshold: false, pierce: 0, name: "En Croix", desc: "A four step combo with a minor flourish"},
             {tier: 0, diceReq: 5, dmg:8, threshold: false, pierce: 0, name: "Rond de jambe", desc: "A five step combo with a major flourish"},
             {tier: 1, diceReq: 6, dmg:12, threshold: false, pierce: 0, name: "Port de bras", desc: "A six step combo with hits on the strike and return"},
-            {tier: 2, diceReq: 8, dmg:24, threshold: "1,1,2,3,4,5,6,6", pierce: 0, name: "Magnum Opus", desc: "Dear god, it's beautiful."}
+            {tier: 2, diceReq: 8, dmg:24, threshold: [1,1,2,3,4,5,6,6], pierce: 0, name: "Magnum Opus", desc: "Dear god, it's beautiful."}
         ],
         ability: function(diceArray) {
             if (diceArray.length <= 2){
@@ -108,7 +108,7 @@ let Playstyle = [
             console.log(attackSubmission)
             if (chosenAttack.diceReq === 8){
                 console.log("They're trying the complicated thing")
-                if (attackSubmission === [1,1,2,3,4,5,6,6,]){
+                if (attackSubmission.sort((a, b) => a - b) === threshold){
                     console.log("MAGNUM!")
                     return true
                 } else {
@@ -198,7 +198,7 @@ let Playstyle = [
         abilityMax: [[1,1,1],[2,1,1],[3,2,1]],
         abilityText: "Change up to two standard dice to a value of 2",
         attack:[
-            {tier: 0, diceReq: 1, dmg:1, threshold:6, pierce: 0, name: "Basic Attack", desc: "Give the enemy a bonk"},//Original design calls for 5 or 6 to be valid
+            {tier: 0, diceReq: 1, dmg:1, threshold:[5,6], pierce: 0, name: "Basic Attack", desc: "Give the enemy a bonk"},//Original design calls for 5 or 6 to be valid
             {tier: 0, diceReq: 2, dmg:3, threshold:4, pierce: 5, name: "Sleight of hand", desc: "Distract the enemy so you can strike with your off-hand"},
             {tier: 0, diceReq: 4, dmg:6, threshold:8, pierce: 5, name: "Calculated strike", desc: "You find a weakness in their guard and exploit it"},
             {tier: 1, diceReq: 6, dmg:12, threshold:10, pierce: 10, name: "Backstab", desc: "Dash to the enemy's flank and strike"},
@@ -234,7 +234,7 @@ let Playstyle = [
         },
         basicAttack: function(attackSubmission, chosenAttack){
             console.log(attackSubmission, chosenAttack)
-            if (attackSubmission.length === 1 && attackSubmission[0].value === chosenAttack.threshold){
+            if (attackSubmission.length === 1 && chosenAttack.threshold.includes(attackSubmission[0].value)){
                 console.log("The basic attack succeeds")
                 return true
             } else {

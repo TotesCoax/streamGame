@@ -1,5 +1,5 @@
-const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket', 'polling', 'flashsocket']})
-// const socket = io("http://localhost:3000", {transports: ['websocket', 'polling', 'flashsocket']})
+// const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket', 'polling', 'flashsocket']})
+const socket = io("http://localhost:3000", {transports: ['websocket', 'polling', 'flashsocket']})
 
 const initialScreen = document.querySelector("#initialScreen")
 const newSessionBtn = document.querySelector("#newSessionButton")
@@ -298,7 +298,7 @@ function fillUpPlayers(){
             //console.log(attackImport[a].threshold)
             if (!false) {
                 if (a === 0 && playerStats.playstyle.title !== "elegant"){
-                    playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerHTML = "die with value of " + attackImport[a].threshold
+                    playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerHTML = "die with value of " + attackImport[a].threshold.toString().replace(',', ' or ')
                 } else {
                     switch (playerStats.playstyle.title) {
                         case "staunch":
@@ -314,8 +314,8 @@ function fillUpPlayers(){
                             break;
                     }
                 }
-                if (attackImport[a].threshold === "1,1,2,3,4,5,6,6"){
-                    playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerHTML = "dice with values of " + attackImport[a].threshold
+                if (attackImport[a].threshold.toString() === "1,1,2,3,4,5,6,6"){
+                    playerInsert.querySelector(`#${newAttack.id} .attack-req-threshold`).innerHTML = "dice with values of " + attackImport[a].threshold.toString()
                 }
             }
             newAttack.querySelector(".attack-name").innerText = attackImport[a].name

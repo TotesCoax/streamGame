@@ -218,7 +218,10 @@
         <!-- Gameboard end div -->
     </div>
     <div id="devTracker" class="stat-box">
-        <h2>Your game code is: <span id="sessionCodeDisplay"></span></h2>
+        <div>
+            <h2>Your game code is: <span id="sessionCodeDisplay"></span></h2>
+            <button class="toggleHidden">Hide Code</button>
+        </div>
         Dev Tracker:
         <div class="gameboard-level">
             Board Level: <span class="gameboard-level-counter">X</span>
@@ -230,19 +233,23 @@
         <div class="instructions">
             <h1>Game Rules:</h1>
             <p>There are 3 levels of scenarios to beat.</p>
-            <p>Each scenario dictates how many dice are rerolled.</p>
+            <p>Each scenario dictates how many dice are rolled.</p>
             <p>Each scenario has a number of stages to beat in order to defeat the scenario.</p>
             <p>Stage might have effects that impact certain game elements.</p>
-            <p>Each player turn is one active player and one support player rolling an amoutn of dice.</p>
-            <p>Only the active player issues attacks during their turn.</p>
+            <p>Each player turn is one active player and one support player rolling an amount of dice.</p>
             <p>Only the active and support players can use abilities during the turn</p>
+            <p>Each character has a unique ability.</p>
+            <p>The number of uses per scenario for that ability are determined by the number of players in the game and what level of scenario the party is on.</p>
             <p>Each support becomes the new active player.</p>
+            <p>This player cycling continues through scenarios.</p>
             <p>Active only needs to be chose at the start of the game.</p>
-            <p>The cycle continues through scenarios.</p>
             <p>The default amount of rerolls is two.</p>
             <p>Both players must reroll their dice pools at the same time.</p>
             <p>Dice can be marked as kept so they are not rerolled. A die can be unkept at anytime.</p>
             <p>After rerolls are gone you move to attack phase.</p>
+            <p>All the dice from the rolling phase now become the pool of dice the active player can declare attacks with.</p>
+            <p>Only the active player may issue attacks during the turn.</p>
+            <p>Both the active and support can use abilities in the attack phase if they have uses remaining.</p>
             <p>In attack phase you mark dice to submit and then declare an attack using those dice.</p>
             <p>Each playstyle has it's own criteria for what dice are valid for their attack.</p>
             <p>If you use up all dice for attacks, you trigger a switch.</p>
@@ -254,7 +261,7 @@
             <p>The player to land the last hit on any scenario is granted an item reward.</p>
             <p>Some items have passive effects, some are consumables.</p>
             <p>You can only use consumables after the Active player is declared but before they choose their support.</p>
-            <p>After beating Scenario 2 you are granted a Boon (similar to a party-wide item).</p>
+            <p>After beating Scenario 2 you are granted a boon (similar to a party-wide item) as well as an item.</p>
         </div>
     </div>
 

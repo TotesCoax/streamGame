@@ -452,13 +452,14 @@ function fillUpPlayerInventory(player) {
             destination.appendChild(template.content.cloneNode(true))
             let newItem = destination.lastElementChild
             newItem.classList.add(item.name.split(" ").join("").toLowerCase())
-            if (item.consumed === true){
-                newItem.classList.add("consumed")
-            }
             newItem.querySelector(".player-item-name").innerText = item.name
             newItem.querySelector(".player-item-description").innerText = item.description
             newItem.querySelector("button").dataset.holder = player.username.split(" ").join("").toLowerCase()
             newItem.querySelector('button').dataset.itemname = item.name.split(" ").join("").toLowerCase()
+            if (item.consumed === true){
+                newItem.classList.add("consumed")
+                newItem.querySelector('button').classList.add("hidden")
+            }
         })
     }
 }
@@ -908,3 +909,7 @@ function toggleRollHUDdisplay(){
     })
 
 }
+
+document.querySelector(".toggleHidden").addEventListener('click', function(e){
+    document.querySelector("#sessionCodeDisplay").classList.toggle("hidden")
+})

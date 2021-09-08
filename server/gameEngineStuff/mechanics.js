@@ -655,14 +655,14 @@ function moveToAttackPhaseCheck(){
             }
         }
         let mitigation = currentStageDef - pierceValue
-        if (mitigation > 0){
+        if (mitigation < 0){
             mitigation = 0
         }
         if (calcDmg - mitigation > 0){
             //Apply new damage amount to scenario
-            board.scenarios[board.level].dmgCounter+= (calcDmg - currentStageDef)
+            board.scenarios[board.level].dmgCounter+= (calcDmg - mitigation)
+            console.log(calcDmg - mitigation, "dmg has been applied to the scenario")
         }
-        console.log(calcDmg, "dmg has been applied to the scenario")
     }
 
 //Find and initiate player ability based on client info

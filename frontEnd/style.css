@@ -62,8 +62,13 @@ html {
     opacity: .5;
 }
 
-.playerItem {
-    background: grey;
+.player-item {
+    background: lightgoldenrodyellow;
+}
+
+.player-item.consumed {
+    background:lightgray;
+    opacity: .5;
 }
 
 .playerItem div {

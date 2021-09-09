@@ -103,7 +103,7 @@ function rollHand(hand) {
     for (let i = 0; i < hand.length; i++) {
         hand[i].rollDie()
     }
-    console.log(hand)
+    // console.log(hand)
 }
 
 //Game over check

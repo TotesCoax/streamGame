@@ -72,10 +72,10 @@ function handlePlayerJoined(number){
 socket.on('gamestate', handleGamestate)
 
 function handleGamestate(data){
-    console.log("Gamestate refresh object:", data)
+    // console.log("Gamestate refresh object:", data)
     gameboard = data.boardExport 
 
-    console.log("New gamestate arrived!", gameboard)
+    // console.log("New gamestate arrived!", gameboard)
     refreshScenario()
     refreshPlayers()
     refreshDMGValues()
@@ -97,11 +97,11 @@ function handleGamestate(data){
             }
             if (gameboard.attackHand.length > 0){
                 refreshAttackHand()
-                console.log("Attack hand refreshed")
+                // console.log("Attack hand refreshed")
             }
             if (gameboard.dicePool.active.length > 0){
                 refreshDice()
-                console.log("Rolling hands refreshed")
+                // console.log("Rolling hands refreshed")
             }
             if (gameboard.gameState.turnCounter > 0 && gameboard.players.findIndex(player => player.status === "support") >= 0){
                 insertStartTurnButton()
@@ -112,14 +112,14 @@ function handleGamestate(data){
             }
             break;
     }
-    console.log("All refreshed!")
+    // console.log("All refreshed!")
 }
 
 socket.on('prompt', handlePrompt)
 
 function handlePrompt(dataFromServer){
     console.log("Prompt arrived!")
-    console.log(dataFromServer);
+    // console.log(dataFromServer);
     promptPlayer(dataFromServer)
 }
 
@@ -127,7 +127,7 @@ socket.on('alert', handleAlert)
 
 function handleAlert(data) {
     console.log("Alert arrived!")
-    console.log(data)
+    // console.log(data)
     alert(data.message)
     if (!data.gameOver){
         requestBoardExport()
@@ -262,7 +262,7 @@ function fillUpPlayers(){
     //console.log(temp.content.firstElementChild.id)
     //Populating the player array
     for (let i = 0; i < gameboard.players.length; i++){
-        console.log(`Inserting player: ${gameboard.players[i].username}` )
+        // console.log(`Inserting player: ${gameboard.players[i].username}` )
         playerContainer.appendChild(temp.content.cloneNode(true))
         //playerInsert is always the last element created in the array
         let playerInsert = playerContainer.lastElementChild,
@@ -337,7 +337,7 @@ function insertStartTurnButton(){
     if(infopanel.firstChild){
         infopanel.firstChild.remove()
     }
-    console.log("Insert attack button for: ", activePlayer.username)
+    // console.log("Insert attack button for: ", activePlayer.username)
     if (gameboard.dicePool.active.length === 0 && gameboard.attackHand.length === 0){
         let startTurnBtn = document.createElement("button")
         startTurnBtn.innerText = `Initial dice roll for ${activePlayer.username}'s turn!`
@@ -363,7 +363,7 @@ function insertItemPhaseOverButton(){
     if(infopanel.firstChild){
         infopanel.firstChild.remove()
     }
-    console.log("Insert button for moves out of Item phase")
+    // console.log("Insert button for moves out of Item phase")
     let startNewScenario = document.createElement("button")
     startNewScenario.innerText = "Move out of items phase"
     startNewScenario.addEventListener("click", sendItemsDone)
@@ -389,7 +389,7 @@ function fillUpDiceRollingPhase() {
             dieVal = gameboard.dicePool.active[d].value,
             dieID = gameboard.dicePool.active[d].id,
             dieKeep = gameboard.dicePool.active[d].keep
-        console.log(dieVal, dieID)
+        // console.log(dieVal, dieID)
         newDie.querySelector(".die").innerText = dieVal
         newDie.querySelector(".die").id = dieID
         if (dieKeep){
@@ -403,7 +403,7 @@ function fillUpDiceRollingPhase() {
             dieVal = gameboard.dicePool.support[d].value,
             dieID = gameboard.dicePool.support[d].id,
             dieKeep = gameboard.dicePool.support[d].keep
-        console.log(dieVal, dieID)
+        // console.log(dieVal, dieID)
         newDie.querySelector(".die").innerText = dieVal
         newDie.querySelector(".die").id = dieID
         if (dieKeep){
@@ -429,7 +429,7 @@ function fillUpAttackHand(){
                 dieVal = gameboard.attackHand[d].value,
                 dieID = gameboard.attackHand[d].id,
                 dieSubmit = gameboard.attackHand[d].submitted
-            console.log(dieVal, dieID)
+            // console.log(dieVal, dieID)
             newDie.querySelector(".die").innerText = dieVal
             newDie.querySelector(".die").id = dieID
             if (dieSubmit){
@@ -445,7 +445,7 @@ function fillUpAttackHand(){
 
 function fillUpPlayerInventory(player) {
     let template = document.getElementById("playerItemTemplate")
-    console.log(player)
+    // console.log(player)
     if (player.inventory.length > 0){
         player.inventory.forEach(item => {
             let destination = document.querySelector(`#${player.username.toLowerCase()} .inventory`)
@@ -465,7 +465,7 @@ function fillUpPlayerInventory(player) {
 }
 // {username: board.players[i].username, itemname: board.players[i].inventory[j].name, consumed: board.players[i].inventory[j].consumed}
 function transmitItemPhase(playersWithConsumables) {
-    console.log(playersWithConsumables)
+    // console.log(playersWithConsumables)
     let infopane = document.querySelector("#infopanel"),
         newDiv = document.createElement("div"),
         newButton = document.createElement("button")
@@ -576,12 +576,12 @@ function sendPlayerChoice(choice, requestCode){
         choice: choice,
         requestCode: requestCode
     }
-    console.log(choiceObject)
+    // console.log(choiceObject)
     socket.emit('sendChoice', choiceObject)
 }
 
 function activateItem(e){
-    console.log(e.target)
+    // console.log(e.target)
     //Generate Player Targetting
     let playerTargets = document.querySelectorAll(".player.target")
     playerTargets.forEach(player => {
@@ -593,13 +593,13 @@ function activateItem(e){
 }
 
 function sendUseItem(e){
-    console.log(e)
+    // console.log(e)
     let useItemObject = {
         holder: e.target.dataset.holder,
         item: e.target.dataset.itemname,
         target: e.target.dataset.username
     }
-    console.log(useItemObject)
+    // console.log(useItemObject)
     let playerTargets = document.querySelectorAll(".player.target")
     playerTargets.forEach(player => {
         player.classList.add("hidden")
@@ -753,13 +753,13 @@ function settingStatusHTML() {
 
 //Send keep die command
 function sendKeepDie(e) {
-    console.log(e.target.previousElementSibling.id)
+    // console.log(e.target.previousElementSibling.id)
     let foundDie = e.target.previousElementSibling.id
     socket.emit('keepDie', foundDie)
 }
 
 function sendSubmitDie(e){
-    console.log(e.target.previousElementSibling.id)
+    // console.log(e.target.previousElementSibling.id)
     let foundDie = e.target.previousElementSibling.id
     socket.emit('submitDie', foundDie)
 }
@@ -783,7 +783,7 @@ function sendAttack(e){
 }
 
 function activateAbility(e){
-    console.log(e.target)
+    // console.log(e.target)
     let player = gameboard.players.find(entry => entry.username === e.target.dataset.username)
     if(player.abilityCounter > 0){
         
@@ -804,7 +804,7 @@ function activateAbility(e){
         targets.forEach(die =>{
             die.addEventListener("click", toggleChoice)
         })
-        console.log(targets)
+        // console.log(targets)
     } else {
         alert("You have no ability points left!")
     }
@@ -815,10 +815,10 @@ function toggleChoice(e){
 }
 
 function sendAbility(e) {
-    console.log(e.target.dataset.username)
+    // console.log(e.target.dataset.username)
     let submitter = e.target.dataset.username,
         chosenDice = document.querySelectorAll(".choice")
-    console.log(chosenDice)
+    // console.log(chosenDice)
 
     let chosenDiceIDs = []
     for(let i = 0; i < chosenDice.length; i++){
@@ -857,7 +857,7 @@ function endAttackHand() {
 function sendRoll(e){
     let status = e.target.dataset.status
 
-    console.log(e)
+    // console.log(e)
     socket.emit('roll', status)
 }
 

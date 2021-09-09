@@ -183,7 +183,7 @@ io.on('connection', client => {
     function theMasterController(data, roomName){
       state[roomName] = Game.serverGameState()
       // console.log("States:", state)
-      console.log(data.type)
+      // console.log(data.type)
       switch (data.type) {
         case "prompt":
           console.log("Sending a prompt request!")

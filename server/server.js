@@ -26,7 +26,8 @@ io.on('connection', client => {
 
     client.on('newSession', handleNewSession)
 
-    function handleNewSession(){
+    function handleNewSession(data){
+      console.log(data)
       let roomName = makeid(5)
       clientRooms[client.id] = roomName
       client.emit('sessionCode', roomName)
@@ -34,17 +35,19 @@ io.on('connection', client => {
       state[roomName] = Game.serverGameState()
 
       client.join(roomName)
-      client.number = 1
+      client.username = data
       console.log("New session created: ", roomName)
-    client.emit('sessionCreated', 1)
+    client.emit('sessionCreated', client.username)
     }
 
     client.on('joinSession', handleJoinSession)
 
-    function handleJoinSession(sessionCode){
+    function handleJoinSession(dataFromServer){
+      let sessionCode = dataFromServer.gamecode,
+          username = dataFromServer.username
       const room = io.sockets.adapter.rooms.get(sessionCode)
       // console.log(io.sockets.adapter.rooms)
-      console.log("A player is trying to connect to: ", sessionCode)
+      console.log(username ," is trying to connect to: ", sessionCode)
       // console.log(room)
       // console.log(room.size)
       if (room){
@@ -64,9 +67,9 @@ io.on('connection', client => {
       clientRooms[client.id] = sessionCode
       client.join(sessionCode)
       client.emit('sessionCode', sessionCode)
-      // console.log("New player joined: ", sessionCode, "Size is now: ", room.size)
-      client.number = room.size
-      client.emit('playerJoined', client.number)  
+      console.log(username, " joined: ", sessionCode, "Size is now: ", room.size)
+      client.username = username
+      client.emit('playerJoined', client.username)  
     }
 
     client.on('requestBoardState', handleRequestEvent)

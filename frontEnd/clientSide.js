@@ -2,6 +2,7 @@ const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['we
 // const socket = io("http://localhost:3000", {transports: ['websocket', 'polling', 'flashsocket']})
 
 const initialScreen = document.querySelector("#initialScreen")
+const usernameInput = document.querySelector("#usernameInput")
 const newSessionBtn = document.querySelector("#newSessionButton")
 const joinSessionBtn = document.querySelector("#joinSessionButton")
 const sessionCodeInput = document.querySelector("#sessionCodeInput")
@@ -11,17 +12,19 @@ newSessionBtn.addEventListener('click', newSession)
 joinSessionBtn.addEventListener('click', joinSession)
 
 function newSession(){
-    socket.emit('newSession')
+    let username = usernameInput.value
+    socket.emit('newSession', username)
     initialScreen.classList.add("hidden")
 }
 
 function joinSession(){
-    let code = sessionCodeInput.value
-    socket.emit('joinSession', code)
+    let code = sessionCodeInput.value,
+        username = usernameInput.value
+    socket.emit('joinSession', {gamecode: code, username: username})
 }
 
 let gameboard = {},
-    playerNumber
+    playerUsername
 
 socket.on('init', handleInit)
 
@@ -31,8 +34,10 @@ function handleInit(msg) {
 
 socket.on('sessionCreated', handleNewSession)
 
-function handleNewSession(number){
-    playerNumber = number
+function handleNewSession(username){
+    console.log(username)
+    playerUsername = username
+    alert(`Welcome, ${playerUsername}!`)
 }
 
 socket.on('sessionCode', handleSessionCode)
@@ -56,7 +61,8 @@ function handleTooManyPlayers(){
 }
 
 function resetUI(){
-    playerNumber = null
+    playerUsername = null
+    usernameInput.value = ""
     sessionCodeInput.value = ""
     sessionCodeDisplay.innerText = ""
     initialScreen.classList.remove("hidden")
@@ -64,8 +70,9 @@ function resetUI(){
 
 socket.on('playerJoined', handlePlayerJoined)
 
-function handlePlayerJoined(number){
-    playerNumber = number
+function handlePlayerJoined(username){
+    playerUsername = username
+    alert(`Welcome, ${playerUsername}!`)
     initialScreen.classList.add("hidden")
 }
 

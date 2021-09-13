@@ -79,7 +79,7 @@ io.on('connection', client => {
     function handleRequestEvent(){
       console.log("Gamestate has been requested.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.newGameState(state[roomName].board, state[roomName].gameState), roomName)
+      theMasterController(Game.newGameState(state[roomName]), roomName)
     }
 
     client.on('pickCharacter', handlePickCharacter)
@@ -95,7 +95,7 @@ io.on('connection', client => {
     function handleNewGame(){
       console.log("New game has been requested.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.NewGameSetup(state[roomName].board, state[roomName].gameState, false), roomName)
+      theMasterController(Game.NewGameSetup(state[roomName], false), roomName)
     }
 
     client.on('newTestGame', handleNewTestGame)
@@ -104,7 +104,7 @@ io.on('connection', client => {
       console.log("New game has been requested.")
       let roomName = clientRooms[client.id]
       state[roomName] = Game.serverGameState()
-      theMasterController(Game.NewGameSetup(state[roomName].board, state[roomName].gameState, true), roomName)
+      theMasterController(Game.NewGameSetup(state[roomName], true), roomName)
     }
 
     client.on('sendChoice', handleChoice)
@@ -117,10 +117,10 @@ io.on('connection', client => {
           let selectionObject = {username: client.username, playstyle: choiceObjectFromClient.choice},
               index = charactersOpen[roomName].findIndex(choice => choice === choiceObjectFromClient.choice)
           charactersOpen[roomName].splice(index, 1)
-          theMasterController(Game.pickCharacter(selectionObject), roomName)
+          theMasterController(Game.pickCharacter(state[roomName], selectionObject), roomName)
           break;
         default:
-          theMasterController(Game.setPlayerStatus(choiceObjectFromClient), roomName)
+          theMasterController(Game.setPlayerStatus(state[roomName], choiceObjectFromClient), roomName)
           break;
       }
     }
@@ -130,7 +130,7 @@ io.on('connection', client => {
     function handleItem(data){
       console.log("Item use has been received.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.useConsumable(data), roomName)
+      theMasterController(Game.useConsumable(state[roomName], data), roomName)
     }
 
     client.on('startTurn', handleStartTurn)
@@ -138,7 +138,7 @@ io.on('connection', client => {
     function handleStartTurn(){
       console.log("New turn has been requested.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.RollingPhase(), roomName)
+      theMasterController(Game.RollingPhase(state[roomName], ), roomName)
     }
 
     client.on('startScenario', handleNewScneario)
@@ -146,7 +146,7 @@ io.on('connection', client => {
     function handleNewScneario(){
       console.log("Start scenario has been requested.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.startNewScenario(), roomName)
+      theMasterController(Game.startNewScenario(state[roomName], ), roomName)
     }
 
     client.on('itemOver', handleItemOver)
@@ -154,21 +154,21 @@ io.on('connection', client => {
     function handleItemOver(){
       console.log("Item phase is over.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.ItemPhaseDone(), roomName)
+      theMasterController(Game.ItemPhaseDone(state[roomName]), roomName)
     }
 
     client.on('keepDie', handleKeepDie)
 
     function handleKeepDie(dieIDFromClient){
       let roomName = clientRooms[client.id]
-      theMasterController(Game.keepDie(dieIDFromClient), roomName)
+      theMasterController(Game.keepDie(state[roomName], dieIDFromClient), roomName)
     }
 
     client.on('submitDie', handleSubmitDie)
 
     function handleSubmitDie(dieIDFromClient){
       let roomName = clientRooms[client.id]
-      theMasterController(Game.submitDie(dieIDFromClient), roomName)
+      theMasterController(Game.submitDie(state[roomName], dieIDFromClient), roomName)
     }
 
     client.on('roll', handleRoll)
@@ -176,7 +176,7 @@ io.on('connection', client => {
     function handleRoll(status){
       console.log("Roll has been requested.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.wantsReroll(status), roomName)
+      theMasterController(Game.wantsReroll(state[roomName], status), roomName)
     }
 
     client.on('useAbility', handleAbility)
@@ -184,7 +184,7 @@ io.on('connection', client => {
     function handleAbility(abilityObjectFromClient){
       console.log("Ability use has been received.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.useAbility(abilityObjectFromClient), roomName)
+      theMasterController(Game.useAbility(state[roomName], abilityObjectFromClient), roomName)
     }
 
     client.on('toAttackPhase', handleAttackPhase)
@@ -192,7 +192,7 @@ io.on('connection', client => {
     function handleAttackPhase(){
       console.log("Attack Phase has been requested.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.AttackPhase(), roomName)
+      theMasterController(Game.AttackPhase(state[roomName], ), roomName)
     }
 
     client.on('useAttack', handleAttack)
@@ -200,7 +200,7 @@ io.on('connection', client => {
     function handleAttack(attackObjFromClient){
       console.log("Attack declaration has been received.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.attack(attackObjFromClient), roomName)
+      theMasterController(Game.attack(state[roomName], attackObjFromClient), roomName)
     }
 
     client.on('endAttack', handleEndAttackPhase)
@@ -208,7 +208,7 @@ io.on('connection', client => {
     function handleEndAttackPhase() {
       console.log("End attack phase has been requested.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.endAttackPhase(), roomName)
+      theMasterController(Game.endAttackPhase(state[roomName], ), roomName)
     }
 
     //This function dictates the type of communications the client will get, so it can respond accordingly.

@@ -1,5 +1,5 @@
-const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket', 'polling', 'flashsocket']})
-// const socket = io("http://localhost:3000", {transports: ['websocket', 'polling', 'flashsocket']})
+// const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket', 'polling', 'flashsocket']})
+const socket = io("http://localhost:3000", {transports: ['websocket', 'polling', 'flashsocket']})
 
 const initialScreen = document.querySelector("#initialScreen")
 const usernameInput = document.querySelector("#usernameInput")
@@ -183,10 +183,21 @@ function handleScenarioDefeated(data){
     insertStartScenarioButton()
 }
 
+function pickCharacter() {
+    socket.emit('pickCharacter')
+    document.querySelector('#pickCharacterButton').classList.add("hidden")
+    document.querySelector('#newGameButton').classList.remove("hidden")
+}
+
 //This gets back a gamestate refresh
 function startNewGame() {
-    socket.emit('newGame', { data: ["Me", "You"] })
+    socket.emit('newGame')
 }
+
+function startNewTestGame() {
+    socket.emit('newTestGame')
+}
+
 
 function sendStartTurn(e){
     e.target.remove()

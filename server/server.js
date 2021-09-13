@@ -8,6 +8,7 @@ const INDEX = '/index.html';
 
 const state = {}
 const clientRooms = {}
+const charactersOpen = {}
 
 const server = express()
 .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
@@ -33,6 +34,7 @@ io.on('connection', client => {
       client.emit('sessionCode', roomName)
 
       state[roomName] = Game.serverGameState()
+      charactersOpen[roomName] = Game.generateCharacterPool()
 
       client.join(roomName)
       client.username = data
@@ -77,7 +79,15 @@ io.on('connection', client => {
     function handleRequestEvent(){
       console.log("Gamestate has been requested.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.newGameState(), roomName)
+      theMasterController(Game.newGameState(state[roomName].board, state[roomName].gameState), roomName)
+    }
+
+    client.on('pickCharacter', handlePickCharacter)
+
+    function handlePickCharacter(){
+      let roomName = clientRooms[client.id]
+      console.log(charactersOpen);
+      theMasterController(Game.characterSelection(charactersOpen[roomName]), roomName)
     }
 
     client.on('newGame', handleNewGame)
@@ -85,7 +95,16 @@ io.on('connection', client => {
     function handleNewGame(){
       console.log("New game has been requested.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.NewGameSetup(), roomName)
+      theMasterController(Game.NewGameSetup(state[roomName].board, state[roomName].gameState, false), roomName)
+    }
+
+    client.on('newTestGame', handleNewTestGame)
+
+    function handleNewTestGame(){
+      console.log("New game has been requested.")
+      let roomName = clientRooms[client.id]
+      state[roomName] = Game.serverGameState()
+      theMasterController(Game.NewGameSetup(state[roomName].board, state[roomName].gameState, true), roomName)
     }
 
     client.on('sendChoice', handleChoice)
@@ -93,7 +112,17 @@ io.on('connection', client => {
     function handleChoice(choiceObjectFromClient){
       console.log("Choice has been received.")
       let roomName = clientRooms[client.id]
-      theMasterController(Game.setPlayerStatus(choiceObjectFromClient), roomName)
+      switch (choiceObjectFromClient.requestCode) {
+        case 'character':
+          let selectionObject = {username: client.username, playstyle: choiceObjectFromClient.choice},
+              index = charactersOpen[roomName].findIndex(choice => choice === choiceObjectFromClient.choice)
+          charactersOpen[roomName].splice(index, 1)
+          theMasterController(Game.pickCharacter(selectionObject), roomName)
+          break;
+        default:
+          theMasterController(Game.setPlayerStatus(choiceObjectFromClient), roomName)
+          break;
+      }
     }
 
     client.on("useItem", handleItem)
@@ -184,7 +213,6 @@ io.on('connection', client => {
 
     //This function dictates the type of communications the client will get, so it can respond accordingly.
     function theMasterController(data, roomName){
-      state[roomName] = Game.serverGameState()
       // console.log("States:", state)
       // console.log(data.type)
       switch (data.type) {

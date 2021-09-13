@@ -145,10 +145,10 @@ let scenario2Deck = [
             dmg:1,
             def:0,
             aoe:false,
-            effect:function poisoned(board, gameState){
+            effect:function poisoned(board){
                 let players = board.players
                 //No Consumables
-                gameState.noConsumables = true
+                board.gameState.noConsumables = true
                 //At the start of each player's turn POISONED PLAYER (randomly chosen) suffers X (4 is default for game) dmg
                 //the poison tick is handled by another function in the turns
                 let poisonedPlayer = players[Math.floor(Math.random() * (players.length)) + 1]
@@ -170,7 +170,7 @@ let scenario2Deck = [
             dmg:3,
             def:0,
             aoe:true,
-            effect:function(board, gameState){
+            effect:function(board){
                 console.log("This stage has no effect")
             }
         },
@@ -180,9 +180,9 @@ let scenario2Deck = [
             dmg:5,
             def:0,
             aoe:false,
-            effect:function(board, gameState){
+            effect:function(board){
                 //No Abilities
-                gameState.noAbilities = true
+                board.gameState.noAbilities = true
                 console.log("No abilities may be used")
             }
         },
@@ -192,7 +192,7 @@ let scenario2Deck = [
             dmg:5,
             def:5,
             aoe:false,
-            effect:function(board, gameState){
+            effect:function(board){
                 console.log("This stage has no effect")
             }
         }
@@ -211,7 +211,7 @@ let scenario2Deck = [
             dmg:6,
             def:3,
             aoe:false,
-            effect:function(board, gameState){
+            effect:function(board){
                 console.log("This stage has no effect")
             }
         }
@@ -232,7 +232,7 @@ let scenario3Deck = [
             dmg:5,
             def:0,
             aoe:true,
-            effect:function(board, gameState){
+            effect:function(board){
                 console.log("This stage has no effect")
             }
         },
@@ -242,7 +242,7 @@ let scenario3Deck = [
             dmg:15,
             def:0,
             aoe:false,
-            effect:function(board, gameState){
+            effect:function(board){
                 console.log("This stage has no effect")
             }
         }
@@ -261,7 +261,7 @@ let scenario3Deck = [
             dmg:99,
             def:99,
             aoe:false,
-            effect:function countdown(board, gameState){
+            effect:function countdown(board){
                 //At the start of each players turn, this enemy suffers 1 dmg, ignoring defense
                 board.scenarios[board.level].poison = 1
             }
@@ -280,9 +280,9 @@ let scenario3Deck = [
             dmg:8,
             def:3,
             aoe:false,
-            effect:function(board, gameState){
+            effect:function(board){
                 //No Consumables
-                gameState.noConsumables = true
+                board.gameState.noConsumables = true
                 console.log("No consumables active")
             }
         },
@@ -292,9 +292,9 @@ let scenario3Deck = [
             dmg:5,
             def:3,
             aoe:true,
-            effect:function(board, gameState){
+            effect:function(board){
                 //No Consumables
-                gameState.noConsumables = true
+                board.gameState.noConsumables = true
                 console.log("No consumables active")
             }
         },
@@ -304,9 +304,9 @@ let scenario3Deck = [
             dmg:12,
             def:3,
             aoe:false,
-            effect:function(board, gameState){
+            effect:function(board){
                 //No Consumables
-                gameState.noConsumables = true
+                board.gameState.noConsumables = true
                 console.log("No consumables active")
             }
         },
@@ -316,9 +316,9 @@ let scenario3Deck = [
             dmg:8,
             def:3,
             aoe:true,
-            effect:function(board, gameState){
+            effect:function(board){
                 //No Consumables
-                gameState.noConsumables = true
+                board.gameState.noConsumables = true
                 console.log("No consumables active")
             }
         }

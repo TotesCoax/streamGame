@@ -22,7 +22,7 @@ exports.newGameState = function newExport() {
     // }
 }
 //Global Object reservations
-let board, gameState
+let board
 
 //Gameboard object. To create some global variables
 function resetBoard(){
@@ -39,7 +39,16 @@ function resetBoard(){
         boon: {
             deck: [],
             drawn: []
+        },
+        gameState: {
+            turnCounter: 0,
+            switchCounter: 0,
+            noConsumables: false,
+            noAbilities: false,
+            itemPhase: false,
+            gameOver:  false
         }
+    
     }
     console.log("Board object reset")
 }
@@ -47,14 +56,6 @@ resetBoard()
 
 //Game state object to help handle some stage effects and track some fun things.
 function resetGamestate(){
-    gameState = {
-        turnCounter: 0,
-        switchCounter: 0,
-        noConsumables: false,
-        noAbilities: false,
-        itemPhase: false,
-        gameOver:  false
-    }
     console.log("Gamestate object reset")
 }
 resetGamestate()
@@ -71,7 +72,7 @@ function exportGamestate() {
         },
         attackHand: board.attackHand,
         boon: board.boon.drawn,
-        gameState: gameState
+        gameState: board.gameState
     }
     return boardExport
 }
@@ -79,7 +80,7 @@ function exportGamestate() {
 //Global functions
 
 exports.serverGameState = function (){
-    return {board, gameState}
+    return board
 }
 
 //Deck shuffler ~ confirmed to work
@@ -108,7 +109,7 @@ function rollHand(hand) {
 
 //Game over check
 function isGameOver(){
-    if (gameState.gameOver){
+    if (board.gameState.gameOver){
         return new Alert("The game ended! You have to start a new game.")
     }
 }
@@ -377,7 +378,7 @@ function checkConsumables(){
 //Use consumable
 exports.useConsumable = function useConsumable(itemChoiceObject){
     console.log(itemChoiceObject)
-    if (gameState.itemPhase === false){
+    if (board.gameState.itemPhase === false){
         console.log("not in phase")
         return new Alert("You can only use consumables at the start of the turn!")
     }
@@ -385,7 +386,7 @@ exports.useConsumable = function useConsumable(itemChoiceObject){
         item = holder.inventory.find(item => item.name.split(" ").join("").toLowerCase() === itemChoiceObject.item),
         target = board.players.find(player => player.username.split(" ").join("").toLowerCase() === itemChoiceObject.target.split(" ").join("").toLowerCase())
     //Checking to see if game state allows consumables
-    if (gameState.noConsumables === false){
+    if (board.gameState.noConsumables === false){
         //Checking if item is consumed
         if (!item.consumed){
             item.ability(target)
@@ -676,7 +677,7 @@ exports.useAbility = function useAbility(abilityObject){
     if (player.abilityCounter === 0){
         return new Alert("You don't have any ability uses left!")
     }
-    if (gameState.noAbilities){
+    if (board.gameState.noAbilities){
         return new Alert("Something is preventing you from using abilities!")
     }
     
@@ -755,7 +756,7 @@ exports.endAttackPhase = function endAttackPhase() {
         return CounterAttackPhase()
     } else {
         console.log("Switch triggered!")
-        gameState.switchCounter += 1
+        board.gameState.switchCounter += 1
         clearAttackHand()
         let output = EndPhase()
         output.switchTriggered = true
@@ -839,12 +840,12 @@ function stageHPchecker(){
     if (currentScenario.dmgCounter >= currentStage.hp){
         currentScenario.stageCounter++
         currentScenario.dmgCounter = 0
-        gameState.noAbilities = false
-        gameState.noConsumables = false
+        board.gameState.noAbilities = false
+        board.gameState.noConsumables = false
         if (currentScenario.stageCounter > (currentScenario.card.stage.length - 1)){
-            console.log("achieved switch rate of: ", ((gameState.switchCounter / gameState.turnCounter) * 100),"%")
-            gameState.turnCounter = 0
-            gameState.switchCounter = 0
+            console.log("achieved switch rate of: ", ((board.gameState.switchCounter / board.gameState.turnCounter) * 100),"%")
+            board.gameState.turnCounter = 0
+            board.gameState.switchCounter = 0
             currentScenario.defeated === true
             return ScenarioCleared()
         } else {
@@ -873,7 +874,7 @@ function doesGameContinue(){
             return true
         } else {
             //Game Over
-            gameState.gameOver = true
+            board.gameState.gameOver = true
             return false
         }
     } else {
@@ -1049,7 +1050,7 @@ exports.startNewScenario = function (){
         console.log("Current stage: ", currentStage)
         //Check for any Event Stage effects
         //Apply the Stage effect
-        currentStage.effect(board, gameState)
+        currentStage.effect(board)
         console.log("Stage affect has been applied")
         //console.log("Stage level item effects have been applied")
         console.log("NewStageSetup has finished")
@@ -1059,7 +1060,7 @@ exports.startNewScenario = function (){
     function NewPlayerTurnSetup() {
         isGameOver()
         gameState.turnCounter += 1
-        console.log("It is now turn: ", gameState.turnCounter)
+        console.log("It is now turn: ", board.gameState.turnCounter)
         //I moved DOT to here for a consistent trigger and to give players plenty of time to try to respond to it.
         damageOverTimeEffect()
         //Active Player is declared
@@ -1079,7 +1080,7 @@ exports.startNewScenario = function (){
         }
     }
     function startOfTurnItemsPhase(){
-        gameState.itemPhase = true
+        board.gameState.itemPhase = true
         //Consumable Item phase
         //Check for any consumables
         let playersWithConsumables = checkConsumables(board.players)
@@ -1106,7 +1107,7 @@ exports.startNewScenario = function (){
 
     //Rolling phase
     exports.RollingPhase = function RollingPhase(){
-        gameState.itemPhase = false
+        board.gameState.itemPhase = false
         //Check for any reroll modifiers (event or items)
         //Apply any reroll modifiers to respective party
         setRerolls()
@@ -1170,7 +1171,7 @@ exports.startNewScenario = function (){
                 console.log("Nobody seems to be dead. Continuing...");
                 return EndPhase()
             } else {
-                gameState.gameOver = true
+                board.gameState.gameOver = true
                 return new Alert("Game over!")
             }
         }

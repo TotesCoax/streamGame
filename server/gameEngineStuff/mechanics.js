@@ -46,19 +46,23 @@ function resetBoard(){
 
 function exportGamestate(board) {
     //Gameboard object to export - use this to hide game information from the front end
-    let boardExport = {
-        players: board.players,
-        level: board.level,
-        scenarios: board.scenarios,
-        dicePool: {
-            active: board.dicePool.active,
-            support: board.dicePool.support
-        },
-        attackHand: board.attackHand,
-        boon: board.boon.drawn,
-        gameState: board.gameState
+    try {
+        let boardExport = {
+            players: board.players,
+            level: board.level,
+            scenarios: board.scenarios,
+            dicePool: {
+                active: board.dicePool.active,
+                support: board.dicePool.support
+            },
+            attackHand: board.attackHand,
+            boon: board.boon.drawn,
+            gameState: board.gameState
+        }
+        return boardExport
+    } catch (error) {
+        return new Alert('No board to export!')
     }
-    return boardExport
 }
 
 //Global functions

@@ -52,15 +52,24 @@ io.on('connection', client => {
       console.log(username ," is trying to connect to: ", sessionCode)
       // console.log(room)
       // console.log(room.size)
+      console.log(state)
       if (room){
         if (room.size === 0){
-          // console.log("No session triggered")
           return
         } else if (room.size > 5){
           // console.log("Too many players triggered");
           client.emit('tooManyPlayers')
           return
         }
+      } else if (state[sessionCode]){
+        // console.log("Rejoin after DC?")
+        clientRooms[client.id] = sessionCode
+        client.emit('sessionCode', sessionCode)
+        client.join(sessionCode)
+        console.log(`${username} joined: ${sessionCode}`)
+        client.username = username
+        client.emit('playerJoined', client.username)
+        return
       }
       else {
         client.emit('noSession')
@@ -69,7 +78,7 @@ io.on('connection', client => {
       clientRooms[client.id] = sessionCode
       client.join(sessionCode)
       client.emit('sessionCode', sessionCode)
-      console.log(username, " joined: ", sessionCode, "Size is now: ", room.size)
+      console.log(`${username} joined: ${sessionCode}`)
       client.username = username
       client.emit('playerJoined', client.username)  
     }

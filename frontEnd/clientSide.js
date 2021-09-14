@@ -24,12 +24,16 @@ function joinSession(){
 }
 
 let gameboard = {},
-    playerUsername
+    playerUsername,
+    sessionCode
 
 socket.on('init', handleInit)
 
 function handleInit(msg) {
     console.log(msg)
+    if (sessionCode){
+        socket.emit('joinSession', {gamecode: sessionCode, username: playerUsername})
+    }
 }
 
 socket.on('sessionCreated', handleNewSession)
@@ -42,8 +46,9 @@ function handleNewSession(username){
 
 socket.on('sessionCode', handleSessionCode)
 
-function handleSessionCode(sessionCode){
-    sessionCodeDisplay.innerText = sessionCode
+function handleSessionCode(codeFromServer){
+    sessionCodeDisplay.innerText = codeFromServer
+    sessionCode = codeFromServer
 }
 
 socket.on('noSession', handleNoSession)
@@ -74,6 +79,7 @@ function handlePlayerJoined(username){
     playerUsername = username
     alert(`Welcome, ${playerUsername}!`)
     initialScreen.classList.add("hidden")
+    requestBoardExport()
 }
 
 socket.on('gamestate', handleGamestate)
@@ -81,7 +87,6 @@ socket.on('gamestate', handleGamestate)
 function handleGamestate(data){
     // console.log("Gamestate refresh object:", data)
     gameboard = data.boardExport 
-
     // console.log("New gamestate arrived!", gameboard)
     refreshScenario()
     refreshPlayers()

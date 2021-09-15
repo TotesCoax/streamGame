@@ -8,9 +8,10 @@ The original game is called Sword Art Online: Sword of Fellows.
 I really liked the mechanics of this game but what came in the box left me feeling like so much more could be done with the core mechanics.
 So I initially wanted to code the game engine, strip most of the branded flavor, and rework some of the sections of the game to be more open-ended.
 
-Current Phase (8/31/21): Phase 3
-  - I have a working prototype of the client and server code for single person testing. Just need to have some friends do a bit of QA for the engine.
-  - In the meantime, I get to research how I can turn it into a multiplayer game using socket.io
+Current Phase (09/15/21): Phase 3
+  - Allows multiple players in multiple lobbies, but haven't coded in a link between client-player so anyone can perform any actions.
+  - If lobby disconnects it is possible to rejoin, but only as long as the server doesn't crash (which can still happen) - Haven't linked gamestates to an external DB yet (for a multitude of perks)
+  - A few client-side issues syncing back to gamestate after disconnects in some few select occasions, but otherwise pretty good. Not sure it the better fix for these is server-side or client-side.
 
 Phase 1: Coding the game engine
   - Just translating the game rules into computer code to make the game engine

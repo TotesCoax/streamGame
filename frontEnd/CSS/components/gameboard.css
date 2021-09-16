@@ -1,0 +1,49 @@
+/*Gameboard formatting*/
+#gameboardContainer{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#scenarioContainer {
+    height: 100%;
+}
+
+#playerContainer {
+    display: flex;
+}
+
+#playerContainer div {
+    width: 250px;
+}
+
+.infopane-item {
+    border: 1px solid black;
+}
+
+
+/* Rolling section formatting */
+#rollingPlayers {
+    width: 350px;
+}
+
+.roll-dash {
+    border: 3px dotted black;
+    border-radius: 5px;
+    background: lightgreen;
+}
+
+.rollButton.wantsReroll {
+    background: purple;
+}
+
+.player-hand {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;}
+
+.hand-slot {
+    display: flex;
+    flex-direction: column;
+}

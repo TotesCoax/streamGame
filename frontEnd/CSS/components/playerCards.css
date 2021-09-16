@@ -1,0 +1,79 @@
+/*Active players formatting*/
+.player-card {
+    border: 5px solid black;
+}
+
+.position {
+    display: flex;
+    flex-direction: column;
+}
+
+.active {
+    background: lightcoral
+}
+
+    /* This auto-unhides relevant display */
+.active .player-display-toggle {
+    display: block;
+}
+
+.support {
+    background-color: lightcyan;
+}
+
+    /* This auto-unhides relevant display */
+.support .player-display-toggle.ability {
+    display: block;
+}
+
+.inactive {
+    background-color: grey;
+    height: max-content;
+}
+
+.exhausted {
+    opacity: .5;
+}
+
+
+/* This is for when a player target needs to be selected */
+.player.target {
+    z-index: 100;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(52, 171, 218, 0.33)
+}
+
+/* Attacks formatting */
+.player-attack {
+    display: flex;
+    background: rgba(119, 136, 153, 0.333);
+}
+
+.player-attack:nth-child(even) {
+    background: lightyellow;
+}
+
+.attack-info {
+    width: 100%;
+}
+
+.attack-name {
+    background: white;
+}
+
+span.attack-damage {
+    background-color: red;
+    color: white;
+    padding: .1em;
+    border-radius: 25%;
+    font-size: 1.5em;
+}
+
+.inventory {
+    display: flex;
+    flex-wrap: wrap;
+}

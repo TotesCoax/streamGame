@@ -5,8 +5,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stream Game UI</title>
-    <link rel="stylesheet" href="normalize.css">
-    <link rel="stylesheet" href="style.css">
+    <style type="text/css">
+    @import url("./CSS/main.css");
+    </style>
 </head>
 <body>
 
@@ -15,18 +16,18 @@
     <!-- Scenario Card templates -->
         <!-- Scenario card template -->
         <template id="scenarioCardTemplate">
-            <div class="scenario-card card">
+            <div class="scenario-card">
                 <div class="scenario-image">
                     <!-- <img src="blank" alt="this is the scenario image"> -->
                 </div>
-                <div  class="roll-amounts stat-box">
+                <div  class="roll-amounts ">
                     <div>Roll Counts:</div>
                     <div class="active-player-rolls roll-count">X</div>
                     <div class="support-player-rolls roll-count">Y</div>
                 </div>
-                <div class="stat-box">Damage: <span class="scenario-dmg-counter">00</span></div>
-                <div class="scenario-title stat-box">Scenario Title</div>
-                <div class="scenario-stage-hook stat-box">
+                <div class="scenario-health">Damage: <span class="scenario-dmg-counter">00</span></div>
+                <div class="scenario-title ">Scenario Title</div>
+                <div class="scenario-stage-hook ">
                     <!-- This is where the stage templates get put -->
                 </div>
             </div>
@@ -53,7 +54,7 @@
 
     <!-- Player Card Templates -->
     <template id="playerCardTemplate">
-        <div class="player card">
+        <div class="player-card player">
             <div class="portrait">
                 <!-- <img src="twitchProfilePic" alt="active player portrait"> -->
             </div>
@@ -66,7 +67,7 @@
             <div class="player-mechanic-explain">
                 Explain
             </div>
-            <div class="hp-bar stat-box">
+            <div class="hp-bar ">
                 <div class="player-dmg">
                     DMG: <span class="player-dmg-counter">00</span>
                 </div>
@@ -81,7 +82,7 @@
                 <button class="ability-button">Ability</button>
                 <span class="ability-text">Text for the ability.</span>
             </div>
-            <div class="attack-box stat-box player-display-toggle">
+            <div class="attack-box  player-display-toggle">
                 <!-- This is where the attack templates get put -->
             </div>
             <div class="inventory">
@@ -165,7 +166,7 @@
         <div id="scenarioContainer">
 
         </div>
-        <div id="rollingPlayers" class="stat-box">
+        <div id="rollingPlayers" class="">
             <!-- Active Player Card -->
             <div id="activePlayerPosition" class="position">
                 <div id="activePlayerCardHook">
@@ -220,7 +221,7 @@
 
         <!-- Gameboard end div -->
     </div>
-    <div id="devTracker" class="stat-box">
+    <div id="devTracker" class="">
         <div>
             <h2>Your game code is: <span id="sessionCodeDisplay"></span></h2>
             <button class="toggleHidden">Hide Code</button>

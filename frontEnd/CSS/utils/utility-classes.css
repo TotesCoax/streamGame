@@ -1,0 +1,9 @@
+
+.hidden {
+    display: none;
+}
+
+/* This is to create a display toggle based on active/support player status */
+.player-display-toggle {
+    display: none;
+}

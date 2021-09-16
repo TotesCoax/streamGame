@@ -1,0 +1,11 @@
+html {
+    box-sizing: border-box;
+}
+
+.em75 {
+    font-size: .75em;
+}
+
+.em50 {
+    font-size: .5em;
+}

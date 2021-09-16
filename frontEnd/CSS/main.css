@@ -1,0 +1,17 @@
+/* Compile all the individual CSS */
+
+/* Base CSS */
+@import "./base/normalize.css";
+@import "./base/core.css";
+
+/* CSS for components */
+@import "./components/popupcover.css";
+@import "./components/gameboard.css";
+@import "./components/scenarioCard.css";
+@import "./components/playerCards.css";
+@import "./components/dice.css";
+@import "./components/item.css";
+
+
+/* CSS for utilities */
+@import "./utils/utility-classes.css";

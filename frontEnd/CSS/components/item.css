@@ -1,0 +1,20 @@
+/* Items formatting */
+.player-item {
+    width: 100px;
+    border: 1px solid black;
+    background: lightgoldenrodyellow;
+}
+
+.player-item-name {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.player-item.consumed {
+    background:lightgray;
+    opacity: .5;
+}
+
+.playerItem div {
+    color: white;
+}

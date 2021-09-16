@@ -4,23 +4,28 @@ class DicePool {
     constructor(){
         this.pool = []
     }
-    addDie(die){
-        this.pool.push(die)
+    addDice(diceArray){
+        diceArray.forEach(die => this.pool.push(die))
     }
-    removeDie(diceArray) {
-        let index = this.pool.findIndex(die => die.id === target.id)
-        this.pool.splice(index, 1)
+    removeDice(diceArray) {
+        diceArray.forEach(die => {
+            let index = this.pool.findIndex(search => search.id === die.id)
+            this.pool.splice(index, 1)
+        })
     }
     rollPool() {
-        this.hand.forEach(die => die.rollDie())
+        this.pool.forEach(die => die.rollDie())
     }
     sortPool() {
-        this.hand.sort(function(a,b) {
+        this.pool.sort(function(a,b) {
             return a.value - b.value
         })
     }
+    allKeep() {
+        this.pool.forEach(die => die.keep = true)
+    }
     clearPool() {
-        this.hand = []
+        this.pool = []
     }
 }
 
@@ -31,19 +36,16 @@ class AttackHand extends DicePool{
     createAttackSubmission(){
         let submission = []
         for (let i = 0; i < this.pool.length; i++){
-            //console.log(hand[i])
-            if (hand[i].submitted === true){
+            //console.log(this.pool[i])
+            if (this.pool[i].submitted === true){
                 //console.log("Die Moved")
-                submission.push(hand[i])
+                submission.push(this.pool[i])
                 this.pool.splice(i,1)
                 i--
             }
         }
         //console.log(submission)
         return submission
-    }
-    allKeep() {
-        this.pool.forEach(die => die.keep = true)
     }
 }
 
@@ -66,16 +68,13 @@ class Player {
         //Section for Dice related stuff
             //wantsReroll is for the rolling function on the client
             this.wantsReroll = false
-            this.hand = []
+            this.hand = new DicePool()
             this.attackHand = []
         //Exhausted is for selecting supports
         this.exhausted = false
         //Section for debuffs
             //A player is poisoned when this is >0, and takes poison damage each turn, is not mitigated by effects or items.
             this.poison = 0
-    }
-    rollHand(){
-        this.hand.forEach(die => die.roll())
     }
     attack(chosenAttack){
         

@@ -293,6 +293,9 @@ function fillUpPlayers(){
 
         playerInsert.id = playerStats.username.toLowerCase().split(" ").join("")
         playerInsert.classList.add(playerStats.status)
+        if (playerStats.exhausted){
+            playerInsert.classList.add("exhausted")
+        }
         playerInsert.querySelector(".player-name").innerText = playerStats.username.toUpperCase()
         playerInsert.querySelector(".player-class").innerText = "the " + playerStats.playstyle.title
         playerInsert.querySelector(".player-mechanic-explain").innerText = playerStats.playstyle.mechanicExplain

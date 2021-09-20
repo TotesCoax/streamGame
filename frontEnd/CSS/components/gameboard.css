@@ -14,10 +14,6 @@
     display: flex;
 }
 
-#playerContainer div {
-    width: 250px;
-}
-
 .infopane-item {
     border: 1px solid black;
 }
@@ -25,6 +21,7 @@
 
 /* Rolling section formatting */
 #rollingPlayers {
+    background: grey;
     width: 350px;
 }
 

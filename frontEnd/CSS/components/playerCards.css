@@ -1,11 +1,7 @@
 /*Active players formatting*/
 .player-card {
+    width: 350px;
     border: 5px solid black;
-}
-
-.position {
-    display: flex;
-    flex-direction: column;
 }
 
 .active {
@@ -31,8 +27,8 @@
     height: max-content;
 }
 
-.exhausted {
-    opacity: .5;
+.exhausted.inactive {
+    opacity: .66;
 }
 
 

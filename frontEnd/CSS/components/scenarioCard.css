@@ -3,7 +3,6 @@
 .scenario-card {
     width: 500px;
     height: 350px;
-    background-color: antiquewhite;
     border: 5px black solid;
     border-radius: 1%;
 }

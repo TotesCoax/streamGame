@@ -46,19 +46,14 @@
 /* Attacks formatting */
 .player-attack {
     display: flex;
-    background: rgba(119, 136, 153, 0.333);
 }
 
 .player-attack:nth-child(even) {
-    background: lightyellow;
+    background: white;
 }
 
 .attack-info {
     width: 100%;
-}
-
-.attack-name {
-    background: white;
 }
 
 span.attack-damage {

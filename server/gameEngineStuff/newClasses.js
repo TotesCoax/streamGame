@@ -1,22 +1,24 @@
+const {Playstyle} = require("./decks/characters")
+
 //Experimental Classes to work on optimization.
 
 class DicePool {
-    constructor(){
-        this.pool = []
+    constructor(initialDice){
+        this.pool = initialDice
     }
-    addDice(diceArray){
+    add(diceArray){
         diceArray.forEach(die => this.pool.push(die))
     }
-    removeDice(diceArray) {
+    remove(diceArray) {
         diceArray.forEach(die => {
             let index = this.pool.findIndex(search => search.id === die.id)
             this.pool.splice(index, 1)
         })
     }
-    rollPool() {
+    roll() {
         this.pool.forEach(die => die.rollDie())
     }
-    sortPool() {
+    sort() {
         this.pool.sort(function(a,b) {
             return a.value - b.value
         })
@@ -24,7 +26,7 @@ class DicePool {
     allKeep() {
         this.pool.forEach(die => die.keep = true)
     }
-    clearPool() {
+    clear() {
         this.pool = []
     }
 }
@@ -50,7 +52,7 @@ class AttackHand extends DicePool{
 }
 
 
-class Player {
+class PlayerNew {
     constructor(username, playstyle) {
         this.username = username.toLowerCase()
         //this.profilePic = profilePic
@@ -68,7 +70,7 @@ class Player {
         //Section for Dice related stuff
             //wantsReroll is for the rolling function on the client
             this.wantsReroll = false
-            this.hand = new DicePool()
+            this.hand = []
             this.attackHand = []
         //Exhausted is for selecting supports
         this.exhausted = false
@@ -79,4 +81,8 @@ class Player {
     attack(chosenAttack){
         
     }
+}
+
+module.exports = {
+    DicePool, AttackHand, PlayerNew
 }

@@ -1,8 +1,8 @@
-import TestComponent from "./TestComponent"
+import Gameboard from "./Gameboard"
 
 function App() {
   return (
-    <TestComponent />
+    <Gameboard />
   )
 }
 

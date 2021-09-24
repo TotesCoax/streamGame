@@ -166,7 +166,7 @@
         <div id="scenarioContainer">
 
         </div>
-        <div id="rollingPlayers" class="">
+        <div id="rollingPlayers">
             <!-- Active Player Card -->
             <div id="activePlayerPosition" class="position">
                 <div id="activePlayerCardHook">
@@ -237,36 +237,71 @@
         <button id="newGameButton" class="hidden" type="button" onclick="startNewGame()">Start a new game!</button>
         <div class="instructions">
             <h1>Game Rules:</h1>
-            <p>There are 3 levels of scenarios to beat.</p>
-            <p>Each scenario dictates how many dice are rolled.</p>
-            <p>Each scenario has a number of stages to beat in order to defeat the scenario.</p>
-            <p>Stage might have effects that impact certain game elements.</p>
-            <p>Each player turn is one active player and one support player rolling an amount of dice.</p>
-            <p>Only the active and support players can use abilities during the turn</p>
-            <p>Each character has a unique ability.</p>
-            <p>The number of uses per scenario for that ability are determined by the number of players in the game and what level of scenario the party is on.</p>
-            <p>Each support becomes the new active player.</p>
-            <p>This player cycling continues through scenarios.</p>
-            <p>Active only needs to be chose at the start of the game.</p>
-            <p>The default amount of rerolls is two.</p>
-            <p>Both players must reroll their dice pools at the same time.</p>
-            <p>Dice can be marked as kept so they are not rerolled. A die can be unkept at anytime.</p>
-            <p>After rerolls are gone you move to attack phase.</p>
-            <p>All the dice from the rolling phase now become the pool of dice the active player can declare attacks with.</p>
-            <p>Only the active player may issue attacks during the turn.</p>
-            <p>Both the active and support can use abilities in the attack phase if they have uses remaining.</p>
-            <p>In attack phase you mark dice to submit and then declare an attack using those dice.</p>
-            <p>Each playstyle has it's own criteria for what dice are valid for their attack.</p>
-            <p>If you use up all dice for attacks, you trigger a switch.</p>
-            <p>When a switch is triggered, the stage does not counterattack.</p>
-            <p>A stage counterattack applies it's damage to the active player</p>
-            <p>Unless the stage has the AOE tag and that applies damage to all players.</p>
-            <p>If a stage has defense of X (Def:X) then it blocks X damage before taking damage.</p>
-            <p>If one player dies, the game is over. It's all or nothing baby.</p>
-            <p>The player to land the last hit on any scenario is granted an item reward.</p>
-            <p>Some items have passive effects, some are consumables.</p>
-            <p>You can only use consumables after the Active player is declared but before they choose their support.</p>
-            <p>After beating Scenario 2 you are granted a boon (similar to a party-wide item) as well as an item.</p>
+            <div>
+                <h3>General rules</h3>
+                <p>Each player starts by picking a playstyle they would like to play.</p>
+                <p>The game will randomize and pick a series of scenarios to construct an adventure for the party.</p>
+                <p>There are 3 levels of scenarios to beat.</p>
+                <p>If one player dies, the game is over. It's all or nothing baby.</p>
+                <p>The phases of a game are: New Scenario -> New Stage -> New Player Turn -> Rolling Phase -> Attack Phase -> Counter Attack Phase -> End Phase</p>
+            </div>
+            <div>
+                <h3>Scenario & stage rules</h3>
+                <p>Each scenario dictates how many dice are rolled for each player turn.</p>
+                <p>A scenario itself only affects the number of dice that are rolled for every stage in that scenario.</p>
+                <p>Each scenario has a number of stages to beat in order to defeat the scenario.</p>
+                <p>Stages might have effects that impact the gameplay.</p>
+                <p>A stage effect takes effect when the stage is encountered and that effect clears when the stage is defeated.</p>
+                <p>A stage effect can modify multiple things at once as one effect.</p>
+            </div>
+            <div>
+                <h3>Player turn rules</h3>
+                <p>Each player turn is one active player and one support player rolling an amount of dice.</p>
+                <p>Only the active and support players can use abilities during the turn</p>
+                <p>Each character has a unique ability that can affect things in the game.</p>
+                <p>Only the active and support can use abilities in the rolling phase or attack phase if they have uses remaining.</p>
+                <p>The number of uses per scenario for that ability are determined by the number of players in the game and what level of scenario the party is on.</p>
+                <p>Each support becomes the new active player for the next turn.</p>
+                <p>If there are consumable items to use they can be used at this time.</p>
+                <p>The new active player then chooses their new support</p>
+                <p>This player cycling continues through scenarios.</p>
+                <p>The start of the game is the only time the active and support will need to be decided at the same time.</p>
+            </div>
+            <div>
+                <h3>Rolling phase rules</h3>
+                <p>The default amount of rerolls is two.</p>
+                <p>Both players must reroll their dice pools at the same time.</p>
+                <p>Dice can be marked as kept so they are not rerolled. A die can be unkept at anytime.</p>
+                <p>After rerolls are depleted you move to attack phase.</p>
+            </div>
+            <div>
+                <h3>Attack phase rules</h3>
+                <p>All the dice from the rolling phase now become the pool of dice the active player can declare attacks with.</p>
+                <p>Only the active player may issue attacks during the turn.</p>
+                <p>In attack phase you mark dice to submit and then declare an attack using those dice.</p>
+                <p>Each playstyle has it's own criteria for what dice are valid for their attack.</p>
+                <p>If a stage has defense of X (Def:X) then it blocks X damage before taking damage.</p>
+                <p>If you use up all dice for attacks, you trigger a switch.</p>
+                <p>When a switch is triggered, the stage does not counterattack.</p>
+                <p>Even if you apply enough damage to the stage to defeat it, it will still get a chance to counterattack if you do not trigger a switch.</p>
+            </div>
+            <div>
+                <h3>Counterattack phase rules</h3>
+                <p>A stage counterattack applies it's damage to the active player</p>
+                <p>Unless the stage has the AOE tag and that applies damage to all players.</p>
+                <p>The game then moves to the end phase.</p>
+            </div>
+            <div>
+                <h3>End Phase rules</h3>
+                <p>The game checks to see if you have defeated the stage or not. If not, it moves on to a new player turn in the same stage.</p>
+                <p>When you deal enough damage to exceed the stage's health, the stage is defeated and you move onto the next stage.</p>
+                <p>If there are no more stages the scenario is defeated.</p>
+                <p>The player to land the last hit on any scenario is granted an item reward.</p>
+                <p>Some items have passive effects, some are consumables.</p>
+                <p>You can only use consumables after the Active player is assigned but before they choose their support.</p>
+                <p>After beating Scenario 2 the party is granted a boon (similar to a party-wide item) as well as an item to the last hitter.</p>
+                <p>After each scenario is defeated, all players heal to full and their ability uses are refreshed.</p>
+            </div>
         </div>
     </div>
 

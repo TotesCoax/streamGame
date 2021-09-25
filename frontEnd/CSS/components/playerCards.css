@@ -46,6 +46,8 @@
 /* Attacks formatting */
 .player-attack {
     display: flex;
+    padding: 2px;
+    border-top: 3px solid black;
 }
 
 .player-attack:nth-child(even) {

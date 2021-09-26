@@ -13,6 +13,11 @@ joinSessionBtn.addEventListener('click', joinSession)
 
 function newSession(){
     let username = usernameInput.value
+
+    if (username === ""){
+        alert("Please enter a username.")
+    }
+
     socket.emit('newSession', username)
     initialScreen.classList.add("hidden")
 }
@@ -20,6 +25,11 @@ function newSession(){
 function joinSession(){
     let code = sessionCodeInput.value,
         username = usernameInput.value
+
+    if (username === ""){
+        alert("Please enter a username.")
+    }
+    
     socket.emit('joinSession', {gamecode: code, username: username})
 }
 

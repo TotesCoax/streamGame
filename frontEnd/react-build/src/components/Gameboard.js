@@ -1,10 +1,10 @@
 import Scenario from './Scenario'
 
-export default function Gameboard() {
+export default function Gameboard({gameboard}) {
     return (
         <>
         <div>
-            This is the gameboard!
+            {gameboard}
         </div>
         <div className="scenarios">
         <Scenario />

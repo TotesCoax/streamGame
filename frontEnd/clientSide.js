@@ -28,6 +28,7 @@ function joinSession(){
 
     if (username === ""){
         alert("Please enter a username.")
+        return
     }
     
     socket.emit('joinSession', {gamecode: code, username: username})

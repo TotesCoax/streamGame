@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import io from 'socket.io-client'
+import { Button, Container } from 'react-bootstrap'
 
 import Gameboard from "./components/Gameboard"
 
@@ -7,17 +8,21 @@ import Gameboard from "./components/Gameboard"
 
 function App() {
   const [socket, setSocket] = useState(null)
-  const [gameboard, setGameboard] = useState('No gameboard found')
 
   useEffect(() => {
     const newSocket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket', 'polling', 'flashsocket']})
     newSocket.on('init', (msg) => console.log(msg))
     setSocket(newSocket)
-    return () => newSocket.close()
+    return () => {
+      console.log("socket will close");
+      newSocket.close()}
   }, [])
 
   return (
-    <Gameboard gameboard={gameboard}/>
+    <Container>
+      <Button>Button</Button>
+      <Gameboard socket={socket}/>
+    </Container>
   )
 }
 

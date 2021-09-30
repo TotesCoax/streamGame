@@ -1,5 +1,5 @@
-const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket', 'polling', 'flashsocket']})
-// const socket = io("http://localhost:3000", {transports: ['websocket', 'polling', 'flashsocket']})
+// const socket = io("https://calm-plateau-34573.herokuapp.com/", {transports: ['websocket', 'polling', 'flashsocket']})
+const socket = io("http://localhost:3000", {transports: ['websocket', 'polling', 'flashsocket']})
 
 const initialScreen = document.querySelector("#initialScreen")
 const usernameInput = document.querySelector("#usernameInput")
@@ -52,6 +52,7 @@ socket.on('sessionCreated', handleNewSession)
 function handleNewSession(username){
     console.log(username)
     playerUsername = username
+    document.querySelector('#pickCharacterButton').classList.remove("hidden")
     alert(`Welcome, ${playerUsername}!`)
 }
 
@@ -90,7 +91,14 @@ function handlePlayerJoined(username){
     playerUsername = username
     alert(`Welcome, ${playerUsername}!`)
     initialScreen.classList.add("hidden")
+    document.querySelector('#pickCharacterButton').classList.remove("hidden")
     requestBoardExport()
+}
+
+socket.on('charactersReset', handleCharacterReset)
+
+function handleCharacterReset(){
+    document.querySelector('#gameSessionReset').classList.add('hidden')
 }
 
 socket.on('gamestate', handleGamestate)
@@ -99,13 +107,16 @@ function handleGamestate(data){
     // console.log("Gamestate refresh object:", data)
     gameboard = data.boardExport 
     // console.log("New gamestate arrived!", gameboard)
+    console.log(data.type)
     refreshScenario()
     refreshPlayers()
     refreshDMGValues()
+    clearInfopanel()
     //Dice Controller
     switch (data.type) {
         case "startWait":
             insertStartTurnButton()
+            document.querySelector(".attack-hand").classList.add("hidden")
             break;
         case "rollPhase":
             refreshDice()
@@ -116,6 +127,11 @@ function handleGamestate(data){
             break;
         default:
             if (gameboard.gameState.gameOver === true){
+                let gameButtons = document.querySelectorAll('#gameboardContainer button')
+                gameButtons.forEach(button => button.disabled = true)
+                document.querySelector('#gameSessionReset').classList.remove('hidden')
+                document.querySelector('#pickCharacterButton').classList.add('hidden')
+                document.querySelector('#newGameButton').classList.add('hidden')
                 break;
             }
             if (gameboard.attackHand.length > 0){
@@ -126,9 +142,10 @@ function handleGamestate(data){
                 refreshDice()
                 // console.log("Rolling hands refreshed")
             }
-            if (gameboard.gameState.turnCounter > 0 && gameboard.players.findIndex(player => player.status === "support") >= 0){
+            if (gameboard.gameState.turnCounter > 0 && ((gameboard.players.findIndex(player => player.status === "support") >= 0))){
+                //This condition is needed for any rejoins during start of turn phase.
                 insertStartTurnButton()
-            } else if (gameboard.players.findIndex(player => player.status === "active") >= 0 && !(gameboard.players.findIndex(player => player.status === "support") >= 0)){
+            } else if (gameboard.players.findIndex(player => player.status === "active") >= 0 && !((gameboard.players.findIndex(player => player.status === "support") >= 0))){
                 insertItemPhaseOverButton()
             } else if (gameboard.scenarios.length > 0) {
                 insertStartScenarioButton()
@@ -208,10 +225,21 @@ function pickCharacter() {
 //This gets back a gamestate refresh
 function startNewGame() {
     socket.emit('newGame')
+    let gameButtons = document.querySelectorAll('#gameboardContainer button')
+    gameButtons.forEach(button => button.disabled = false)
+
 }
+
+function resetCharacters(){
+    socket.emit('resetCharacters')
+}
+
 
 function startNewTestGame() {
     socket.emit('newTestGame')
+    let gameButtons = document.querySelectorAll('#gameboardContainer button')
+    gameButtons.forEach(button => button.disabled = false)
+
 }
 
 
@@ -368,12 +396,17 @@ function fillUpPlayers(){
     }
 }
 
+function clearInfopanel(){
+    let infopanel = document.querySelector('#infopanel')
+
+    while (infopanel.firstChild){
+        infopanel.removeChild(infopanel.firstChild)
+    }
+}
+
 function insertStartTurnButton(){
     let activePlayer = gameboard.players.find(player => player.status === "active"),
     infopanel = document.querySelector("#infopanel")
-    if(infopanel.firstChild){
-        infopanel.firstChild.remove()
-    }
     // console.log("Insert attack button for: ", activePlayer.username)
     if (gameboard.dicePool.active.length === 0 && gameboard.attackHand.length === 0){
         let startTurnBtn = document.createElement("button")
@@ -385,9 +418,6 @@ function insertStartTurnButton(){
 
 function insertStartScenarioButton(){
     let infopanel = document.querySelector("#infopanel")
-    if(infopanel.firstChild){
-        infopanel.firstChild.remove()
-    }
     console.log("Insert attack button for new scenario!")
     let startNewScenario = document.createElement("button")
     startNewScenario.innerText = "Ready to move on to the next scenario!"
@@ -397,9 +427,6 @@ function insertStartScenarioButton(){
 
 function insertItemPhaseOverButton(){
     let infopanel = document.querySelector("#infopanel")
-    if(infopanel.firstChild){
-        infopanel.firstChild.remove()
-    }
     // console.log("Insert button for moves out of Item phase")
     let startNewScenario = document.createElement("button")
     startNewScenario.innerText = "Move out of items phase"

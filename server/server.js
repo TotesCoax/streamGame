@@ -92,6 +92,14 @@ io.on('connection', client => {
       theMasterController(Game.newGameState(state[roomName]), roomName)
     }
 
+    client.on('resetCharacters', handleResetCharacters)
+
+    function handleResetCharacters(){
+      let roomName = clientRooms[client.id]
+      charactersOpen[roomName] = Game.generateCharacterPool()
+      io.to(roomName).emit('charactersReset')
+    }
+
     client.on('pickCharacter', handlePickCharacter)
 
     function handlePickCharacter(){

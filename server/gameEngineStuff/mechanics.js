@@ -430,6 +430,8 @@ function cleanseRerollPenalty(players){
 function clearOldStageEffects(board){
     cleansePoison(board.players)
     cleanseRerollPenalty(board.players)
+    board.gameState.noAbilities = false
+    board.gameState.noConsumables = false
 }
 
 //--------------------//
@@ -834,8 +836,6 @@ function stageHPchecker(board){
     if (currentScenario.dmgCounter >= currentStage.hp){
         currentScenario.stageCounter++
         currentScenario.dmgCounter = 0
-        board.gameState.noAbilities = false
-        board.gameState.noConsumables = false
         if (currentScenario.stageCounter > (currentScenario.card.stage.length - 1)){
             console.log("achieved switch rate of: ", ((board.gameState.switchCounter / board.gameState.turnCounter) * 100),"%")
             board.gameState.turnCounter = 0

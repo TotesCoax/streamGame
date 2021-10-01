@@ -20,14 +20,14 @@
                 <div class="scenario-image">
                     <!-- <img src="blank" alt="this is the scenario image"> -->
                 </div>
+                <div class="scenario-title ">Scenario Title</div>
                 <div  class="roll-amounts ">
                     <div>Roll Counts:</div>
                     <div class="active-player-rolls roll-count">X</div>
                     <div class="support-player-rolls roll-count">Y</div>
                 </div>
-                <div class="scenario-health">Damage: <span class="scenario-dmg-counter">00</span></div>
-                <div class="scenario-title ">Scenario Title</div>
-                <div class="scenario-stage-hook ">
+                <div class="scenario-health"> Current damage: <span class="scenario-dmg-counter">00</span></div>
+                <div class="scenario-stage-hook">
                     <!-- This is where the stage templates get put -->
                 </div>
             </div>
@@ -36,17 +36,17 @@
         <!-- Scenario Stage template -->
         <template id="scenarioStageTemplate">
             <div class="scenario-stage">
-                <div class="stage-icon">
-                    HP: <span class="stage-hp-stat">XX</span></div>
-                <div class="stage-icon">
-                    DMG: <span class="stage-dmg-stat">YY</span></div>
+                <div class="stage-name">
+                    This stage is stageful
+                </div>
+                <div class="stage-health-box">
+                    Health: <span class="stage-hp-stat">XX</span>
+                </div>
+                    Attack: <span class="stage-atk-stat">YY</span>
                 <div class="stage-def hidden">
                     Defense: <span class="stage-def-stat"></span>
                 </div>
                 <div class="stage-aoe hidden">AOE</div>
-                <div class="stage-name">
-                    This stage is stageful
-                </div>
             </div>
         </template>
         <!-- End Scenario Stage template -->
@@ -58,29 +58,32 @@
             <div class="portrait">
                 <!-- <img src="twitchProfilePic" alt="active player portrait"> -->
             </div>
-            <div class="player-name">
+            <span class="player-name">
                 Username
-            </div>
-            <div class="player-class">
+            </span>
+            <span class="player-class">
                 Class
-            </div>
+            </span>
             <div class="player-mechanic-explain">
                 Explain
             </div>
             <div class="hp-bar ">
-                <div class="player-dmg">
-                    DMG: <span class="player-dmg-counter">00</span>
-                </div>
-                <div class="player-hp">
-                    HP: <span class="player-hp-counter">88</span>
-                </div>
-                <div class="ability-uses">
-                    Uses: <span class="ability-use-counter">X</span>
+                <span class="player-dmg">
+                    Current Dmg: <span class="player-dmg-counter">00</span>
+                </span>
+                <span class="player-hp">
+                    Max HP: <span class="player-hp-counter">88</span>
+                </span>
+                <div>
+                    <meter class="health-bar" min="0" max="100" value="66">at 66/100</meter>
                 </div>
             </div>
             <div class="ability player-display-toggle">
                 <button class="ability-button">Ability</button>
-                <span class="ability-text">Text for the ability.</span>
+                <span class="ability-uses">
+                    Uses: <span class="ability-use-counter">X</span>
+                </span>
+                <div class="ability-text">Text for the ability.</div>
             </div>
             <div class="attack-box  player-display-toggle">
                 <!-- This is where the attack templates get put -->

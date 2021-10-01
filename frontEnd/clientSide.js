@@ -302,7 +302,7 @@ function fillUpScenario(){
     
             newStage.id = `scenario${scenario.card.tier}stage${s}`
             newStage.querySelector(".stage-hp-stat").innerText = stageImport[s].hp
-            newStage.querySelector(".stage-dmg-stat").innerText = stageImport[s].dmg
+            newStage.querySelector(".stage-atk-stat").innerText = stageImport[s].dmg
             if (stageImport[s].def > 0){
                 newStage.querySelector(".stage-def-stat").innerText = stageImport[s].def
                 newStage.querySelector(".stage-def").classList.remove("hidden")
@@ -732,6 +732,10 @@ function refreshDMGValues(){
         document.querySelector(`#${player.username} .player-dmg-counter`).innerText = player.dmgCounter
         document.querySelector(`#${player.username} .player-hp-counter`).innerText = player.playstyle.hpMax[gameboard.level]
         document.querySelector(`#${player.username} .ability-use-counter`).innerText = player.abilityCounter
+        let meter = document.querySelector(`#${player.username} meter`)
+        meter.value = (player.playstyle.hpMax[gameboard.level] - player.dmgCounter)
+        meter.max = player.playstyle.hpMax[gameboard.level]
+        meter.low = (Math.floor(player.playstyle.hpMax[gameboard.level]*.33))
     })
     if (typeof(gameboard.scenarios[gameboard.level]) !== "undefined"){
         scenDMGCounterHTML.innerText = gameboard.scenarios[gameboard.level].dmgCounter 

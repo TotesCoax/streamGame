@@ -840,7 +840,7 @@ function stageHPchecker(board){
             console.log("achieved switch rate of: ", ((board.gameState.switchCounter / board.gameState.turnCounter) * 100),"%")
             board.gameState.turnCounter = 0
             board.gameState.switchCounter = 0
-            currentScenario.defeated === true
+            currentScenario.defeated = true
             return ScenarioCleared(board)
         } else {
             console.log("New Stage being setup!")

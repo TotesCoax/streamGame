@@ -1,17 +1,24 @@
 /*Gameboard formatting*/
+
 #gameboardContainer{
-    width: 100%;
-    height: 100%;
     display: flex;
     flex-wrap: wrap;
+    position: relative;
+    /* Padding is highlighting twitch overlay dead zones */
+    padding: 5rem 7rem 5rem 0rem;
 }
 
 #scenarioContainer {
     height: 100%;
 }
 
+#animationZone {
+    width: 200px;
+}
+
 #playerContainer {
     display: flex;
+    flex-direction: column;
 }
 
 .infopane-item {

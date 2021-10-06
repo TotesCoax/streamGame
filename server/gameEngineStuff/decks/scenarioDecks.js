@@ -25,7 +25,7 @@ let scenario1Deck = [
     ]}
     */
 
-    {name:"Fight the goon squad",
+    {name:"A pack of hooligans",
     tier:0,
     description:"itemDescription",
     activeDice:3,
@@ -74,14 +74,14 @@ let scenario1Deck = [
     },
 
     {
-    name:"Got Ambushed",
+    name:"An illusionary army",
     tier:0,
     description:"itemDescription",
     activeDice:3,
     suppDice:3,
     stage:[
         {
-            name:"Surprise attack",
+            name:"You cannot tell which is the real enemy.",
             hp:20,
             dmg:3,
             def:0,
@@ -91,7 +91,7 @@ let scenario1Deck = [
             }
         },
         {
-            name:"Your counterattack",
+            name:"The spell is broken! The caster is found.",
             hp:20,
             dmg:5,
             def:0,
@@ -133,7 +133,7 @@ let scenario1Deck = [
 
 let scenario2Deck = [
 
-    {name:"Poisoned",
+    {name:"A deadly assassin",
     tier:1,
     description:"itemDescription",
     activeDice:4,
@@ -158,7 +158,7 @@ let scenario2Deck = [
         }
     ]},
 
-    {name:"The Dragon fight",
+    {name:"A large dragon",
     tier:1,
     description:"itemDescription",
     activeDice:4,
@@ -175,7 +175,7 @@ let scenario2Deck = [
             }
         },
         {
-            name:"The dragon lands! The party trembles at it's fearsome presence. Abilities are disabled.",
+            name:"You ground the dragon! The party trembles at it's fearsome presence. Abilities are disabled.",
             hp:20,
             dmg:5,
             def:0,
@@ -199,7 +199,7 @@ let scenario2Deck = [
 
     ]},
 
-    {name:"Fight the big boi",
+    {name:"A large beast",
     tier:1,
     description:"itemDescription",
     activeDice:4,
@@ -220,7 +220,7 @@ let scenario2Deck = [
 ]
 
 let scenario3Deck = [
-    {name:"A giant drunken giant",
+    {name:"Ol' Stumbles the drunken giant.",
     tier:2,
     description:"itemDescription",
     activeDice:4,
@@ -249,7 +249,7 @@ let scenario3Deck = [
 
     ]},
 
-    {name:"Impending DOOM",
+    {name:"The Doomsday Clock",
     tier:2,
     description:"itemDescription",
     activeDice:4,
@@ -268,7 +268,7 @@ let scenario3Deck = [
         }
     ]},
 
-    {name:"I hope this isn't your first rodeo.",
+    {name:"The Passive Aggressor",
     tier:2,
     description:"itemDescription",
     activeDice:4,

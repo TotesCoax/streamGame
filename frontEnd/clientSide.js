@@ -36,7 +36,8 @@ function joinSession(){
 
 let gameboard = {},
     playerUsername,
-    sessionCode
+    sessionCode,
+    alertQueue = new Queue
 
 socket.on('init', handleInit)
 
@@ -53,7 +54,7 @@ function handleNewSession(username){
     console.log(username)
     playerUsername = username
     document.querySelector('#pickCharacterButton').classList.remove("hidden")
-    alert(`Welcome, ${playerUsername}!`)
+    alertQueue.enqueue(`Welcome, ${playerUsername}!`)
 }
 
 socket.on('sessionCode', handleSessionCode)
@@ -89,7 +90,7 @@ socket.on('playerJoined', handlePlayerJoined)
 
 function handlePlayerJoined(username){
     playerUsername = username
-    alert(`Welcome, ${playerUsername}!`)
+    alertQueue.enqueue(`Welcome, ${playerUsername}!`)
     initialScreen.classList.add("hidden")
     document.querySelector('#pickCharacterButton').classList.remove("hidden")
     requestBoardExport()
@@ -168,7 +169,7 @@ socket.on('alert', handleAlert)
 function handleAlert(data) {
     console.log("Alert arrived!")
     // console.log(data)
-    alert(data.message)
+    alertQueue.enqueue(data.message)
     if (!data.gameOver){
         requestBoardExport()
     }
@@ -197,7 +198,7 @@ function handleItemNotice(data){
     refreshDMGValues()
     insertItemPhaseOverButton()
     if (data.switchTriggered){
-        alert(data.switchMessage)
+        alertQueue.enqueue(data.switchMessage)
     }
 }
 
@@ -211,7 +212,7 @@ socket.on("scenarioDefeated", handleScenarioDefeated)
 function handleScenarioDefeated(data){
     console.log("Scenario defeated rec'd", data)
     gameboard = data.boardExport
-    alert(data.scenarioMessage)
+    alertQueue.enqueue(data.scenarioMessage)
     refreshPlayers()
     insertStartScenarioButton()
 }
@@ -874,7 +875,7 @@ function activateAbility(e){
         })
         // console.log(targets)
     } else {
-        alert("You have no ability points left!")
+        alertQueue.enqueue("You have no ability points left!")
     }
 }
 

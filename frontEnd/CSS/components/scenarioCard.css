@@ -8,6 +8,10 @@
     background: white;
 }
 
+.defeated {
+    opacity: .33;
+}
+
 .roll-amounts {
     width: 100px;
     height: 50px;

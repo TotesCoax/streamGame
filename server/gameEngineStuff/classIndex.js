@@ -19,26 +19,11 @@ class Die {
     }
 //This is used in the rolling phase
     toggleKeep() {
-        switch (this.keep) {
-            case true:
-                this.keep = false
-                break;
-            case false:
-                this.keep = true
-                break;
-        }
+        this.keep = !this.keep
     }
 //This is used in the attack phase, attack function looks for submitted dice.
     toggleSubmit() {
-        switch (this.submitted) {
-            case true:
-                this.submitted = false
-                break;
-        
-            case false:
-                this.submitted = true
-                break;
-        }
+        this.submit = !this.submit
     }
 }
 

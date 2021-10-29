@@ -23,11 +23,6 @@ function resetBoard(){
         level: 0,
         itemDeck: [],
         scenarios: [],
-        dicePool: {
-            active: [],
-            support: []
-        },
-        attackHand: [],
         boon: {
             deck: [],
             drawn: []
@@ -39,7 +34,9 @@ function resetBoard(){
             noAbilities: false,
             itemPhase: false,
             gameOver:  false
-        }
+        },
+        alertQueue: [],
+        combatLog: []
     }
     console.log("Board object reset")
     return board
@@ -52,9 +49,11 @@ function exportGamestate(board) {
             players: board.players,
             level: board.level,
             scenarios: board.scenarios,
-            attackHand: board.attackHand,
+            itemDeck: board.itemDeck.length,
             boon: board.boon.drawn,
-            gameState: board.gameState
+            gameState: board.gameState,
+            alertQueue: board.alertQueue,
+            combatLog: board.combatLog
         }
         return boardExport
     } catch (error) {

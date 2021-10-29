@@ -2,9 +2,33 @@ const {Playstyle} = require("./decks/characters")
 
 //Experimental Classes to work on optimization.
 
+class Die {
+    constructor(id) {
+        this.id = id
+        this.value = 0
+        this.keep = false
+        this.submitted = false
+    }
+//This function rolls values 1-6
+    rollDie()  {
+        if (this.keep === false && this.submit == false){
+            this.value = Math.floor(Math.random() * 6) + 1
+        }
+    }
+//This is used in the rolling phase
+    toggleKeep() {
+        this.keep = !this.keep
+    }
+//This is used in the attack phase, attack function looks for submitted dice.
+    toggleSubmit() {
+        this.submit = !this.submit
+    }
+}
+
+
 class DicePool {
-    constructor(initialDice){
-        this.pool = initialDice
+    constructor(){
+        this.pool = []
     }
     add(diceArray){
         diceArray.forEach(die => this.pool.push(die))
@@ -70,6 +94,7 @@ class PlayerNew {
         //Section for Dice related stuff
             //wantsReroll is for the rolling function on the client
             this.wantsReroll = false
+            //These two will be changed by the engine using "new DicePool" and "new Attackhand"
             this.hand = []
             this.attackHand = []
         //Exhausted is for selecting supports
@@ -78,11 +103,9 @@ class PlayerNew {
             //A player is poisoned when this is >0, and takes poison damage each turn, is not mitigated by effects or items.
             this.poison = 0
     }
-    attack(chosenAttack){
-        
-    }
 }
 
+
 module.exports = {
-    DicePool, AttackHand, PlayerNew
+    Die, DicePool, AttackHand, PlayerNew
 }

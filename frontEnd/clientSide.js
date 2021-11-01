@@ -616,6 +616,10 @@ function promptPlayer(data){
     overlay.classList.remove("hidden")
 }
 
+function alertPlayer(message){
+    //write a better alert function for things
+}
+
 function checkPlayerChoice(e) {
     let form = document.querySelector("#overlay .alert form"),
         choice,

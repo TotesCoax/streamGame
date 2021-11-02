@@ -11,6 +11,7 @@
 @import "./components/playerCards.css";
 @import "./components/dice.css";
 @import "./components/item.css";
+@import "./components/alert.css";
 
 
 /* CSS for utilities */

@@ -15,7 +15,7 @@ function newSession(){
     let username = usernameInput.value
 
     if (username === ""){
-        alert("Please enter a username.")
+        alertPlayer("Please enter a username.")
     }
 
     socket.emit('newSession', username)
@@ -27,7 +27,7 @@ function joinSession(){
         username = usernameInput.value
 
     if (username === ""){
-        alert("Please enter a username.")
+        alertPlayer("Please enter a username.")
         return
     }
     
@@ -52,7 +52,7 @@ function handleNewSession(username){
     console.log(username)
     playerUsername = username
     document.querySelector('#pickCharacterButton').classList.remove("hidden")
-    alert(`Welcome, ${playerUsername}!`)
+    alertPlayer(`Welcome, ${playerUsername}!`)
 }
 
 socket.on('sessionCode', handleSessionCode)
@@ -66,14 +66,14 @@ socket.on('noSession', handleNoSession)
 
 function handleNoSession(){
     resetUI()
-    alert("Unknown game code")
+    alertPlayer("Unknown game code")
 }
 
 socket.on('tooManyPlayers', handleTooManyPlayers)
 
 function handleTooManyPlayers(){
     resetUI()
-    alert("Too many players are in that session")
+    alertPlayer("Too many players are in that session")
 }
 
 function resetUI(){
@@ -88,7 +88,7 @@ socket.on('playerJoined', handlePlayerJoined)
 
 function handlePlayerJoined(username){
     playerUsername = username
-    alert(`Welcome, ${playerUsername}!`)
+    alertPlayer(`Welcome, ${playerUsername}!`)
     initialScreen.classList.add("hidden")
     document.querySelector('#pickCharacterButton').classList.remove("hidden")
     requestBoardExport()
@@ -167,7 +167,7 @@ socket.on('alert', handleAlert)
 function handleAlert(data) {
     console.log("Alert arrived!")
     // console.log(data)
-    alert(data.message)
+    alertPlayer(data.message)
     if (!data.gameOver){
         requestBoardExport()
     }
@@ -196,7 +196,7 @@ function handleItemNotice(data){
     refreshDMGValues()
     insertItemPhaseOverButton()
     if (data.switchTriggered){
-        alert(data.switchMessage)
+        alertPlayer(data.switchMessage)
     }
 }
 
@@ -210,7 +210,7 @@ socket.on("scenarioDefeated", handleScenarioDefeated)
 function handleScenarioDefeated(data){
     console.log("Scenario defeated rec'd", data)
     gameboard = data.boardExport
-    alert(data.scenarioMessage)
+    alertPlayer(data.scenarioMessage)
     refreshPlayers()
     insertStartScenarioButton()
 }
@@ -618,6 +618,15 @@ function promptPlayer(data){
 
 function alertPlayer(message){
     //write a better alert function for things
+    let alertBox = document.querySelector("#queueHook"),
+        newAlert = document.createElement('div')
+
+    newAlert.innerText = message
+    newAlert.classList.add('alert')
+    alertBox.appendChild(newAlert)
+    setTimeout(() => {
+        newAlert.remove()
+    }, 5000, newAlert)
 }
 
 function checkPlayerChoice(e) {
@@ -631,7 +640,7 @@ function checkPlayerChoice(e) {
         }
     }
     if (!choice){
-        alert("Please select an option then hit submit.")
+        alertPlayer("Please select an option then hit submit.")
     } else {
         clearPrompt()
         sendPlayerChoice(choice.value, requestCode)
@@ -877,7 +886,7 @@ function activateAbility(e){
         })
         // console.log(targets)
     } else {
-        alert("You have no ability points left!")
+        alertPlayer("You have no ability points left!")
     }
 }
 
